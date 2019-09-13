@@ -16,29 +16,37 @@ LD = $(XBINDIR)/arm-none-eabi-ld
 # -Wall: report all warnings
 # -mcpu=arm920t: generate code for the 920t architecture
 # -msoft-float: no FP co-processor
-CPPFLAGS = -g -S -fPIC -Wall -mcpu=arm920t -msoft-float -I. -I../../include
+CPPFLAGS = -fno-exceptions -fno-unwind-tables -fno-rtti -std=c++17 -g -S -fPIC -Wall -mcpu=arm920t -msoft-float -I. -I../../include
 
 # c: create archive, if necessary
 # r: insert with replacement
 # s: add index to archive
 ARFLAGS = crs
 
+# -static: force static linking
+# -e: set entry point
+# -nmagic: no page alignment
+# -T: use linker script
+LDFLAGS = -static -e main -nmagic -T ../linker.ld -L ../../lib -L $(XLIBDIR2)
+
 .PHONY: all
-all:  bwio.a
+all: main.elf
 
-bwio.s: bwio.c 
-	$(CC) -S $(CPPFLAGS) bwio.c
+main.s: main.cpp
+	$(CC) -S $(CPPFLAGS) main.cpp
 
-bwio.o: bwio.s
-	$(AS) $(ASFLAGS) -o bwio.o bwio.s
+main.o: main.s
+	$(AS) $(ASFLAGS) -o main.o main.s
 
-bwio.a: bwio.o
-	$(AR) $(ARFLAGS) $@ bwio.o
+main.elf: main.o
+	$(LD) $(LDFLAGS) -o $@ main.o -lbwio -lgcc
 
 .PHONY: install
 install: all
-	cp bwio.a ../../lib/libbwio.a
+	cp main.elf ../../build
+	cp main.elf /u/cs452/tftp/ARM/spratap/k1.elf
+	chmod 777 /u/cs452/tftp/ARM/spratap/k1.elf
 
 .PHONY: clean
 clean:
-	-rm -f *.s *.a *.o main.elf ../../lib/libbwio.a
+	-rm -f *.s *.a *.o main.elf
