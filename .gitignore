@@ -3,4 +3,4 @@
 *.s
 *.elf
 *.swp
-
+.nfs*
