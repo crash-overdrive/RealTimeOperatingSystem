@@ -5,9 +5,9 @@ namespace Utility {
             template<class T>
             static void swap(T *x, T *y) {
                 //NOTE: This swap is probably broken
-                T *temp = x; 
-                x = y; 
-                y = temp; 
+                T temp = *x; 
+                *x = *y; 
+                *y = temp; 
                 
             } 
     };

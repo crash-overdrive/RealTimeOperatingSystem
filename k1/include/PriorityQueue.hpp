@@ -7,6 +7,7 @@
 
         // NOTE: T needs to have a default constructor!!
         // NOTE: T needs to be implementing atleast > operator
+        // NOTE: T needs to implement copy constructor
         template <class T, unsigned int length>
         class PriorityQueue {
             protected:
