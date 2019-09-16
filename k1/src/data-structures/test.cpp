@@ -1,10 +1,10 @@
 #include <iostream>
 #include "../../include/RingBuffer.hpp"
-#include "RingBuffer.cpp"
+#include "../../include/PriorityQueue.hpp"
 
 int main() {
 
-    DataStructures::RingBuffer<int> temp;
+    DataStructures::RingBuffer<int, 3> temp;
     std::cout << "Capacity before doing anything is: " << temp.capacity() << std::endl;
     temp.put(501);
     temp.put(301);
@@ -24,6 +24,7 @@ int main() {
     std::cout <<  "Put 700, Isfull?: " << temp.full() << std::endl;
     std::cout << "Get: " << temp.get() << std::endl;
     std::cout <<  "Isfull?: " << temp.full() << std::endl;
+
     return 0;
 
 }
