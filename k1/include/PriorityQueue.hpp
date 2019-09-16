@@ -6,6 +6,7 @@
     namespace DataStructures {
 
         // NOTE: T needs to have a default constructor!!
+        // NOTE: T needs to be implementing atleast > operator
         template <class T, unsigned int length>
         class PriorityQueue {
             protected:
@@ -14,48 +15,49 @@
                 T heap[length];
 
                 // to get index of parent of node at index "index"
-                int parent(int index) { 
+                int parentIndex(int index) { 
                     
                     return (index-1)/2; 
                     
                 } 
             
                 // to get index of left child of node at index "index"
-                int leftChild(int index) { 
+                int leftChildIndex(int index) { 
 
                     return (2*index + 1); 
                     
                 } 
             
                 // to get index of right child of node at index "index"
-                int rightChild(int index) { 
+                int rightChildIndex(int index) { 
                     
                     return (2*index + 2); 
                     
                 } 
 
                 // to heapify a subtree with the root at given index 
-                void MaxHeapify(int index) {
+                void MaxHeapify(int currentIndex) {
 
-                    int left = leftChild(index); 
-                    int right = rightChild(index); 
-                    int largest = index; 
-                    if (left < heapSize && heap[left] > heap[largest]) {
+                    int leftIndex = leftChildIndex(currentIndex); 
+                    int rightIndex = rightChildIndex(currentIndex); 
+                    int largestElementIndex = currentIndex; 
+                    
+                    if (leftIndex < heapSize && heap[leftIndex] > heap[largestElementIndex]) {
 
-                        largest = left; 
+                        largestElementIndex = leftIndex; 
 
                     }
                         
-                    if (right < heapSize && heap[right] > heap[largest]) {
+                    if (rightIndex < heapSize && heap[rightIndex] > heap[largestElementIndex]) {
 
-                        largest = right;
+                        largestElementIndex = rightIndex;
 
                     } 
                          
-                    if (largest != index) { 
+                    if (largestElementIndex != currentIndex) { 
 
-                        Utility::Util::swap(&heap[index], &heap[largest]); 
-                        MaxHeapify(largest); 
+                        Utility::Util::swap(&heap[currentIndex], &heap[largestElementIndex]); 
+                        MaxHeapify(largestElementIndex); 
 
                     } 
 
@@ -71,7 +73,7 @@
 
                 // Inserts a new key 'key' 
                 // Does nothing if queue is already full
-                void push(int key) {
+                void push(T key) {
                     
                     if (heapSize == maxSize) { 
 
@@ -79,28 +81,28 @@
 
                     } 
                 
-                    // First insert the new key at the end 
+                    // First insert the new key at the end of heap
                     heapSize++; 
-                    int index = heapSize - 1; 
-                    heap[index] = key; 
+                    int indexToBeInsertedAt = heapSize - 1; 
+                    heap[indexToBeInsertedAt] = key; 
                 
                     // Fix the max heap property if it is violated 
-                    while (index != 0 && heap[parent(index)] < heap[index]) {
+                    while (indexToBeInsertedAt != 0 && heap[indexToBeInsertedAt] > heap[parentIndex(indexToBeInsertedAt)]) {
 
-                        Utility::Util::swap(&heap[index], &heap[parent(index)]); 
-                        index = parent(index); 
+                        Utility::Util::swap(&heap[indexToBeInsertedAt], &heap[parentIndex(indexToBeInsertedAt)]); 
+                        indexToBeInsertedAt = parentIndex(indexToBeInsertedAt); 
 
                     } 
 
                 }
             
                 // Returns the maximum key (key at root) from max heap (and removes it from queue)
-                // Returns 0 if called on empty queue
-                int pop() { 
+                // Returns T() if called on empty queue
+                T pop() { 
                     
                     if (heapSize <= 0) {
 
-                        return INT32_MIN;
+                        return T();
 
                     }
  
@@ -112,7 +114,7 @@
                     } 
                 
                     // Store the maximum value, and remove it from heap 
-                    int root = heap[0]; 
+                    T root = heap[0]; 
                     heap[0] = heap[heapSize-1]; 
                     heapSize--; 
                     MaxHeapify(0); 
