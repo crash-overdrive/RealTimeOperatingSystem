@@ -4,7 +4,7 @@
 
     namespace DataStructures {
 
-        // T must have a default constructor
+        // NOTE: T must have a default constructor!!
         template<class T, unsigned int length>
         class RingBuffer {
 
@@ -25,7 +25,7 @@
                 }
 
                 // NOTE: if buffer is full, then put will overwrite the oldest value
-                void put(T item) {
+                void push(T item) {
 
                     buffer[head] = item;
 
@@ -42,7 +42,7 @@
                 }
 
                 // NOTE: if buffer was full and values were overwritten, then will return the oldest value in the buffer
-                T get() {
+                T pop() {
 
                     if(empty()) {
                         return T();
