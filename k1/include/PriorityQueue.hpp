@@ -1,19 +1,19 @@
 #ifndef PRIORITY_QUEUE_H
     #define PRIORITY_QUEUE_H
-
-    #include "../src/util/Utility.cpp"
+    
+    #include "Util.hpp"
 
     namespace DataStructures {
 
-        // NOTE: T needs to have a default constructor!!
-        // NOTE: T needs to be implementing atleast > operator
-        // NOTE: T needs to implement copy constructor
+        // NOTE: Template class T needs to have a default constructor!!
+        // NOTE: Template class T should have a comparator for 2 pointers to evaluate which is greater
         template <class T, unsigned int length>
         class PriorityQueue {
             protected:
-                const unsigned int maxSize = length;
-                unsigned int heapSize;
-                T heap[length];
+                const int maxSize = length;
+                int heapSize;
+                T* heap[length];
+                bool (* isGreaterThan)(T*, T*);
 
                 // to get index of parent of node at index "index"
                 int parentIndex(int index) { 
@@ -43,21 +43,21 @@
                     int rightIndex = rightChildIndex(currentIndex); 
                     int largestElementIndex = currentIndex; 
                     
-                    if (leftIndex < heapSize && heap[leftIndex] > heap[largestElementIndex]) {
+                    if (leftIndex < heapSize && isGreaterThan(heap[leftIndex], heap[largestElementIndex])) {
 
                         largestElementIndex = leftIndex; 
 
                     }
                         
-                    if (rightIndex < heapSize && heap[rightIndex] > heap[largestElementIndex]) {
+                    if (rightIndex < heapSize && isGreaterThan(heap[rightIndex], heap[largestElementIndex])) {
 
                         largestElementIndex = rightIndex;
 
                     } 
                          
                     if (largestElementIndex != currentIndex) { 
-
-                        Utility::Util::swap(&heap[currentIndex], &heap[largestElementIndex]); 
+                        
+                        Util::swap(&heap[currentIndex], &heap[largestElementIndex]); 
                         MaxHeapify(largestElementIndex); 
 
                     } 
@@ -66,15 +66,16 @@
                 
 
             public:
-                PriorityQueue<T, length>() {
+                PriorityQueue<T, length>(bool (* comparator)(T*, T*)) {
 
                     heapSize = 0;
+                    isGreaterThan = comparator;
 
                 };
 
                 // Inserts a new key 'key' 
                 // Does nothing if queue is already full
-                void push(T key) {
+                void push(T* key) {
                     
                     if (heapSize == maxSize) { 
 
@@ -88,9 +89,9 @@
                     heap[indexToBeInsertedAt] = key; 
                 
                     // Fix the max heap property if it is violated 
-                    while (indexToBeInsertedAt != 0 && heap[indexToBeInsertedAt] > heap[parentIndex(indexToBeInsertedAt)]) {
+                    while (indexToBeInsertedAt != 0 && isGreaterThan(heap[indexToBeInsertedAt], heap[parentIndex(indexToBeInsertedAt)])) {
 
-                        Utility::Util::swap(&heap[indexToBeInsertedAt], &heap[parentIndex(indexToBeInsertedAt)]); 
+                        Util::swap(&heap[indexToBeInsertedAt], &heap[parentIndex(indexToBeInsertedAt)]); 
                         indexToBeInsertedAt = parentIndex(indexToBeInsertedAt); 
 
                     } 
@@ -98,12 +99,12 @@
                 }
             
                 // Returns the maximum key (key at root) from max heap (and removes it from queue)
-                // Returns T() if called on empty queue
-                T pop() { 
+                // Returns nullptr if called on empty queue
+                T* pop() { 
                     
                     if (heapSize <= 0) {
 
-                        return T();
+                        return nullptr;
 
                     }
  
@@ -115,7 +116,7 @@
                     } 
                 
                     // Store the maximum value, and remove it from heap 
-                    T root = heap[0]; 
+                    T* root = heap[0]; 
                     heap[0] = heap[heapSize-1]; 
                     heapSize--; 
                     MaxHeapify(0); 

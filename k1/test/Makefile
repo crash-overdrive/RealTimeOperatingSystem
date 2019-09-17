@@ -1,5 +1,5 @@
 #
-# Makefile for main.cpp
+# Makefile 
 #
 XDIR=/u/cs452/public/xdev
 XBINDIR=$(XDIR)/bin
@@ -16,7 +16,7 @@ LD = $(XBINDIR)/arm-none-eabi-ld
 # -Wall: report all warnings
 # -mcpu=arm920t: generate code for the 920t architecture
 # -msoft-float: no FP co-processor
-CPPFLAGS = -fno-exceptions -fno-unwind-tables -fno-rtti -std=c++17 -g -S -fPIC -Wall -mcpu=arm920t -msoft-float -I. -I../../include
+CPPFLAGS = -fno-exceptions -fno-unwind-tables -fno-rtti -std=c++17 -g -S -fPIC -Wall -mcpu=arm920t -msoft-float -I. -I../include
 
 # c: create archive, if necessary
 # r: insert with replacement
@@ -27,26 +27,26 @@ ARFLAGS = crs
 # -e: set entry point
 # -nmagic: no page alignment
 # -T: use linker script
-LDFLAGS = -static -e main -nmagic -T ../linker.ld -L ../../lib -L $(XLIBDIR2)
+LDFLAGS = -static -e TestSuite -nmagic -T ../src/linker.ld -L ../lib -L $(XLIBDIR2)
 
 .PHONY: all
-all: main.elf
+all: TestSuite.elf
 
-main.s: main.cpp
-	$(CC) -S $(CPPFLAGS) main.cpp
+TestSuite.s: TestSuite.cpp
+	$(CC) -S $(CPPFLAGS) -O3 TestSuite.cpp
 
-main.o: main.s
-	$(AS) $(ASFLAGS) -o main.o main.s
+TestSuite.o: TestSuite.s
+	$(AS) $(ASFLAGS) -o TestSuite.o TestSuite.s
 
-main.elf: main.o
-	$(LD) $(LDFLAGS) -o $@ main.o -lbwio -lgcc
+TestSuite.elf: TestSuite.o
+	$(LD) $(LDFLAGS) -o $@ TestSuite.o -lgcc
 
 .PHONY: install
 install: all
-	cp main.elf ../../build
-	cp main.elf /u/cs452/tftp/ARM/spratap/k1.elf
-	chmod 777 /u/cs452/tftp/ARM/spratap/k1.elf
+	cp TestSuite.elf ../build
+	cp TestSuite.elf /u/cs452/tftp/ARM/spratap/TestSuite.elf
+	chmod 777 /u/cs452/tftp/ARM/spratap/TestSuite.elf
 
 .PHONY: clean
 clean:
-	-rm -f *.s *.a *.o main.elf
+	-rm -f *.s *.a *.o *.out TestSuite.elf
