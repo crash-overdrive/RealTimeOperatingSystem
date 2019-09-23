@@ -16,7 +16,7 @@ LD = $(XBINDIR)/arm-none-eabi-ld
 # -Wall: report all warnings
 # -mcpu=arm920t: generate code for the 920t architecture
 # -msoft-float: no FP co-processor
-CPPFLAGS = -fno-exceptions -fno-unwind-tables -fno-rtti -std=c++17 -g -S -fPIC -Wall -mcpu=arm920t -msoft-float -I. -I../include
+CPPFLAGS = -fno-exceptions -fno-unwind-tables -fno-rtti -std=c++17 -g -S -fPIC -Wall -mcpu=arm920t -msoft-float -O3 -I. -I../include
 
 # c: create archive, if necessary
 # r: insert with replacement
@@ -33,13 +33,13 @@ LDFLAGS = -static -e TestSuite -nmagic -T ../src/linker.ld -L ../lib -L $(XLIBDI
 all: TestSuite.elf
 
 TestSuite.s: TestSuite.cpp
-	$(CC) -S $(CPPFLAGS) -O3 TestSuite.cpp
+	$(CC) -S $(CPPFLAGS) TestSuite.cpp
 
 TestSuite.o: TestSuite.s
 	$(AS) $(ASFLAGS) -o TestSuite.o TestSuite.s
 
 TestSuite.elf: TestSuite.o
-	$(LD) $(LDFLAGS) -o $@ TestSuite.o -lgcc
+	$(LD) $(LDFLAGS) -o $@ TestSuite.o -lbwio -lgcc
 
 .PHONY: install
 install: all
