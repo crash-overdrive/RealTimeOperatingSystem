@@ -1,90 +1,87 @@
 #ifndef PRIORITY_QUEUE_H
-    #define PRIORITY_QUEUE_H
-    
-    #include "RingBuffer.hpp"
-    #include "Util.hpp"
+#define PRIORITY_QUEUE_H
 
-    namespace DataStructures {
+#include "RingBuffer.hpp"
+#include "Util.hpp"
 
-        // NOTE: Template class T needs to have a default constructor!!        
-        // NOTE: Lower priority numbers means high priority
-        template <class T, unsigned int rows, unsigned int columns>
-        class PriorityQueue {
+namespace DataStructures {
 
-            protected:
+// NOTE: Template class T needs to have a default constructor!!
+// NOTE: Lower priority numbers means high priority
+template <class T, unsigned int rows, unsigned int columns>
+class PriorityQueue {
 
-                const int maxNumberOfPriorities = rows;
-                const int maxNumberOfSamePriorities = columns;
-                RingBuffer<T, columns> queue[rows];
+    private:
+        const int maxNumberOfPriorities = rows;
+        const int maxNumberOfSamePriorities = columns;
+        RingBuffer<T, columns> queue[rows];
 
-            public:
+    public:
+        PriorityQueue<T, rows, columns>() {
 
-                PriorityQueue<T, rows, columns>() {
+        }
 
-                }
+        // NOTE: if ring buffer of priority is full, then put will overwrite the oldest value
+        // NOTE: if priority is not in the range then its ignored
+        void push(T* item, int priority) {
 
-                // NOTE: if ring buffer of priority is full, then put will overwrite the oldest value
-                // NOTE: if priority is not in the range then its ignored
-                void push(T* item, int priority) {
-                    
-                    if (priority >= 0 && priority < maxNumberOfPriorities) {
+            if (priority >= 0 && priority < maxNumberOfPriorities) {
 
-                        queue[priority].push(item);
+                queue[priority].push(item);
 
-                    }
+            }
 
-                }
+        }
 
-                // NOTE: if all RingBuffers were empty then will return nullptr
-                T* pop() {
+        // NOTE: if all RingBuffers were empty then will return nullptr
+        T* pop() {
 
-                    for(int i = 0; i < maxNumberOfPriorities; ++i) {
+            for(int i = 0; i < maxNumberOfPriorities; ++i) {
 
-                        if (!(queue[i].empty())) {
+                if (!(queue[i].empty())) {
 
-                            T* val = queue[i].pop();
-                            return val;
-
-                        }
-
-                    }
-
-                    return nullptr;
+                    T* val = queue[i].pop();
+                    return val;
 
                 }
 
-                void reset() {
-                    
-                    for(int i = 0; i < maxNumberOfPriorities; ++i) {
+            }
 
-                        queue[i].reset();
+            return nullptr;
 
-                    }
-                    
+        }
+
+        void reset() {
+
+            for(int i = 0; i < maxNumberOfPriorities; ++i) {
+
+                queue[i].reset();
+
+            }
+
+        }
+
+        bool empty() const {
+
+            bool isEmpty = true;
+
+            for(int i = 0; i < maxNumberOfPriorities; ++i) {
+
+                if (!(queue[i].empty())) {
+
+                    isEmpty = false;
+                    break;
 
                 }
 
-                bool empty() const {
+            }
 
-                    bool isEmpty = true;
+            return isEmpty;
 
-                    for(int i = 0; i < maxNumberOfPriorities; ++i) {
+        }
 
-                        if (!(queue[i].empty())) {
+};
 
-                            isEmpty = false;
-                            break;
-
-                        }
-
-                    }
-
-                    return isEmpty;
-
-                }
-
-        };
-
-    }
+}
 
 #endif
