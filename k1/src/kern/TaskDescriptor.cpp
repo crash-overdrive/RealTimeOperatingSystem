@@ -9,7 +9,7 @@ class TaskDescriptor {
         int retval;
         TaskDescriptor * taskParent;
         Constants::STATE taskState;
-        char stack[Constants::KIBIBYTE];
+        char stack[Constants::TD_STACK_SIZE];
     public:
 
 };
