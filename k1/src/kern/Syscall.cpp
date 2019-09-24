@@ -1,5 +1,9 @@
+#include "../../include/UserSyscall.hpp"
+#include "../../include/Syscall.hpp"
+
 
 int Create(int priority, void (*function)()) {
+    return sysCreate(priority, function);
     // assembly pushes priority and function on stack???
     // save rx, ry
     // set rx = priority
@@ -9,13 +13,36 @@ int Create(int priority, void (*function)()) {
 }
 
 
-int MyTid();
+int MyTid() {
+    return sysMyTid();
+}
 
 
-int MyParentTid();
+int MyParentTid() {
+    return sysMyParentTid();
+}
 
 
-void Yield();
+void Yield() {
+    sysYield();
+}
 
 
-void Exit();
+void Exit() {
+    sysExit();
+}
+
+
+int sysCreate(int priority, void (*function)());
+
+
+int sysMyTid();
+
+
+int sysMyParentTid();
+
+
+void sysYield();
+
+
+void sysExit();
