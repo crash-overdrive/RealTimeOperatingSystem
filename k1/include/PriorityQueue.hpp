@@ -1,5 +1,5 @@
-#ifndef PRIORITY_QUEUE_H
-#define PRIORITY_QUEUE_H
+#ifndef PRIORITY_QUEUE_HPP
+#define PRIORITY_QUEUE_HPP
 
 #include "RingBuffer.hpp"
 #include "Util.hpp"

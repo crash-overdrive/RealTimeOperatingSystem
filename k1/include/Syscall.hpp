@@ -1,3 +1,6 @@
+#ifndef SYSCALL_HPP
+#define SYSCALL_HPP
+
 /*
  * Allocates and initializes a task descriptor, using the given priority, and the given function pointer as a pointer to the entry point of executable code,
  * essentially a function with no arguments and no return value. When Create returns, the task descriptor has all the state needed to run the task, the task’s
@@ -37,3 +40,5 @@ void sysYield();
  * task, primarily its memory and task descriptor, are not.
  */
 void sysExit();
+
+#endif

@@ -1,5 +1,5 @@
-#ifndef RING_BUFFER_H
-#define RING_BUFFER_H
+#ifndef RING_BUFFER_HPP
+#define RING_BUFFER_HPP
 
 
 namespace DataStructures {
