@@ -7,7 +7,7 @@ namespace Constants {
     const int EXIT_Q_LENGTH = 128;
     const int TD_STACK_SIZE = 131072;
     const int NUM_TASKS = 128;
-    const enum STATE {
+    enum STATE {
         ACTIVE,
         READY,
         BLOCKED

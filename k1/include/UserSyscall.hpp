@@ -15,9 +15,7 @@ int Create(int priority, void (*function)());
 
 /*
  * Returns the task id of the calling task.
- * #ifndef RING_BUFFER_H
-#define RING_BUFFER_H
-
+ * 
  * Returns:
  *   tid: the positive integer task id of the task that calls it.
  */

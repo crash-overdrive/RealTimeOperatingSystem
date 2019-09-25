@@ -4,12 +4,15 @@
 
 class TaskDescriptor {
 
-    private:
+    public:
         // TaskStack *;
-        int retval;
+        int returnValue;
         TaskDescriptor * taskParent;
         Constants::STATE taskState;
         char stack[Constants::TD_STACK_SIZE];
-    public:
+        int stackPointer;
+        int cpsr;
+        int pc;
+    
 
 };

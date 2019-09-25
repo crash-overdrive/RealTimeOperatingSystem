@@ -1,6 +1,10 @@
 #ifndef UTIL_HPP
 #define UTIL_HPP
 
+extern "C" {
+	#include <bwio.h>
+}
+
 namespace Util {
     
     // A utility function to swap two templates by their pointers 
@@ -13,7 +17,7 @@ namespace Util {
 
     void assert(bool expression) {
         if (!expression) {
-            for(;;);
+            bwprintf(COM2, "!!!!!!!!!!!!!!!!1Assertion Failure!!!!!!!!!!!!!!");
         }
 
     }
