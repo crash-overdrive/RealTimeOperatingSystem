@@ -3,6 +3,12 @@
 #include "../../include/Util.hpp"
 #include "TaskDescriptor.cpp"
 
+#define FOREVER for(;;)
+
+extern "C" {
+	#include <bwio.h>
+}
+
 class Kernel {
 
     private:
@@ -11,26 +17,28 @@ class Kernel {
         DataStructures::RingBuffer<TaskDescriptor, Constants::EXIT_Q_LENGTH> exit_queue;
 
         TaskDescriptor tasks[Constants::NUM_TASKS];
-        TaskDescriptor* activeTask;
 
-    public:
+        TaskDescriptor* activeTask;
+        int request;
+
         void initialize() {
             // TODO: implement me
             // setup comm
         }
 
-        // Returns the task descriptor of the next scheduled task
-        TaskDescriptor *schedule() {
-            return ready_queue.pop();
+        // Sets the active task to the task descriptor of the next scheduled task.
+        void schedule() {
+            // TODO: what happens when ready_queue is empty?
+            activeTask = ready_queue.pop();
         }
 
-        int activate(TaskDescriptor *active) {
+        int activate() {
 
             // Kernel exits from here!!
             kernel_exit:
 
             // Move cpsr of active task into spsr_svc
-            asm volatile("msr spsr_svc, %r0" :: "r"(active->cpsr));
+            asm volatile("msr spsr_svc, %r0" :: "r"(activeTask->cpsr));
 
             // store kernel state on kernel stack
             asm volatile("stmfd sp_svc! {r0-r12, lr_svc}");
@@ -38,7 +46,7 @@ class Kernel {
             asm volatile("stmfd sp_svc! {r12}");
 
             // Move the next pc into lr_svc
-            asm volatile("mov lr_svc, %r0" :: "r"(active->pc));
+            asm volatile("mov lr_svc, %r0" :: "r"(activeTask->pc));
 
             // Change to system mode
             // TODO: check if this works
@@ -53,7 +61,7 @@ class Kernel {
             asm volatile("ldr cpsr 0b10011");
 
             // Set return value by overwriting r0
-            asm volatile("mov r0, %r0" :: "r"(active->returnValue));
+            asm volatile("mov r0, %r0" :: "r"(activeTask->returnValue));
 
             // Go back to user mode
             asm volatile("movs pc lr_svc");
@@ -81,17 +89,17 @@ class Kernel {
             // sp is decremented appropriately and saved into the task descriptor
             // cpsr for user mode is saved in spsr_svc, need to save that into task descriptor as well!!
             asm volatile("stmfd sp_usr! {r4-r11, lr}");
-            asm volatile("mov %r0, sp_usr" : "=r"(active->stackPointer));
+            asm volatile("mov %r0, sp_usr" : "=r"(activeTask->stackPointer));
 
             // Return to supervisor mode
             // TODO: check if this works
             asm volatile("ldr cpsr 0b10011");
 
             // Saving cspr of user mode into task descriptor
-            asm volatile("mrs %r0, spsr_svc" : "=r"(active->cpsr));
+            asm volatile("mrs %r0, spsr_svc" : "=r"(activeTask->cpsr));
 
             // Saving pc of user mode into task descriptor
-            asm volatile("mov %r0, lr_svc" : "=r"(active->pc));
+            asm volatile("mov %r0, lr_svc" : "=r"(activeTask->pc));
 
             // Get Request type
             int requestCode;
@@ -118,6 +126,19 @@ class Kernel {
         // TODO: determine if this should return anything
         void handle(int request) {
             // TODO: implement me
+        }
+
+
+    public:
+        void run() {
+            initialize(); // includes starting the first task
+            FOREVER {
+                schedule();
+                if (activeTask == nullptr) { continue; }
+                request = activate();
+                handle(request);
+            }
+            bwprintf(COM2, "It doesn't work!");
         }
 
 };
