@@ -17,7 +17,7 @@ namespace Util {
 
     void assert(bool expression) {
         if (!expression) {
-            bwprintf(COM2, "!!!!!!!!!!!!!!!!1Assertion Failure!!!!!!!!!!!!!!");
+            bwprintf(COM2, "!!!!!!!!!!!!!!!!!Assertion Failure!!!!!!!!!!!!!!");
         }
 
     }

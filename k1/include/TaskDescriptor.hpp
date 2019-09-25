@@ -1,5 +1,5 @@
-#include "../../include/RingBuffer.hpp"
-#include "../../include/Constants.hpp"
+#include "RingBuffer.hpp"
+#include "Constants.hpp"
 
 
 class TaskDescriptor {
