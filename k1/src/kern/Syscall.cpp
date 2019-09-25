@@ -1,15 +1,16 @@
 #include "../../include/UserSyscall.hpp"
 #include "../../include/Syscall.hpp"
-
+    
+enum SYSCALL {
+    CREATE = 2,
+    MY_TID,
+    PARENT_TID,
+    YIELD,
+    EXIT
+};
 
 int Create(int priority, void (*function)()) {
     return sysCreate(priority, function);
-    // assembly pushes priority and function on stack???
-    // save rx, ry
-    // set rx = priority
-    // set ry = fn pointer
-    // call swi,2
-    // restore rx, ry
 }
 
 
@@ -33,16 +34,37 @@ void Exit() {
 }
 
 
-int sysCreate(int priority, void (*function)());
+int sysCreate(int priority, void (*function)()) {
+    // r0 = priority, r1 = function ptr
+    asm volatile("stmdb {r0-r3, r12}");
+    asm volatile("swi 2");
+    asm volatile("ldmai {r0-r3, r12}");
+}
 
 
-int sysMyTid();
+int sysMyTid() {
+    asm volatile("stmdb {r0-r3, r12}");
+    asm volatile("swi 3");
+    asm volatile("ldmai {r0-r3, r12}");
+}
 
 
-int sysMyParentTid();
+int sysMyParentTid() {
+    asm volatile("stmdb {r0-r3, r12}");
+    asm volatile("swi 4");
+    asm volatile("ldmai {r0-r3, r12}");
+}
 
 
-void sysYield();
+void sysYield() {
+    asm volatile("stmdb {r0-r3, r12}");
+    asm volatile("swi 5");
+    asm volatile("ldmai {r0-r3, r12}");
+}
 
 
-void sysExit();
+void sysExit() {
+    asm volatile("stmdb {r0-r3, r12}");
+    asm volatile("swi 6");
+    asm volatile("ldmai {r0-r3, r12}");
+}
