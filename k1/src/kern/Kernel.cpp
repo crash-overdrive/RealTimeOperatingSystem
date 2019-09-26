@@ -26,48 +26,53 @@ void Kernel::schedule() {
 int Kernel::activate() {
 
     bwprintf(COM2, "Entered activate\n");
+    bwprintf(COM2, "TID: %d \n", activeTask->tid);
+    bwprintf(COM2, "Parent TID: %d \n", activeTask->parentTid);
+    bwprintf(COM2, "CPSR: %d \n", activeTask->cpsr);
+    bwprintf(COM2, "PC: %d \n", activeTask->pc);
+    bwprintf(COM2, "R0: %d \n", activeTask->r0);
+    bwprintf(COM2, "SP: %d \n", activeTask->sp);
+    
 
     // Kernel exits from here!!
 
     // SUPERVISOR MODE
     // Move cpsr of active task into spsr_svc
-    bwprintf(COM2, "1\n");
     asm volatile("msr spsr, %r0" :: "r"(activeTask->cpsr));
 
     // SUPERVISOR MODE
     // store kernel state on kernel stack
-    bwprintf(COM2, "1\n");
     asm volatile("stmfd sp!, {r0-r12, lr}");
     asm volatile("mrs r12, cpsr");
     asm volatile("stmfd sp!, {r12}");
 
     // SUPERVISOR MODE
     // Move the next pc into lr_svc
-    bwprintf(COM2, "1\n");
     asm volatile("mov lr, %r0" :: "r"(activeTask->pc));
 
     // SUPERVISOR MODE
+    // Set return value by overwriting r0
+    asm volatile("mov r0, %r0" :: "r" (activeTask->r0));
+    
+    // SUPERVISOR MODE
     // Change to system mode
-    bwprintf(COM2, "1\n");
-    asm volatile("msr cpsr_c, #0b11111");
-    bwprintf(COM2, "2\n");
+    asm volatile("mov r12, #0b11111");
+    asm volatile("msr cpsr_c, r12");
 
     // SYSTEM MODE
-    // TODO:implement this
-    // Load registers from user stack
-    bwprintf(COM2, "3\n");
+    // set the right stack first into sp_usr
+    asm volatile("mov sp, %r0" :: "r"(activeTask->sp));
+
+    // SYSTEM MODE
+    // and then Load registers from user stack
     asm volatile("ldmfd sp!, {r4-r11, lr}");
 
     // SYSTEM MODE
     // Return to supervisor mode
-    bwprintf(COM2, "4\n");
+    
     asm volatile("mov r12, #0b10011");
-    asm volatile("msr cpsr, r12");
-
-    // SUPERVISOR MODE
-    // Set return value by overwriting r0
-    bwprintf(COM2, "5\n");
-    asm volatile("mov r0, %r0" :: "r"(activeTask->r0));
+    asm volatile("msr cpsr_c, r12");
+ 
 
     bwprintf(COM2, "About to leave kernel mode!!\n");
 
@@ -75,12 +80,14 @@ int Kernel::activate() {
     // Go back to user mode
     bwprintf(COM2, "6\n");
     asm volatile("movs pc, lr");
+
     // !!!!!!!!!!!!KERNEL EXITED!!!!!!!!!!!!
 
 
 
-
+    
     // Should never reach here!! some bug if it reached here!
+    bwprintf(COM2, "If you see this then something is really wrong\n");
     Util::assert(false);
 
 
@@ -208,7 +215,6 @@ int Kernel::handleCreate(int priority, int (*function)()) {
         return -2;  
     }  
     
-    tasks[taskNumber];
     TaskDescriptor* newTD = &tasks[taskNumber];
 
     newTD->tid = availableTid;
@@ -230,18 +236,18 @@ int Kernel::handleCreate(int priority, int (*function)()) {
 
     // setting the stack [r4-r11, lr]
     
-    newTD->stack[0] = 0xdeadbeef; // for debugging purposes
-    newTD->stack[1] = 0; // r4
-    newTD->stack[2] = 0; // r5
-    newTD->stack[3] = 0; // r6
-    newTD->stack[4] = 0; // r7
-    newTD->stack[5] = 0; // r8
-    newTD->stack[6] = 0; // r9
-    newTD->stack[7] = 0; // r10
-    newTD->stack[8] = 0; // r11
-    newTD->stack[9] = 0; // TODO: fix lr
+    newTD->stack[32767] = 0xdeadbeef; // for debugging purposes
+    newTD->stack[32766] = 1; // r4
+    newTD->stack[32765] = 2; // r5
+    newTD->stack[32764] = 3; // r6
+    newTD->stack[32763] = 4; // r7
+    newTD->stack[32762] = 5; // r8
+    newTD->stack[32761] = 6; // r9
+    newTD->stack[32760] = 7; // r10
+    newTD->stack[32759] = 8; // r11
+    newTD->stack[32758] = 9; // TODO: fix lr
 
-    newTD->sp = &(newTD->stack[9]);
+    newTD->sp = &(newTD->stack[32758]);
 
     
 
@@ -265,6 +271,7 @@ void Kernel::handleExit() {
 }
 
 int Kernel::firstTask() {
+    bwprintf(COM2, "Entered USER TASK!!!");
     int a = 1;
     int b = 2;
     int c = a + b;
