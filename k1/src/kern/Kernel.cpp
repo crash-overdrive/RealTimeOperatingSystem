@@ -1,6 +1,7 @@
 #include "../../include/Kernel.hpp"
 
 void Kernel::initialize() {
+    
     // Setup comm
     uart.setConfig(COM1, BPF8, OFF, ON, OFF);
 	uart.setConfig(COM2, BPF8, OFF, OFF, OFF);
@@ -13,8 +14,7 @@ void Kernel::initialize() {
     asm volatile("ldr r3, =0x28");
     asm volatile("str r12, [r3]");
 
-    // TODO: Setup first task
-    
+    // TODO: Setup first task    
     handleCreate(1, firstTask);
 }
 
@@ -25,44 +25,55 @@ void Kernel::schedule() {
 
 int Kernel::activate() {
 
+    bwprintf(COM2, "Entered activate\n");
+
     // Kernel exits from here!!
-    kernel_exit:
 
     // SUPERVISOR MODE
     // Move cpsr of active task into spsr_svc
+    bwprintf(COM2, "1\n");
     asm volatile("msr spsr, %r0" :: "r"(activeTask->cpsr));
 
     // SUPERVISOR MODE
     // store kernel state on kernel stack
+    bwprintf(COM2, "1\n");
     asm volatile("stmfd sp!, {r0-r12, lr}");
     asm volatile("mrs r12, cpsr");
     asm volatile("stmfd sp!, {r12}");
 
     // SUPERVISOR MODE
     // Move the next pc into lr_svc
+    bwprintf(COM2, "1\n");
     asm volatile("mov lr, %r0" :: "r"(activeTask->pc));
 
     // SUPERVISOR MODE
     // Change to system mode
-    asm volatile("mov r12, #0b11111");
-    asm volatile("msr cpsr, r12");
+    bwprintf(COM2, "1\n");
+    asm volatile("msr cpsr_c, #0b11111");
+    bwprintf(COM2, "2\n");
 
     // SYSTEM MODE
     // TODO:implement this
     // Load registers from user stack
+    bwprintf(COM2, "3\n");
     asm volatile("ldmfd sp!, {r4-r11, lr}");
 
     // SYSTEM MODE
     // Return to supervisor mode
+    bwprintf(COM2, "4\n");
     asm volatile("mov r12, #0b10011");
     asm volatile("msr cpsr, r12");
 
     // SUPERVISOR MODE
     // Set return value by overwriting r0
+    bwprintf(COM2, "5\n");
     asm volatile("mov r0, %r0" :: "r"(activeTask->r0));
+
+    bwprintf(COM2, "About to leave kernel mode!!\n");
 
     // SUPERVISOR MODE
     // Go back to user mode
+    bwprintf(COM2, "6\n");
     asm volatile("movs pc, lr");
     // !!!!!!!!!!!!KERNEL EXITED!!!!!!!!!!!!
 
@@ -185,6 +196,7 @@ void Kernel::handle(int request)  {
 }
 
 int Kernel::handleCreate(int priority, int (*function)()) {
+    bwprintf(COM2, "Started Creation of a task\n");
     taskNumber++;
     availableTid++;
 
@@ -194,19 +206,27 @@ int Kernel::handleCreate(int priority, int (*function)()) {
 
     if (taskNumber >= Constants::NUM_TASKS) {
         return -2;  
-    }
+    }  
+    
+    tasks[taskNumber];
     TaskDescriptor* newTD = &tasks[taskNumber];
 
     newTD->tid = availableTid;
-    newTD->parentTid = activeTask->tid;
+
+    if (activeTask == nullptr) {
+        newTD->parentTid = 0;
+    } else {
+        newTD->parentTid = activeTask->tid;
+    }
+    
     newTD->priority = priority;
     newTD->taskState = Constants::READY;
     newTD->r0 = 0;
+    newTD->cpsr = 0b10000;
 
-    // TODO: check validity of cpsr and pc
+    // TODO: check validity of pc
     // TODO: wrap function in another function with exit()
     newTD->pc = (int)function;
-    
 
     // setting the stack [r4-r11, lr]
     
@@ -222,6 +242,12 @@ int Kernel::handleCreate(int priority, int (*function)()) {
     newTD->stack[9] = 0; // TODO: fix lr
 
     newTD->sp = &(newTD->stack[9]);
+
+    
+
+    ready_queue.push(newTD, newTD->priority);
+
+    bwprintf(COM2, "Ended creation of task\n");
 
     return availableTid;
 }
@@ -249,7 +275,7 @@ void Kernel::run() {
     initialize();
     FOREVER {
         schedule();
-        if (activeTask == nullptr) { continue; }
+        if (activeTask == nullptr) { bwprintf(COM2, "No activetasks!!"); continue; }
         request = activate();
         handle(request);
     }

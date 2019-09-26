@@ -16,7 +16,7 @@ LD = $(XBINDIR)/arm-none-eabi-ld
 # -Wall: report all warnings
 # -mcpu=arm920t: generate code for the 920t architecture
 # -msoft-float: no FP co-processor
-CPPFLAGS = -fno-exceptions -fno-unwind-tables -fno-rtti -std=c++17 -g -S -fPIC -Wall -mcpu=arm920t -msoft-float -I. -I../../include
+CPPFLAGS = -fno-exceptions -fno-unwind-tables -fno-rtti -std=c++17 -g -S -fPIC -Wall -mcpu=arm920t -msoft-float -I. -I../../include -lstdc++
 
 # c: create archive, if necessary
 # r: insert with replacement
@@ -27,7 +27,7 @@ ARFLAGS = crs
 # -e: set entry point
 # -nmagic: no page alignment
 # -T: use linker script
-LDFLAGS = -static -e main -nmagic -T ../linker.ld -L ../../lib -L $(XLIBDIR2)
+LDFLAGS = -static -e main -nmagic -T ../linker.ld -L $(XLIBDIR1) -L ../../lib -L $(XLIBDIR2) -lstdc++ -lc -lgcc
 
 .PHONY: all
 all: main.elf
@@ -40,7 +40,7 @@ main.o: main.s
 
 # TODO: Fix this all up to be linked from somewhere sensible
 main.elf: main.o
-	$(LD) $(LDFLAGS) -o $@ main.o ../kern/Kernel.o ../io/UART.o -lbwio -lgcc
+	$(LD) $(LDFLAGS) -o $@ main.o ../kern/Kernel.o ../io/UART.o -lbwio -lgcc -lc
 
 .PHONY: install
 install: all

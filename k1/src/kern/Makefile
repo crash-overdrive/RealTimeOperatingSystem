@@ -16,18 +16,12 @@ LD = $(XBINDIR)/arm-none-eabi-ld
 # -Wall: report all warnings
 # -mcpu=arm920t: generate code for the 920t architecture
 # -msoft-float: no FP co-processor
-CPPFLAGS = -fno-exceptions -fno-unwind-tables -fno-rtti -std=c++17 -g -S -fPIC -Wall -mcpu=arm920t -msoft-float -I. -I../../include
+CPPFLAGS = -fno-exceptions -fno-unwind-tables -fno-rtti -std=c++17 -g -S -fPIC -Wall -mcpu=arm920t -msoft-float -I. -I../../include -lstdc++ -lc
 
 # c: create archive, if necessary
 # r: insert with replacement
 # s: add index to archive
 ARFLAGS = crs
-
-# -static: force static linking
-# -e: set entry point
-# -nmagic: no page alignment
-# -T: use linker script
-LDFLAGS = -static -nmagic -T ../linker.ld -L ../../lib -L $(XLIBDIR2)
 
 .PHONY: all
 all: Kernel.o
