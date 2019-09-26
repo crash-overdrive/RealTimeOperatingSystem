@@ -1,4 +1,11 @@
 #include "../../include/Kernel.hpp"
+#include "../../include/UserSyscall.hpp"
+
+#define print(str) bwprintf(COM2, str)
+
+void testTask() {
+    // TODO: implement me
+}
 
 void Kernel::initialize() {
     // Setup comm
@@ -243,6 +250,17 @@ int Kernel::firstTask() {
     int b = 2;
     int c = a + b;
     bwprintf(COM2, "Value of c: %d\n", c);
+    int tid;
+    tid = Create(3, testTask);
+    bwprintf(COM2, "Created: %d", tid);
+    tid = Create(3, testTask);
+    bwprintf(COM2, "Created: %d", tid);
+    tid = Create(1, testTask);
+    bwprintf(COM2, "Created: %d", tid);
+    tid = Create(1, testTask);
+    bwprintf(COM2, "Created: %d", tid);
+    bwprintf(COM2, "FirstUserTask: exiting");
+    Exit();
 }
 
 void Kernel::run() {
@@ -253,5 +271,5 @@ void Kernel::run() {
         request = activate();
         handle(request);
     }
-    bwprintf(COM2, "It doesn't work!");
+    bwprintf(COM2, "Kernel reached end of execution unexpectedly!");
 }
