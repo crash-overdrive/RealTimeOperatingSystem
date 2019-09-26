@@ -6,13 +6,20 @@ class TaskDescriptor {
 
     public:
         // TaskStack *;
-        int returnValue;
-        TaskDescriptor * taskParent;
+        
+        int selfTid;
+        int parentTid;
+
         Constants::STATE taskState;
-        char stack[Constants::TD_STACK_SIZE];
-        int stackPointer;
+
+        int* sp;
         int cpsr;
         int pc;
+        int r0;
+
+        int priority;
+
+        char stack[Constants::TD_STACK_SIZE];
     
 
 };

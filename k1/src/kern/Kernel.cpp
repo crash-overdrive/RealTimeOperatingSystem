@@ -120,8 +120,52 @@ int Kernel::activate() {
 }
 
 void Kernel::handle(int request)  {
-    // TODO: implement me
+    // Set the state of the activeTask to be READY
+    // If it needs to be changed then the appropriate handler will do it
+    activeTask->taskState = STATE.READY;
+
+    switch(request) {
+        case 2:
+            int tid = handleCreate(arg1, arg2);
+            activeTask->r0 = tid;
+            break;
+
+        case 3:
+            int selfTid = handleMyTid();
+            activeTask->r0 = selfTid;
+            break;
+
+        case 4:
+            int parentTid = handleMyParentTid();
+            activeTask->r0 = parentTid;
+            break;
+
+        case 5:
+            break;
+
+        case 6:
+            handleExit();
+            break;
+    }
+    
 }
+
+int Kernel::handleCreate(int priority, void (*function)()) {
+
+}
+
+int Kernel::handleMyTid() {
+    return activeTask->selfTid;
+}
+
+int Kernel::handleMyParentTid() {
+    return activeTask->parentTid;
+}
+
+void Kernel::handleExit() {
+    activeTask->taskState = STATE.ZOMBIE;
+}
+
 
 void Kernel::run() {
     initialize();

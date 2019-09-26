@@ -23,9 +23,10 @@ class Kernel {
         
         TaskDescriptor tasks[Constants::NUM_TASKS];
 
+        //TODO: Group all these 3 together?
         volatile TaskDescriptor* activeTask;
         volatile int request;
-        int arg1, arg2, arg3, arg4;
+        volatile int arg1, arg2, arg3, arg4;
 
         void initialize();
 
@@ -36,6 +37,11 @@ class Kernel {
 
         // TODO: determine if this should return anything
         void handle(int request);
+
+        int handleCreate(int priority, void (*function)());
+        int handleMyTid();
+        int handleMyParentTid();
+        void handleExit();
 
 
     public:

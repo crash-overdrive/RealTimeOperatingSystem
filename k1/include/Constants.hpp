@@ -10,7 +10,8 @@ namespace Constants {
     enum STATE {
         ACTIVE,
         READY,
-        BLOCKED
+        BLOCKED,
+        ZOMBIE
     };
 };
 
