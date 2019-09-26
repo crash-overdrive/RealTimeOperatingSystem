@@ -28,7 +28,7 @@ void Kernel::initialize() {
 
     // TODO: Setup first task
     
-    handleCreate(1, firstTask);
+    handleCreate(2, firstTask);
 }
 
 void Kernel::schedule() {
