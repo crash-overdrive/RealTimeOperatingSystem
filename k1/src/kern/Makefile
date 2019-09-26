@@ -38,10 +38,9 @@ Kernel.s: Kernel.cpp
 Kernel.o: Kernel.s
 	$(AS) $(ASFLAGS) -o Kernel.o Kernel.s
 
-
 .PHONY: install
 install: all
 
 .PHONY: clean
 clean:
-	-rm -f *.s *.a *.o Kernel.elf
+	-rm -f *.s *.a *.o

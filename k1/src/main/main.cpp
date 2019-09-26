@@ -1,4 +1,4 @@
-#include "../kern/Kernel.cpp"
+#include "../../include/Kernel.hpp"
 
 int main () {
     Kernel kern;

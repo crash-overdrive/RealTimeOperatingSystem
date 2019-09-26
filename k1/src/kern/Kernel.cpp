@@ -10,7 +10,8 @@ void Kernel::initialize() {
     // asm volatile("mov r12, #0xe59ff018"); // e59ff018 = ldr pc, [pc, #24]
     // asm volatile("str r12, #0x8");
     asm volatile("ldr r12, =kernel_entry");
-    asm volatile("str r12, #0x28");
+    asm volatile("ldr r3, =0x28");
+    asm volatile("str r12, [r3]");
 
     // TODO: Setup first task
     
@@ -75,7 +76,7 @@ int Kernel::activate() {
 
 
     // !!!!!!!!!!!!KERNEL ENTERS!!!!!!!!!!!!
-    kernel_entry:
+    asm volatile("kernel_entry: ");
     
     // SUPERVISOR MODE
     // Change to system mode
@@ -209,18 +210,18 @@ int Kernel::handleCreate(int priority, int (*function)()) {
 
     // setting the stack [r4-r11, lr]
     
-    stack[0] = 0xdeadbeef; // for debugging purposes
-    stack[1] = 0; // r4
-    stack[2] = 0; // r5
-    stack[3] = 0; // r6
-    stack[4] = 0; // r7
-    stack[5] = 0; // r8
-    stack[6] = 0; // r9
-    stack[7] = 0; // r10
-    stack[8] = 0; // r11
-    stack[9] = 0; // TODO: fix lr
+    newTD->stack[0] = 0xdeadbeef; // for debugging purposes
+    newTD->stack[1] = 0; // r4
+    newTD->stack[2] = 0; // r5
+    newTD->stack[3] = 0; // r6
+    newTD->stack[4] = 0; // r7
+    newTD->stack[5] = 0; // r8
+    newTD->stack[6] = 0; // r9
+    newTD->stack[7] = 0; // r10
+    newTD->stack[8] = 0; // r11
+    newTD->stack[9] = 0; // TODO: fix lr
 
-    sp = &stack[9];
+    newTD->sp = &(newTD->stack[9]);
 
     return availableTid;
 }
@@ -241,6 +242,7 @@ int Kernel::firstTask() {
     int a = 1;
     int b = 2;
     int c = a + b;
+    bwprintf(COM2, "Value of c: %d\n", c);
 }
 
 void Kernel::run() {

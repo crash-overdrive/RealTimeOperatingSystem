@@ -2,8 +2,12 @@
 all: main
 
 .PHONY: main
-main: io
+main: io kern
 	cd main && $(MAKE) clean && $(MAKE) install
+
+.PHONY: kern
+kern:
+	cd kern && $(MAKE) clean && $(MAKE) install
 
 .PHONY: io
 io:

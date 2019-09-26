@@ -15,7 +15,7 @@ namespace Util {
         *y = temp; 
     }
 
-    void assert(bool expression) {
+    inline void assert(bool expression) {
         if (!expression) {
             bwprintf(COM2, "!!!!!!!!!!!!!!!!!Assertion Failure!!!!!!!!!!!!!!");
         }

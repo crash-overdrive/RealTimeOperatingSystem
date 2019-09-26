@@ -24,7 +24,7 @@ CPPFLAGS = -g -S -fPIC -Wall -mcpu=arm920t -msoft-float -I. -I../../include
 ARFLAGS = crs
 
 .PHONY: all
-all:  bwio.a
+all:  bwio.a UART.o
 
 bwio.s: bwio.c 
 	$(CC) -S $(CPPFLAGS) bwio.c
@@ -34,6 +34,12 @@ bwio.o: bwio.s
 
 bwio.a: bwio.o
 	$(AR) $(ARFLAGS) $@ bwio.o
+
+UART.s: UART.cpp
+	$(CC) -S $(CPPFLAGS) UART.cpp
+
+UART.o: UART.s
+	$(AS) $(ASFLAGS) -o UART.o UART.s
 
 .PHONY: install
 install: all

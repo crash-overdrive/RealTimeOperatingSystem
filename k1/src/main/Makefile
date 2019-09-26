@@ -38,8 +38,9 @@ main.s: main.cpp
 main.o: main.s
 	$(AS) $(ASFLAGS) -o main.o main.s
 
+# TODO: Fix this all up to be linked from somewhere sensible
 main.elf: main.o
-	$(LD) $(LDFLAGS) -o $@ main.o -lbwio -lgcc
+	$(LD) $(LDFLAGS) -o $@ main.o ../kern/Kernel.o ../io/UART.o -lbwio -lgcc
 
 .PHONY: install
 install: all
