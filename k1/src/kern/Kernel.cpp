@@ -4,7 +4,13 @@
 #define print(str) bwprintf(COM2, str)
 
 void testTask() {
-    // TODO: implement me
+    int tid, ptid;
+    tid = MyTid();
+    ptid = MyParentTid();
+    bwprintf(COM2, "TestTask: My tid is %d and my parent's tid is %d\n\r", tid, ptid);
+    Yield();
+    bwprintf(COM2, "TestTask: My tid is %d and my parent's tid is %d\n\r", tid, ptid);
+    Exit();
 }
 
 void Kernel::initialize() {
@@ -249,16 +255,16 @@ int Kernel::firstTask() {
     int a = 1;
     int b = 2;
     int c = a + b;
-    bwprintf(COM2, "Value of c: %d\n", c);
+    bwprintf(COM2, "Value of c: %d\n\r", c);
     int tid;
     tid = Create(3, testTask);
-    bwprintf(COM2, "Created: %d", tid);
+    bwprintf(COM2, "Created: %d\n\r", tid);
     tid = Create(3, testTask);
-    bwprintf(COM2, "Created: %d", tid);
+    bwprintf(COM2, "Created: %d\n\r", tid);
     tid = Create(1, testTask);
-    bwprintf(COM2, "Created: %d", tid);
+    bwprintf(COM2, "Created: %d\n\r", tid);
     tid = Create(1, testTask);
-    bwprintf(COM2, "Created: %d", tid);
+    bwprintf(COM2, "Created: %d\n\r", tid);
     bwprintf(COM2, "FirstUserTask: exiting");
     Exit();
 }
