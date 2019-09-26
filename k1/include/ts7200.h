@@ -27,6 +27,11 @@
 #define COM1	0
 #define COM2	1
 
+#define BPF8	3
+#define BPF7	2
+#define BPF6	1
+#define BPF5	0
+
 #define IRDA_BASE	0x808b0000
 #define UART1_BASE	0x808c0000
 #define UART2_BASE	0x808d0000
