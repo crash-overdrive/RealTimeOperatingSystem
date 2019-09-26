@@ -6,13 +6,14 @@ void Kernel::initialize() {
 	uart.setConfig(COM2, BPF8, OFF, OFF, OFF);
 
     // Setup 0x08, 0x28
-    asm volatile("mov r0, #0xe59ff018"); // e59ff018 = ldr pc, [pc, #24]
-    asm volatile("str r0, #0x8");
-    asm volatile("ldr r0, =kernel_entry");
-    asm volatile("str r0, #0x28");
+    asm volatile("mov r12, #0xe59ff018"); // e59ff018 = ldr pc, [pc, #24]
+    asm volatile("str r12, #0x8");
+    asm volatile("ldr r12, =kernel_entry");
+    asm volatile("str r12, #0x28");
 
     // TODO: Setup first task
-    handleCreate(1, (void *)firstTask);
+    
+    handleCreate(1, &firstTask);
 }
 
 void Kernel::schedule() {
@@ -36,7 +37,7 @@ int Kernel::activate() {
     asm volatile("stmfd sp!, {r12}");
 
     // SUPERVISOR MODE
-    // Move the next pc into lr_svcstmfd
+    // Move the next pc into lr_svc
     asm volatile("mov lr, %r0" :: "r"(activeTask->pc));
 
     // SUPERVISOR MODE
@@ -56,7 +57,7 @@ int Kernel::activate() {
 
     // SUPERVISOR MODE
     // Set return value by overwriting r0
-    asm volatile("mov r0, %r0" :: "r"(activeTask->returnValue));
+    asm volatile("mov r0, %r0" :: "r"(activeTask->r0));
 
     // SUPERVISOR MODE
     // Go back to user mode
@@ -87,14 +88,14 @@ int Kernel::activate() {
     // sp is decremented appropriately and saved into the task descriptor
     // cpsr for user mode is saved in spsr_svc, need to save that into task descriptor as well!!
     asm volatile("stmfd sp!, {r4-r11, lr}");
-    asm volatile("mov %r0, sp" : "=r"(activeTask->stackPointer));
+    asm volatile("mov %r0, sp" : "=r"(activeTask->sp));
 
     // SYSTEM MODE
     // Return to supervisor mode
     asm volatile("mov r12, #0b10011");
     asm volatile("msr cpsr, r12");
 
-    // SUPERVISOR MODE
+    // SUPERVISOR MODEvoid;
     // Saving cspr of user mode into task descriptor
     asm volatile("mrs %r0, spsr" : "=r"(activeTask->cpsr));
 
@@ -130,22 +131,23 @@ int Kernel::activate() {
 void Kernel::handle(int request)  {
     // Set the state of the activeTask to be READY
     // If it needs to be changed then the appropriate handler will do it
-    activeTask->taskState = STATE.READY;
+    activeTask->taskState = Constants::READY;
 
     switch(request) {
+        int kernelRequestResponse;
         case 2:
-            int tid = handleCreate(arg1, arg2);
-            activeTask->r0 = tid;
+            kernelRequestResponse = handleCreate((int)arg1, (void (*function)())arg2);
+            activeTask->r0 = kernelRequestResponse;
             break;
 
         case 3:
-            int selfTid = handleMyTid();
-            activeTask->r0 = selfTid;
+            kernelRequestResponse = handleMyTid();
+            activeTask->r0 = kernelRequestResponse;
             break;
 
         case 4:
-            int parentTid = handleMyParentTid();
-            activeTask->r0 = parentTid;
+            kernelRequestResponse = handleMyParentTid();
+            activeTask->r0 = kernelRequestResponse;
             break;
 
         case 5:
@@ -156,33 +158,52 @@ void Kernel::handle(int request)  {
             break;
 
         default:
+            bwprintf(COM2, "Invalid argument to SWI passed: %d \n", request);
             break;
     }
 
     switch (activeTask->taskState) {
-        case READY:
-            void;
+        case Constants::READY:
+            ready_queue.push(activeTask, activeTask->priority);
             break;
 
-        case ZOMBIE:
-            void;
+        case Constants::ZOMBIE:
+            exit_queue.push(activeTask);
             break;
 
-        case ACTIVE:
-            void;
+        case Constants::ACTIVE:
+            bwprintf(COM2, "Task shouldnt have ACTIVE state\n");
             break;
 
         default:
+            bwprintf(COM2, "Got invalid task State: %d \n", activeTask->taskState);
+            break;
     }
     
 }
 
 int Kernel::handleCreate(int priority, void (*function)()) {
+    taskNumber++;
+    availableTid++;
+    TaskDescriptor* newTD = &tasks[taskNumber];
+    newTD->tid = availableTid;
+    newTD->parentTid = activeTask->tid;
+    newTD->priority = priority;
+    newTD->taskState = Constants::READY;
+    newTD->r0 = 0;
+
+    // TODO: check validity of cpsr and pc
+    newTD->cpsr = 0b10011;
+    // TODO: wrap function in another function with exit()
+    newTD->pc = function;
+    
+
+    // setting the stack [r4-r11, lr]
 
 }
 
 int Kernel::handleMyTid() {
-    return activeTask->selfTid;
+    return activeTask->tid;
 }
 
 int Kernel::handleMyParentTid() {
@@ -190,7 +211,7 @@ int Kernel::handleMyParentTid() {
 }
 
 void Kernel::handleExit() {
-    activeTask->taskState = STATE.ZOMBIE;
+    activeTask->taskState = Constants::ZOMBIE;
 }
 
 void Kernel::firstTask() {

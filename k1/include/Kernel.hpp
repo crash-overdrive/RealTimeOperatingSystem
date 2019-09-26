@@ -27,9 +27,17 @@ class Kernel {
         //TODO: Group all these 3 together?
         UART uart;
 
-        volatile TaskDescriptor* activeTask;
+        TaskDescriptor* activeTask;
         volatile int request;
-        volatile int arg1, arg2, arg3, arg4;
+
+        void* arg1;
+        void* arg2; 
+        void* arg3;
+        void* arg4;
+
+        volatile int availableTid = 0;
+
+        volatile int taskNumber = -1;
 
         void initialize();
 
@@ -46,9 +54,9 @@ class Kernel {
         int handleMyTid();
         int handleMyParentTid();
         void handleExit();
+
         // Starts the first task
         void firstTask();
-
 
     public:
 
