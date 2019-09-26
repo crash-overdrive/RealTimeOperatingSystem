@@ -19,6 +19,6 @@ class TaskDescriptor {
 
         int priority;
 
-        char stack[Constants::TD_STACK_SIZE];
+        int stack[Constants::TD_STACK_SIZE];
 
 };
