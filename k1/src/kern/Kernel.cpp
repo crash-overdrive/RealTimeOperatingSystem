@@ -1,10 +1,18 @@
 #include "../../include/Kernel.hpp"
 
 void Kernel::initialize() {
-    // TODO: implement me
-    // setup comm
-    // setup 0x08, 0x28
-    // setup first task
+    // Setup comm
+    uart.setConfig(COM1, BPF8, OFF, ON, OFF);
+	uart.setConfig(COM2, BPF8, OFF, OFF, OFF);
+
+    // Setup 0x08, 0x28
+    asm volatile("mov r0, #0xe59ff018"); // e59ff018 = ldr pc, [pc, #24]
+    asm volatile("str r0, #0x8");
+    asm volatile("ldr r0, =kernel_entry");
+    asm volatile("str r0, #0x28");
+
+    // TODO: Setup first task
+    handleCreate(1, (void *)firstTask);
 }
 
 void Kernel::schedule() {
@@ -121,6 +129,12 @@ int Kernel::activate() {
 
 void Kernel::handle(int request)  {
     // TODO: implement me
+}
+
+void Kernel::firstTask() {
+    int a = 1;
+    int b = 2;
+    int c = a + b;
 }
 
 void Kernel::run() {

@@ -5,6 +5,7 @@
 #include "Constants.hpp"
 #include "Util.hpp"
 #include "TaskDescriptor.hpp"
+#include "UART.hpp"
 
 #define FOREVER for(;;)
 
@@ -23,19 +24,25 @@ class Kernel {
         
         TaskDescriptor tasks[Constants::NUM_TASKS];
 
+        UART uart;
+
         volatile TaskDescriptor* activeTask;
         volatile int request;
-        int arg1, arg2, arg3, arg4;
+        volatile int arg1, arg2, arg3, arg4;
 
         void initialize();
 
         // Sets the active task to the task descriptor of the next scheduled task.
         void schedule();
 
+        // Activates the current active task.
         int activate();
 
-        // TODO: determine if this should return anything
+        // TODO: determine if this should return anything.
         void handle(int request);
+
+        // Starts the first task
+        void firstTask();
 
 
     public:
