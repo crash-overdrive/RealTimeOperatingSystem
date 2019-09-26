@@ -5,15 +5,16 @@ void Kernel::initialize() {
     uart.setConfig(COM1, BPF8, OFF, ON, OFF);
 	uart.setConfig(COM2, BPF8, OFF, OFF, OFF);
 
-    // Setup 0x08, 0x28
-    asm volatile("mov r12, #0xe59ff018"); // e59ff018 = ldr pc, [pc, #24]
-    asm volatile("str r12, #0x8");
+    // Setup 0x8, 0x28
+    *(int*)0x8 = 0xe59ff018; // e59ff018 = ldr pc, [pc, #24]
+    // asm volatile("mov r12, #0xe59ff018"); // e59ff018 = ldr pc, [pc, #24]
+    // asm volatile("str r12, #0x8");
     asm volatile("ldr r12, =kernel_entry");
     asm volatile("str r12, #0x28");
 
     // TODO: Setup first task
     
-    handleCreate(1, &firstTask);
+    handleCreate(1, firstTask);
 }
 
 void Kernel::schedule() {
@@ -136,7 +137,7 @@ void Kernel::handle(int request)  {
     switch(request) {
         int kernelRequestResponse;
         case 2:
-            kernelRequestResponse = handleCreate((int)arg1, (void (*function)())arg2);
+            kernelRequestResponse = handleCreate((int)arg1, (int (*)())arg2);
             activeTask->r0 = kernelRequestResponse;
             break;
 
@@ -182,7 +183,7 @@ void Kernel::handle(int request)  {
     
 }
 
-int Kernel::handleCreate(int priority, void (*function)()) {
+int Kernel::handleCreate(int priority, int (*function)()) {
     taskNumber++;
     availableTid++;
     TaskDescriptor* newTD = &tasks[taskNumber];
@@ -195,7 +196,7 @@ int Kernel::handleCreate(int priority, void (*function)()) {
     // TODO: check validity of cpsr and pc
     newTD->cpsr = 0b10011;
     // TODO: wrap function in another function with exit()
-    newTD->pc = function;
+    newTD->pc = (int)function;
     
 
     // setting the stack [r4-r11, lr]
@@ -214,7 +215,7 @@ void Kernel::handleExit() {
     activeTask->taskState = Constants::ZOMBIE;
 }
 
-void Kernel::firstTask() {
+int Kernel::firstTask() {
     int a = 1;
     int b = 2;
     int c = a + b;

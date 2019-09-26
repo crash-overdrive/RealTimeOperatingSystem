@@ -15,7 +15,7 @@ class TaskDescriptor {
         int* sp;
         int cpsr;
         int r0;
-        void* pc;
+        int pc;
 
         int priority;
 

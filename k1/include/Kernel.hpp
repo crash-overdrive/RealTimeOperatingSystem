@@ -50,13 +50,13 @@ class Kernel {
         // TODO: determine if this should return anything.
         void handle(int request);
 
-        int handleCreate(int priority, void (*function)());
+        int handleCreate(int priority, int (*function)());
         int handleMyTid();
         int handleMyParentTid();
         void handleExit();
 
         // Starts the first task
-        void firstTask();
+        static int firstTask();
 
     public:
 
