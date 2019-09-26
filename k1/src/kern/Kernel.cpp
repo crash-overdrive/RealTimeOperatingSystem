@@ -185,7 +185,16 @@ void Kernel::handle(int request)  {
 int Kernel::handleCreate(int priority, void (*function)()) {
     taskNumber++;
     availableTid++;
+
+    if (priority < 0 || priority >= Constants::NUM_PRIORITIES) {
+        return -1;
+    }
+
+    if (taskNumber >= Constants::NUM_TASKS) {
+        return -2;  
+    }
     TaskDescriptor* newTD = &tasks[taskNumber];
+
     newTD->tid = availableTid;
     newTD->parentTid = activeTask->tid;
     newTD->priority = priority;
@@ -193,13 +202,26 @@ int Kernel::handleCreate(int priority, void (*function)()) {
     newTD->r0 = 0;
 
     // TODO: check validity of cpsr and pc
-    newTD->cpsr = 0b10011;
     // TODO: wrap function in another function with exit()
     newTD->pc = function;
     
 
     // setting the stack [r4-r11, lr]
+    
+    stack[0] = 0xdeadbeef; // for debugging purposes
+    stack[1] = 0; // r4
+    stack[2] = 0; // r5
+    stack[3] = 0; // r6
+    stack[4] = 0; // r7
+    stack[5] = 0; // r8
+    stack[6] = 0; // r9
+    stack[7] = 0; // r10
+    stack[8] = 0; // r11
+    stack[9] = 0; // TODO: fix lr
 
+    sp = &stack[9];
+
+    return availableTid;
 }
 
 int Kernel::handleMyTid() {
