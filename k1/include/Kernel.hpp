@@ -27,7 +27,7 @@ class Kernel {
         //TODO: Group all these 3 together?
         UART uart;
 
-        TaskDescriptor* activeTask;
+        TaskDescriptor* activeTask = nullptr;
         volatile int request;
 
         void* arg1;
