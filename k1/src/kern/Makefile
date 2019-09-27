@@ -24,13 +24,19 @@ CPPFLAGS = -fno-exceptions -fno-unwind-tables -fno-rtti -std=c++17 -g -S -fPIC -
 ARFLAGS = crs
 
 .PHONY: all
-all: Kernel.o
+all: Kernel.o Syscall.o
 
 Kernel.s: Kernel.cpp
 	$(CC) -S $(CPPFLAGS) Kernel.cpp
 
 Kernel.o: Kernel.s
 	$(AS) $(ASFLAGS) -o Kernel.o Kernel.s
+
+Syscall.s: Syscall.cpp
+	$(CC) -S $(CPPFLAGS) Syscall.cpp
+
+Syscall.o: Syscall.s
+	$(AS) $(ASFLAGS) -o Syscall.o Syscall.s
 
 .PHONY: install
 install: all
