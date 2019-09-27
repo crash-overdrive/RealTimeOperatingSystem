@@ -11,6 +11,14 @@ int reg4;
 int reg5;
 int reg6;
 
+void printRegisters(int* stack){
+    bwprintf(COM2, "Stack pointer : %x\r\n", stack);
+    int i=0;
+    for(i=0;i<16;i++){
+        bwprintf(COM2, "%x at %x\r\n", stack[i], stack+i);
+    }
+}
+
 void testTask() {
     int tid, ptid;
     tid = MyTid();
@@ -43,6 +51,7 @@ void Kernel::initialize() {
 void Kernel::schedule() {
     // TODO: what happens when ready_queue is empty?
     activeTask = ready_queue.pop();
+    bwprintf(COM2, "Scheduled %d\n", activeTask->tid);
 }
 
 int Kernel::activate() {
@@ -85,24 +94,29 @@ void Kernel::handle(int request)  {
     switch(request) {
         int kernelRequestResponse;
         case 2:
+            bwprintf(COM2, "Called Create");
             kernelRequestResponse = handleCreate((int)arg1, (int (*)())arg2);
             activeTask->r0 = kernelRequestResponse;
             break;
 
         case 3:
+            bwprintf(COM2, "Called MyTid");
             kernelRequestResponse = handleMyTid();
             activeTask->r0 = kernelRequestResponse;
             break;
 
         case 4:
+            bwprintf(COM2, "Called MyParentTid");
             kernelRequestResponse = handleMyParentTid();
             activeTask->r0 = kernelRequestResponse;
             break;
 
         case 5:
+            bwprintf(COM2, "Called Yield");
             break;
 
         case 6:
+            bwprintf(COM2, "Called Exit");
             handleExit();
             break;
 
@@ -132,6 +146,7 @@ void Kernel::handle(int request)  {
 }
 
 int Kernel::handleCreate(int priority, int (*function)()) {
+    // bwprintf(COM2, "Enter handle create\n\r");
     taskNumber++;
     availableTid++;
 
@@ -141,7 +156,8 @@ int Kernel::handleCreate(int priority, int (*function)()) {
 
     if (taskNumber >= Constants::NUM_TASKS) {
         return -2;  
-    }  
+    }
+    // bwprintf(COM2, "Clear check!\n\r");
     
     TaskDescriptor* newTD = &tasks[taskNumber];
 
@@ -152,6 +168,7 @@ int Kernel::handleCreate(int priority, int (*function)()) {
     } else {
         newTD->parentTid = activeTask->tid;
     }
+    bwprintf(COM2, "TID: %d\n\r", activeTask->tid);
     
     newTD->priority = priority;
     newTD->taskState = Constants::READY;
@@ -173,13 +190,15 @@ int Kernel::handleCreate(int priority, int (*function)()) {
     newTD->stack[32761] = 6; // r9
     newTD->stack[32760] = 7; // r10
     newTD->stack[32759] = 8; // r11
-    newTD->stack[32758] = 9; // TODO: fix lr
+    newTD->stack[32758] = 9; // TODO: fix lrs values
 
+    // bwprintf(COM2, "SP UPDATE?\n\r");
     newTD->sp = &(newTD->stack[32758]);
 
-    
-
+    bwprintf(COM2, "Value of SP for new user task is %d", newTD->sp);
+    // bwprintf(COM2, "RQ PUSH?\n\r");
     ready_queue.push(newTD, newTD->priority);
+    // bwprintf(COM2, "Exit handle create\n\r");
 
     return availableTid;
 }
@@ -203,25 +222,30 @@ int Kernel::firstTask() {
     int c = a + b;
     bwprintf(COM2, "Value of c: %d\n\r", c);
     int tid;
-    tid = Create(3, testTask);
-    bwprintf(COM2, "Created: %d\n\r", tid);
-    tid = Create(3, testTask);
-    bwprintf(COM2, "Created: %d\n\r", tid);
+    tid = MyTid();
+    bwprintf(COM2, "My TID is: %d",tid);
     tid = Create(1, testTask);
     bwprintf(COM2, "Created: %d\n\r", tid);
     tid = Create(1, testTask);
+    bwprintf(COM2, "Created: %d\n\r", tid);
+    tid = Create(3, testTask);
+    bwprintf(COM2, "Created: %d\n\r", tid);
+    tid = Create(3, testTask);
     bwprintf(COM2, "Created: %d\n\r", tid);
     bwprintf(COM2, "FirstUserTask: exiting");
     Exit();
 }
 
 void Kernel::run() {
+    int i = 0;
     initialize();
     FOREVER {
+        if (i == 5) { break; }
         schedule();
-        if (activeTask == nullptr) {  continue; }
+        if (activeTask == nullptr) { bwprintf(COM2, "BREAK!"); break; }
         request = activate();
         handle(request);
+        i++;
     }
     bwprintf(COM2, "Kernel reached end of execution unexpectedly!");
 }
