@@ -57,9 +57,9 @@ void Kernel::schedule() {
 
 int Kernel::activate() {
 
-    reg5 = (int)activeTask->sp;
-    reg6 = activeTask->cpsr;
-    reg7 = activeTask->pc;
+    reg1 = (int)activeTask->sp;
+    reg2 = activeTask->cpsr;
+    reg3 = activeTask->pc;
 
     asm volatile("ldr pc, =context_switch_exit");
 
@@ -77,6 +77,7 @@ int Kernel::activate() {
     arg4 = (void *) reg3;
     activeTask->sp = (int *) reg5;
     activeTask->cpsr = reg6;
+    activeTask->pc = reg7;
 
 
     return reg4;

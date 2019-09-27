@@ -8,8 +8,9 @@ context_switch_entry:
     // r12 saved by caller
     // sp, pc should not be saved on the stack
     // sp is decremented appropriately and saved into the task descriptor
-    // move stack pointer into r5
     stmfd sp!, {r4-r11, lr}
+    
+    // save user stack pointer into r5
     mov r5, sp
 
     // SYSTEM MODE
@@ -26,11 +27,10 @@ context_switch_entry:
     and r4, #0xff
 
     // SUPERVISOR MODE
-    // Get lr_svc which is gonna be the pc of the activeTask
-    ldr r12, =reg7
-    str r7, [r12]
+    // Get lr_svc which is gonna be the pc of the activeTask, save into r7
+    mov r7, lr
 
-    // save r0-r6
+    // save r0-r7 on reg0-reg7
     ldr r12, =reg0
     str r0, [r12]
 
@@ -51,6 +51,9 @@ context_switch_entry:
 
     ldr r12, =reg6
     str r6, [r12]
+
+    ldr r12, =reg7
+    str r7, [r12]
 
 
     // SUPERVISOR MODE
