@@ -203,7 +203,6 @@ int Kernel::firstTask() {
     int c = a + b;
     bwprintf(COM2, "Value of c: %d\n\r", c);
     int tid;
-    Exit();
     tid = Create(3, testTask);
     bwprintf(COM2, "Created: %d\n\r", tid);
     tid = Create(3, testTask);
@@ -220,7 +219,7 @@ void Kernel::run() {
     initialize();
     FOREVER {
         schedule();
-        if (activeTask == nullptr) { bwprintf(COM2, "No activetasks!!"); continue; }
+        if (activeTask == nullptr) {  continue; }
         request = activate();
         handle(request);
     }

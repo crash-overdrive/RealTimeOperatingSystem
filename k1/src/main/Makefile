@@ -45,8 +45,8 @@ main.elf: main.o
 .PHONY: install
 install: all
 	cp main.elf ../../build
-	cp main.elf /u/cs452/tftp/ARM/sgaweda/k1.elf
-	chmod 777 /u/cs452/tftp/ARM/sgaweda/k1.elf
+	cp main.elf /u/cs452/tftp/ARM/spratap/k1.elf
+	chmod 777 /u/cs452/tftp/ARM/spratap/k1.elf
 
 .PHONY: clean
 clean:
