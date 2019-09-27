@@ -3,14 +3,14 @@
 
 #define print(str) bwprintf(COM2, str)
 
-int reg0;
-int reg1;
-int reg2;
-int reg3;
-int reg4;
-int reg5;
-int reg6;
-int reg7;
+volatile int reg0;
+volatile int reg1;
+volatile int reg2;
+volatile int reg3;
+volatile int reg4;
+volatile int reg5;
+volatile int reg6;
+volatile int reg7;
 
 void printRegisters(int* stack){
     bwprintf(COM2, "Stack pointer : %x\r\n", stack);
@@ -94,18 +94,21 @@ void Kernel::handle(int request)  {
         case 2:
             // bwprintf(COM2, "Called Create \n");
             kernelRequestResponse = handleCreate((int)arg1, (int (*)())arg2);
+            // bwprintf(COM2, "Got created task tid: %d", kernelRequestResponse);
             activeTask->r0 = kernelRequestResponse;
             break;
 
         case 3:
             // bwprintf(COM2, "Called MyTid \n");
             kernelRequestResponse = handleMyTid();
+            // bwprintf(COM2, "Got tid: %d", kernelRequestResponse);
             activeTask->r0 = kernelRequestResponse;
             break;
 
         case 4:
             // bwprintf(COM2, "Called MyParentTid \n");
             kernelRequestResponse = handleMyParentTid();
+            // bwprintf(COM2, "Got parent tid: %d", kernelRequestResponse);
             activeTask->r0 = kernelRequestResponse;
             break;
 

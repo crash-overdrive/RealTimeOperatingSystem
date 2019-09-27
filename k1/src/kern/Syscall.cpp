@@ -30,25 +30,34 @@ void Exit() {
 }
 
 int sysCreate(int priority, void (*function)()) {
+    int retval;
     // r0 = priority, r1 = function ptr
     asm volatile("stmdb sp!, {r0-r3, r12}");
     asm volatile("swi 2");
+    asm volatile("mov %r0, r0" : "=r"(retval));
     asm volatile("ldmia sp!, {r0-r3, r12}");
-    // TODO: return something? how?
+    
+    return retval;
 }
 
 int sysMyTid() {
+    int retval;
     asm volatile("stmdb sp!, {r0-r3, r12}");
     asm volatile("swi 3");
+    asm volatile("mov %r0, r0" : "=r"(retval));
     asm volatile("ldmia sp!, {r0-r3, r12}");
-    // TODO: return something? how?
+    
+    return retval;
 }
 
 int sysMyParentTid() {
+    int retval;
     asm volatile("stmdb sp!, {r0-r3, r12}");
     asm volatile("swi 4");
+    asm volatile("mov %r0, r0" : "=r"(retval));
     asm volatile("ldmia sp!, {r0-r3, r12}");
-    // TODO: return something? how?
+    
+    return retval;
 }
 
 void sysYield() {
