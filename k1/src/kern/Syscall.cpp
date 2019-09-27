@@ -31,31 +31,31 @@ void Exit() {
 
 int sysCreate(int priority, void (*function)()) {
     // r0 = priority, r1 = function ptr
-    asm volatile("stmdb {r0-r3, r12}");
+    asm volatile("stmdb sp!, {r0-r3, r12}");
     asm volatile("swi 2");
-    asm volatile("ldmai {r0-r3, r12}");
+    asm volatile("ldmia sp!, {r0-r3, r12}");
 }
 
 int sysMyTid() {
-    asm volatile("stmdb {r0-r3, r12}");
+    asm volatile("stmdb sp!, {r0-r3, r12}");
     asm volatile("swi 3");
-    asm volatile("ldmai {r0-r3, r12}");
+    asm volatile("ldmia sp!, {r0-r3, r12}");
 }
 
 int sysMyParentTid() {
-    asm volatile("stmdb {r0-r3, r12}");
+    asm volatile("stmdb sp!, {r0-r3, r12}");
     asm volatile("swi 4");
-    asm volatile("ldmai {r0-r3, r12}");
+    asm volatile("ldmia sp!, {r0-r3, r12}");
 }
 
 void sysYield() {
-    asm volatile("stmdb {r0-r3, r12}");
+    asm volatile("stmdb sp!, {r0-r3, r12}");
     asm volatile("swi 5");
-    asm volatile("ldmai {r0-r3, r12}");
+    asm volatile("ldmia sp!, {r0-r3, r12}");
 }
 
 void sysExit() {
-    asm volatile("stmdb {r0-r3, r12}");
+    asm volatile("stmdb sp!, {r0-r3, r12}");
     asm volatile("swi 6");
-    asm volatile("ldmai {r0-r3, r12}");
+    asm volatile("ldmia sp!, {r0-r3, r12}");
 }
