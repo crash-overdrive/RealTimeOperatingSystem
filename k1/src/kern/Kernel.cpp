@@ -76,7 +76,6 @@ int Kernel::activate() {
     arg3 = (void *) reg2;
     arg4 = (void *) reg3;
     activeTask->sp = (int *) reg5;
-    activeTask->cpsr = reg6;
     activeTask->pc = reg7;
     
 
@@ -93,34 +92,34 @@ void Kernel::handle(int request)  {
     switch(request) {
         int kernelRequestResponse;
         case 2:
-            bwprintf(COM2, "Called Create \n");
+            // bwprintf(COM2, "Called Create \n");
             kernelRequestResponse = handleCreate((int)arg1, (int (*)())arg2);
             activeTask->r0 = kernelRequestResponse;
             break;
 
         case 3:
-            bwprintf(COM2, "Called MyTid \n");
+            // bwprintf(COM2, "Called MyTid \n");
             kernelRequestResponse = handleMyTid();
             activeTask->r0 = kernelRequestResponse;
             break;
 
         case 4:
-            bwprintf(COM2, "Called MyParentTid \n");
+            // bwprintf(COM2, "Called MyParentTid \n");
             kernelRequestResponse = handleMyParentTid();
             activeTask->r0 = kernelRequestResponse;
             break;
 
         case 5:
-            bwprintf(COM2, "Called Yield \n");
+            // bwprintf(COM2, "Called Yield \n");
             break;
 
         case 6:
-            bwprintf(COM2, "Called Exit \n");
+            // bwprintf(COM2, "Called Exit \n");
             handleExit();
             break;
 
         default:
-            bwprintf(COM2, "Invalid argument to SWI passed: %d \n", request);
+            // bwprintf(COM2, "Invalid argument to SWI passed: %d \n", request);
             break;
     }
 
@@ -130,7 +129,7 @@ void Kernel::handle(int request)  {
             break;
 
         case Constants::ZOMBIE:
-            bwprintf(COM2, "Pushing to dead queue");
+            // bwprintf(COM2, "Pushing to dead queue");
             exit_queue.push(activeTask);
             break;
 
@@ -218,26 +217,23 @@ void Kernel::handleExit() {
 int Kernel::firstTask() {
     int tid;
     tid = Create(3, testTask);
-    bwprintf(COM2, "FirstUserTask: Created: %d\n\r", tid);
+    bwprintf(COM2, "FirstUserTask: Created Task: %d\n\r", tid);
     tid = Create(3, testTask);
-    bwprintf(COM2, "FirstUserTask: Created: %d\n\r", tid);
+    bwprintf(COM2, "FirstUserTask: Created Task: %d\n\r", tid);
     tid = Create(1, testTask);
-    bwprintf(COM2, "FirstUserTask: Created: %d\n\r", tid);
+    bwprintf(COM2, "FirstUserTask: Created Task: %d\n\r", tid);
     tid = Create(1, testTask);
-    bwprintf(COM2, "FirstUserTask: Created: %d\n\r", tid);
-    bwprintf(COM2, "FirstUserTask: exiting");
+    bwprintf(COM2, "FirstUserTask: Created Task: %d\n\r", tid);
+    bwprintf(COM2, "FirstUserTask: exiting\n\r");
     Exit();
 }
 
 void Kernel::run() {
-    int i = 0;
     initialize();
     FOREVER {
-        if (i == 5) { break; }
         schedule();
-        if (activeTask == nullptr) { bwprintf(COM2, "BREAK!"); break; }
+        if (activeTask == nullptr) { bwprintf(COM2, "No active tasks scheduled!"); break; }
         request = activate();
         handle(request);
-        i++;
     }
 }
