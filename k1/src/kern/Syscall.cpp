@@ -34,18 +34,21 @@ int sysCreate(int priority, void (*function)()) {
     asm volatile("stmdb sp!, {r0-r3, r12}");
     asm volatile("swi 2");
     asm volatile("ldmia sp!, {r0-r3, r12}");
+    // TODO: return something? how?
 }
 
 int sysMyTid() {
     asm volatile("stmdb sp!, {r0-r3, r12}");
     asm volatile("swi 3");
     asm volatile("ldmia sp!, {r0-r3, r12}");
+    // TODO: return something? how?
 }
 
 int sysMyParentTid() {
     asm volatile("stmdb sp!, {r0-r3, r12}");
     asm volatile("swi 4");
     asm volatile("ldmia sp!, {r0-r3, r12}");
+    // TODO: return something? how?
 }
 
 void sysYield() {
