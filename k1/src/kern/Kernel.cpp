@@ -63,6 +63,7 @@ int Kernel::activate() {
 
 
 
+    asm volatile(".globl kernel_entry");
     asm volatile("kernel_entry:");
     arg1 = (void *) reg0;
     arg2 = (void *) reg1;

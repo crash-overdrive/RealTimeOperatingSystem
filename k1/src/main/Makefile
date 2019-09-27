@@ -1,4 +1,3 @@
-
 #
 # Makefile for main.cpp
 #
@@ -41,13 +40,13 @@ main.o: main.s
 
 # TODO: Fix this all up to be linked from somewhere sensible
 main.elf: main.o
-	$(LD) $(LDFLAGS) -o $@ main.o ../kern/Kernel.o ../kern/Syscall.o ../kern/ContextSwitch.o ../io/UART.o -lbwio -lgcc -lc
+	$(LD) $(LDFLAGS) -o $@ main.o ../kern/ContextSwitch.o ../kern/Kernel.o ../kern/Syscall.o ../io/UART.o -lbwio -lgcc -lc
 
 .PHONY: install
 install: all
 	cp main.elf ../../build
-	cp main.elf /u/cs452/tftp/ARM/spratap/k1.elf
-	chmod 777 /u/cs452/tftp/ARM/spratap/k1.elf
+	cp main.elf /u/cs452/tftp/ARM/sgaweda/k1.elf
+	chmod 777 /u/cs452/tftp/ARM/sgaweda/k1.elf
 
 .PHONY: clean
 clean:
