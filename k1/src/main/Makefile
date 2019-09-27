@@ -1,3 +1,4 @@
+
 #
 # Makefile for main.cpp
 #
@@ -40,7 +41,7 @@ main.o: main.s
 
 # TODO: Fix this all up to be linked from somewhere sensible
 main.elf: main.o
-	$(LD) $(LDFLAGS) -o $@ main.o ../kern/Kernel.o ../kern/Syscall.o ../io/UART.o -lbwio -lgcc -lc
+	$(LD) $(LDFLAGS) -o $@ main.o ../kern/Kernel.o ../kern/Syscall.o ../kern/ContextSwitch.o ../io/UART.o -lbwio -lgcc -lc
 
 .PHONY: install
 install: all
