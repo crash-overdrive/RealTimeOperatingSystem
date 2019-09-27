@@ -52,14 +52,14 @@ void Kernel::initialize() {
 void Kernel::schedule() {
     // TODO: what happens when ready_queue is empty?
     activeTask = ready_queue.pop();
-    bwprintf(COM2, "Scheduled %d\n", activeTask->tid);
+    // bwprintf(COM2, "Scheduled %d\n", activeTask->tid);
 }
 
 int Kernel::activate() {
-
-    reg1 = (int)activeTask->sp;
-    reg2 = activeTask->cpsr;
-    reg3 = activeTask->pc;
+    reg0 = activeTask->cpsr;
+    reg1 = (int)activeTask->pc;
+    reg2 = activeTask->r0;
+    reg3 = (int)activeTask->sp;
 
     asm volatile("ldr pc, =context_switch_exit");
 
@@ -78,6 +78,7 @@ int Kernel::activate() {
     activeTask->sp = (int *) reg5;
     activeTask->cpsr = reg6;
     activeTask->pc = reg7;
+    
 
 
     return reg4;
@@ -92,29 +93,29 @@ void Kernel::handle(int request)  {
     switch(request) {
         int kernelRequestResponse;
         case 2:
-            bwprintf(COM2, "Called Create");
+            bwprintf(COM2, "Called Create \n");
             kernelRequestResponse = handleCreate((int)arg1, (int (*)())arg2);
             activeTask->r0 = kernelRequestResponse;
             break;
 
         case 3:
-            bwprintf(COM2, "Called MyTid");
+            bwprintf(COM2, "Called MyTid \n");
             kernelRequestResponse = handleMyTid();
             activeTask->r0 = kernelRequestResponse;
             break;
 
         case 4:
-            bwprintf(COM2, "Called MyParentTid");
+            bwprintf(COM2, "Called MyParentTid \n");
             kernelRequestResponse = handleMyParentTid();
             activeTask->r0 = kernelRequestResponse;
             break;
 
         case 5:
-            bwprintf(COM2, "Called Yield");
+            bwprintf(COM2, "Called Yield \n");
             break;
 
         case 6:
-            bwprintf(COM2, "Called Exit");
+            bwprintf(COM2, "Called Exit \n");
             handleExit();
             break;
 
@@ -129,6 +130,7 @@ void Kernel::handle(int request)  {
             break;
 
         case Constants::ZOMBIE:
+            bwprintf(COM2, "Pushing to dead queue");
             exit_queue.push(activeTask);
             break;
 
@@ -166,7 +168,7 @@ int Kernel::handleCreate(int priority, int (*function)()) {
     } else {
         newTD->parentTid = activeTask->tid;
     }
-    bwprintf(COM2, "TID: %d\n\r", activeTask->tid);
+    // bwprintf(COM2, "TID: %d\n\r", newTD->tid);
     
     newTD->priority = priority;
     newTD->taskState = Constants::READY;
@@ -193,7 +195,7 @@ int Kernel::handleCreate(int priority, int (*function)()) {
     // bwprintf(COM2, "SP UPDATE?\n\r");
     newTD->sp = &(newTD->stack[32758]);
 
-    bwprintf(COM2, "Value of SP for new user task is %d", newTD->sp);
+    // bwprintf(COM2, "Value of SP for new user task is %x\n", newTD->sp);
     // bwprintf(COM2, "RQ PUSH?\n\r");
     ready_queue.push(newTD, newTD->priority);
     // bwprintf(COM2, "Exit handle create\n\r");
@@ -214,22 +216,15 @@ void Kernel::handleExit() {
 }
 
 int Kernel::firstTask() {
-    bwprintf(COM2, "Entered USER TASK!!!");
-    int a = 1;
-    int b = 2;
-    int c = a + b;
-    bwprintf(COM2, "Value of c: %d\n\r", c);
     int tid;
-    tid = MyTid();
-    bwprintf(COM2, "My TID is: %d",tid);
-    tid = Create(1, testTask);
-    bwprintf(COM2, "Created: %d\n\r", tid);
-    tid = Create(1, testTask);
-    bwprintf(COM2, "Created: %d\n\r", tid);
     tid = Create(3, testTask);
-    bwprintf(COM2, "Created: %d\n\r", tid);
+    bwprintf(COM2, "FirstUserTask: Created: %d\n\r", tid);
     tid = Create(3, testTask);
-    bwprintf(COM2, "Created: %d\n\r", tid);
+    bwprintf(COM2, "FirstUserTask: Created: %d\n\r", tid);
+    tid = Create(1, testTask);
+    bwprintf(COM2, "FirstUserTask: Created: %d\n\r", tid);
+    tid = Create(1, testTask);
+    bwprintf(COM2, "FirstUserTask: Created: %d\n\r", tid);
     bwprintf(COM2, "FirstUserTask: exiting");
     Exit();
 }
@@ -245,5 +240,4 @@ void Kernel::run() {
         handle(request);
         i++;
     }
-    bwprintf(COM2, "Kernel reached end of execution unexpectedly!");
 }

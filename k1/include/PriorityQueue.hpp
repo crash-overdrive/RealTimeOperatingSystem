@@ -27,6 +27,7 @@ class PriorityQueue {
 
             if (priority >= 0 && priority < maxNumberOfPriorities) {
 
+                bwprintf(COM2, "Pushed with priority: %d \n", priority);
                 queue[priority].push(item);
 
             }
