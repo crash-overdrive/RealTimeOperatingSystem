@@ -17,13 +17,18 @@ context_switch_entry:
     msr cpsr_c, #0b10011
 
     // SUPERVISOR MODE
-    // Saving cspr of user mode (which is spsr_svc) into task descriptor
+    // Saving cspr of user mode (which is spsr_svc) into r6
     mrs r6, spsr
 
     // SUPERVISOR MODE
     // Get Request type, save into r4
     ldr r4, [lr, #-4]
     and r4, #0xff
+
+    // SUPERVISOR MODE
+    // Get lr_svc which is gonna be the pc of the activeTask
+    ldr r12, =reg7
+    str r7, [r12]
 
     // save r0-r6
     ldr r12, =reg0
@@ -105,4 +110,5 @@ context_switch_exit:
  
     // SUPERVISOR MODE
     // Go back to user mode
+    @ movs pc, lr
     movs pc, lr

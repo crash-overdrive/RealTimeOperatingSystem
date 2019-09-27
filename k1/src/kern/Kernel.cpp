@@ -10,6 +10,7 @@ int reg3;
 int reg4;
 int reg5;
 int reg6;
+int reg7;
 
 void testTask() {
     int tid, ptid;
@@ -47,15 +48,11 @@ void Kernel::schedule() {
 
 int Kernel::activate() {
 
-    reg0 = activeTask->cpsr;
-    reg1 = activeTask->pc;
-    reg2 = activeTask->r0;
-    reg3 = (int)activeTask->sp;
+    reg5 = (int)activeTask->sp;
+    reg6 = activeTask->cpsr;
+    reg7 = activeTask->pc;
 
     asm volatile("ldr pc, =context_switch_exit");
-    
-
-    // Kernel exits from here!!
 
     // Should never reach here!! some bug if it reached here!
     bwprintf(COM2, "If you see this then something is really wrong\n");
