@@ -1,4 +1,5 @@
 #include "../../include/Syscall.hpp"
+#include "../../include/message.h"
 
 extern "C" {
 	#include <bwio.h>
@@ -13,35 +14,29 @@ enum SYSCALL {
 };
 
 int sysCreate(int priority, void (*function)()) {
-    volatile int retval;
-    // r0 = priority, r1 = function ptr
-    asm volatile("stmdb sp!, {r0-r3, r12}");
+    int retval;
+    asm volatile("stmdb sp!, {r1-r3, r12}");
     asm volatile("swi 2");
-    asm volatile("mov r8, r0");
-    asm volatile("ldmia sp!, {r0-r3, r12}");
-    asm volatile("mov %0, r8" : "=r"(retval));
+    asm volatile("mov %0, r0" : "=r"(retval));
+    asm volatile("ldmia sp!, {r1-r3, r12}");
     return retval;
 }
 
 int sysMyTid() {
-    volatile int retval;
-    asm volatile("stmdb sp!, {r0-r3, r12}");
+    int retval;
+    asm volatile("stmdb sp!, {r1-r3, r12}");
     asm volatile("swi 3");
-    // asm volatile("mov %r0, r0" : "=r"(retval));
-    asm volatile("mov r8, r0");
-    asm volatile("ldmia sp!, {r0-r3, r12}");
-    asm volatile("mov %0, r8" : "=r"(retval));
+    asm volatile("mov %0, r0" : "=r"(retval));
+    asm volatile("ldmia sp!, {r1-r3, r12}");
     return retval;
 }
 
 int sysMyParentTid() {
-    volatile int retval;
-    asm volatile("stmdb sp!, {r0-r3, r12}");
+    int retval;
+    asm volatile("stmdb sp!, {r1-r3, r12}");
     asm volatile("swi 4");
-    // asm volatile("mov %r0, r0" : "=r"(retval));
-    asm volatile("mov r8, r0");
-    asm volatile("ldmia sp!, {r0-r3, r12}");
-    asm volatile("mov %0, r8" : "=r"(retval));
+    asm volatile("mov %0, r0" : "=r"(retval));
+    asm volatile("ldmia sp!, {r1-r3, r12}");
     return retval;
 }
 
@@ -57,14 +52,29 @@ void sysExit() {
     asm volatile("ldmia sp!, {r0-r3, r12}");
 }
 
-int Send(int tid, const char *msg, int msglen, char *reply, int rplen) {
-    return 0;
+int sysSend(struct message message) {
+    int retval;
+    asm volatile("stmdb sp!, {r1-r3, r12}");
+    asm volatile("swi 7");
+    asm volatile("mov %0, r0" : "=r"(retval));
+    asm volatile("ldmia sp!, {r1-r3, r12}");
+    return retval;
 }
 
-int Receive(int *tid, char *msg, int msglen) {
-    return 0;
+int sysReceive(int *tid, char *msg, int msglen) {
+    int retval;
+    asm volatile("stmdb sp!, {r1-r3, r12}");
+    asm volatile("swi 8");
+    asm volatile("mov %0, r0" : "=r"(retval));
+    asm volatile("ldmia sp!, {r1-r3, r12}");
+    return retval;
 }
 
-int Reply(int tid, const char *reply, int rplen) {
-    return 0;
+int sysReply(int tid, const char *reply, int rplen) {
+    int retval;
+    asm volatile("stmdb sp!, {r1-r3, r12}");
+    asm volatile("swi 9");
+    asm volatile("mov %0, r0" : "=r"(retval));
+    asm volatile("ldmia sp!, {r1-r3, r12}");
+    return retval;
 }

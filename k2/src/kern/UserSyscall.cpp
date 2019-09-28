@@ -1,5 +1,6 @@
 #include "../../include/UserSyscall.hpp"
 #include "../../include/Syscall.hpp"
+#include "../../include/message.h"
 
 enum SYSCALL {
     CREATE = 2,
@@ -32,6 +33,13 @@ void Exit() {
 int Send(int tid, const char *msg, int msglen, char *reply, int rplen) {
     // TODO: create struct for passing info into sysSend.
     // sysSend();
+    struct message message;
+    message.tid = tid;
+    message.msg = msg;
+    message.msglen = msglen;
+    message.reply = reply;
+    message.rplen = rplen;
+    sysSend(message);
     return 0;
 }
 

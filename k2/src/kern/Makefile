@@ -26,7 +26,7 @@ CPPFLAGS = -fno-exceptions -fno-unwind-tables -fno-rtti -std=c++17 -g -S -fPIC -
 ARFLAGS = crs
 
 .PHONY: all
-all: Kernel.o Syscall.o ContextSwitch.o
+all: Kernel.o Syscall.o UserSyscall.o ContextSwitch.o
 
 Kernel.s: Kernel.cpp
 	$(CC) -S $(CPPFLAGS) Kernel.cpp
@@ -39,6 +39,12 @@ Syscall.s: Syscall.cpp
 
 Syscall.o: Syscall.s
 	$(AS) $(ASFLAGS) -o Syscall.o Syscall.s
+
+UserSyscall.s: UserSyscall.cpp
+	$(CC) -S $(CPPFLAGS) UserSyscall.cpp
+
+UserSyscall.o: UserSyscall.s
+	$(AS) $(ASFLAGS) -o UserSyscall.o UserSyscall.s
 
 ContextSwitch.o:
 	$(AS) $(ASFLAGS) -o ContextSwitch.o ContextSwitch.S
