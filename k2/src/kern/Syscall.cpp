@@ -1,6 +1,10 @@
 #include "../../include/UserSyscall.hpp"
 #include "../../include/Syscall.hpp"
-    
+
+extern "C" {
+	#include <bwio.h>
+}
+
 enum SYSCALL {
     CREATE = 2,
     MY_TID,
@@ -30,33 +34,35 @@ void Exit() {
 }
 
 int sysCreate(int priority, void (*function)()) {
-    int retval;
+    volatile int retval;
     // r0 = priority, r1 = function ptr
     asm volatile("stmdb sp!, {r0-r3, r12}");
     asm volatile("swi 2");
-    asm volatile("mov %r0, r0" : "=r"(retval));
+    asm volatile("mov r8, r0");
     asm volatile("ldmia sp!, {r0-r3, r12}");
-    
+    asm volatile("mov %0, r8" : "=r"(retval));
     return retval;
 }
 
 int sysMyTid() {
-    int retval;
+    volatile int retval;
     asm volatile("stmdb sp!, {r0-r3, r12}");
     asm volatile("swi 3");
-    asm volatile("mov %r0, r0" : "=r"(retval));
+    // asm volatile("mov %r0, r0" : "=r"(retval));
+    asm volatile("mov r8, r0");
     asm volatile("ldmia sp!, {r0-r3, r12}");
-    
+    asm volatile("mov %0, r8" : "=r"(retval));
     return retval;
 }
 
 int sysMyParentTid() {
-    int retval;
+    volatile int retval;
     asm volatile("stmdb sp!, {r0-r3, r12}");
     asm volatile("swi 4");
-    asm volatile("mov %r0, r0" : "=r"(retval));
+    // asm volatile("mov %r0, r0" : "=r"(retval));
+    asm volatile("mov r8, r0");
     asm volatile("ldmia sp!, {r0-r3, r12}");
-    
+    asm volatile("mov %0, r8" : "=r"(retval));
     return retval;
 }
 

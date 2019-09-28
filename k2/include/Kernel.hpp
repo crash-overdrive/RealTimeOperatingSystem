@@ -56,7 +56,7 @@ class Kernel {
         void handleExit();
 
         // Starts the first task
-        static int firstTask();
+        // static int firstTask();
 
     public:
 

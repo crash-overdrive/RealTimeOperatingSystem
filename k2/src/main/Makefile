@@ -17,6 +17,7 @@ LD = $(XBINDIR)/arm-none-eabi-ld
 # -mcpu=arm920t: generate code for the 920t architecture
 # -msoft-float: no FP co-processor
 CPPFLAGS = -fno-exceptions -fno-unwind-tables -fno-rtti -std=c++17 -g -S -fPIC -Wall -mcpu=arm920t -msoft-float -I. -I../../include -lstdc++ -O3
+# CPPFLAGS = -fno-exceptions -fno-unwind-tables -fno-rtti -std=c++17 -g -S -fPIC -Wall -mcpu=arm920t -msoft-float -I. -I../../include -lstdc++
 
 # c: create archive, if necessary
 # r: insert with replacement
@@ -45,8 +46,8 @@ main.elf: main.o
 .PHONY: install
 install: all
 	cp main.elf ../../build
-	cp main.elf /u/cs452/tftp/ARM/spratap/k1.elf
-	chmod 777 /u/cs452/tftp/ARM/spratap/k1.elf
+	cp main.elf /u/cs452/tftp/ARM/sgaweda/k2.elf
+	chmod 777 /u/cs452/tftp/ARM/sgaweda/k2.elf
 
 .PHONY: clean
 clean:
