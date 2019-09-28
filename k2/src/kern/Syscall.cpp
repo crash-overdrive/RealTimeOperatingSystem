@@ -1,4 +1,3 @@
-#include "../../include/UserSyscall.hpp"
 #include "../../include/Syscall.hpp"
 
 extern "C" {
@@ -12,26 +11,6 @@ enum SYSCALL {
     YIELD,
     EXIT
 };
-
-int Create(int priority, void (*function)()) {
-    return sysCreate(priority, function);
-}
-
-int MyTid() {
-    return sysMyTid();
-}
-
-int MyParentTid() {
-    return sysMyParentTid();
-}
-
-void Yield() {
-    sysYield();
-}
-
-void Exit() {
-    sysExit();
-}
 
 int sysCreate(int priority, void (*function)()) {
     volatile int retval;
@@ -76,4 +55,16 @@ void sysExit() {
     asm volatile("stmdb sp!, {r0-r3, r12}");
     asm volatile("swi 6");
     asm volatile("ldmia sp!, {r0-r3, r12}");
+}
+
+int Send(int tid, const char *msg, int msglen, char *reply, int rplen) {
+    return 0;
+}
+
+int Receive(int *tid, char *msg, int msglen) {
+    return 0;
+}
+
+int Reply(int tid, const char *reply, int rplen) {
+    return 0;
 }
