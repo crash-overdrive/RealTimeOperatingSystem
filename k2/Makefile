@@ -15,23 +15,23 @@ LDFLAGS = -static -e main -nmagic -T ../src/linker.ld -L $(XLIBDIR1) -L lib -L $
 
 .PHONY: all
 all: kern.elf
-	echo '\e[31m'"!!!!YOU DIDNT INSTALL!!!!"'\e[0m'
+	echo '\e[31m'"WARNING: kern.elf NOT INSTALLED REMOTELY!"'\e[0m'
 
 .PHONY: O0
 O0: kern-O0.elf
-	echo '\e[31m'"!!!!YOU DIDNT INSTALL!!!!"'\e[0m'
+	echo '\e[31m'"WARNING: kern-00.elf NOT INSTALLED REMOTELY!"'\e[0m'
 
 .PHONY: O1
 O1: kern-O1.elf
-	echo '\e[31m'"!!!!YOU DIDNT INSTALL!!!!"'\e[0m'
+	echo '\e[31m'"WARNING: kern-01.elf NOT INSTALLED REMOTELY!"'\e[0m'
 
 .PHONY: O2
 O2: kern-O2.elf
-	echo '\e[31m'"!!!!YOU DIDNT INSTALL!!!!"'\e[0m'
+	echo '\e[31m'"WARNING: kern-02.elf NOT INSTALLED REMOTELY!"'\e[0m'
 
 .PHONY: O3
 O3: kern-O3.elf
-	echo '\e[31m'"!!!!YOU DIDNT INSTALL!!!!"'\e[0m'
+	echo '\e[31m'"WARNING: kern-03.elf NOT INSTALLED REMOTELY!"'\e[0m'
 
 .PHONY: main
 main: io kern
