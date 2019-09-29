@@ -110,23 +110,23 @@ kern-O2.elf: main-O2
 kern-O3.elf: main-O3
 	cd build && $(LD) $(LDFLAGS) -o $@ main.o bwio.o ContextSwitch.o Kernel.o Syscall.o UART.o UserSyscall.o -lgcc -lc
 
-install: all
+install: kern.elf
 	cd build && cp kern.elf /u/cs452/tftp/ARM/spratap/k2.elf
 	chmod 777 /u/cs452/tftp/ARM/spratap/k2.elf
 
-install-O0: O0
+install-O0: kern-O0.elf
 	cd build && cp kern-O0.elf /u/cs452/tftp/ARM/spratap/k2.elf
 	chmod 777 /u/cs452/tftp/ARM/spratap/k2.elf
 
-install-O1: O1
+install-O1: kern-O1.elf
 	cd build && cp kern-O1.elf /u/cs452/tftp/ARM/spratap/k2.elf
 	chmod 777 /u/cs452/tftp/ARM/spratap/k2.elf
 
-install-O2: O2
+install-O2: kern-O2.elf
 	cd build && cp kern-O2.elf /u/cs452/tftp/ARM/spratap/k2.elf
 	chmod 777 /u/cs452/tftp/ARM/spratap/k2.elf
 
-install-O3: O3
+install-O3: kern-O3.elf
 	cd build && cp kern-O3.elf /u/cs452/tftp/ARM/spratap/k2.elf
 	chmod 777 /u/cs452/tftp/ARM/spratap/k2.elf
 
