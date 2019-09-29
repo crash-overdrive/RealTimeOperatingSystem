@@ -1,6 +1,7 @@
 #ifndef SYSCALL_HPP
 #define SYSCALL_HPP
 
+#include "Message.hpp"
 /*
  * Allocates and initializes a task descriptor, using the given priority, and the given function pointer as a pointer to the entry point of executable code,
  * essentially a function with no arguments and no return value. When Create returns, the task descriptor has all the state needed to run the task, the task’s
@@ -56,7 +57,7 @@ void sysExit();
  *   -1  : tid is not the task id of an existing task.
  *   -2  : send-receive-reply transaction could not be completed.
  */
-int sysSend(struct message message);
+int sysSend(Message message);
 
 /*
  * Blocks until a message is sent to the caller, then returns with the message in its message buffer and tid set to the task id of the task that sent the

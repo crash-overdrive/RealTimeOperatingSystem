@@ -1,9 +1,9 @@
 #ifndef UTIL_HPP
 #define UTIL_HPP
 
-extern "C" {
-	#include <bwio.h>
-}
+
+#include "bwio.h"
+
 
 namespace Util {
     

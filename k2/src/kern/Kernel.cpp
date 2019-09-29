@@ -1,5 +1,8 @@
 #include "../../include/Kernel.hpp"
 #include "../../include/UserSyscall.hpp"
+#include "../../include/bwio.h"
+#include "../../include/ts7200.h"
+#include "../../include/Util.hpp"
 
 #define print(str) bwprintf(COM2, str)
 

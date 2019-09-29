@@ -1,4 +1,5 @@
 #include "../../include/UART.hpp"
+#include "../../include/ts7200.h"
 
 int UART::setConfig(int channel, int wordLength, int fifoEnable, int stop, int parity) {
     int *high, *mid, *low, hmask;

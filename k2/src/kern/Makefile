@@ -1,14 +1,12 @@
 #
-# Makefile for Kernel.cpp
+# Makefile for Kernel.cpp Syscall.cpp UserSyscall.cpp ContextSwitch.S
 #
 XDIR=/u/cs452/public/xdev
 XBINDIR=$(XDIR)/bin
 XLIBDIR1=$(XDIR)/arm-none-eabi/lib
 XLIBDIR2=$(XDIR)/lib/gcc/arm-none-eabi/9.2.0/
 CC = $(XBINDIR)/arm-none-eabi-gcc
-AR = $(XBINDIR)/arm-none-eabi-ar
 AS = $(XBINDIR)/arm-none-eabi-as
-LD = $(XBINDIR)/arm-none-eabi-ld
 
 # -g: include debug information for gdb
 # -S: only compile and emit assembly
@@ -17,13 +15,6 @@ LD = $(XBINDIR)/arm-none-eabi-ld
 # -mcpu=arm920t: generate code for the 920t architecture
 # -msoft-float: no FP co-processor
 CPPFLAGS = -fno-exceptions -fno-unwind-tables -fno-rtti -std=c++17 -g -S -fPIC -Wall -mcpu=arm920t -msoft-float -I. -I../../include -lstdc++ -lc -O3
-# CPPFLAGS = -fno-exceptions -fno-unwind-tables -fno-rtti -std=c++17 -g -S -fPIC -Wall -mcpu=arm920t -msoft-float -I. -I../../include -lstdc++ -lc
-
-
-# c: create archive, if necessary
-# r: insert with replacement
-# s: add index to archive
-ARFLAGS = crs
 
 .PHONY: all
 all: Kernel.o Syscall.o UserSyscall.o ContextSwitch.o
@@ -51,7 +42,8 @@ ContextSwitch.o:
 
 .PHONY: install
 install: all
+	mv *.s *.o ../../build
 
 .PHONY: clean
 clean:
-	-rm -f *.s *.a *.o
+	-rm -f *.s *.o

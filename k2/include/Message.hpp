@@ -1,7 +1,7 @@
 #ifndef MESSAGE_H
 #define MESSAGE_H
 
-struct message {
+struct Message {
     int tid;
     const char *msg;
     int msglen;

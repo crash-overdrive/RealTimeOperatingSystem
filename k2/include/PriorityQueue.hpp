@@ -2,7 +2,6 @@
 #define PRIORITY_QUEUE_HPP
 
 #include "RingBuffer.hpp"
-#include "Util.hpp"
 
 namespace DataStructures {
 

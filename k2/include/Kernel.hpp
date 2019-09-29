@@ -2,17 +2,12 @@
 #define KERNEL_HPP
 
 #include "PriorityQueue.hpp"
+#include "RingBuffer.hpp"
 #include "Constants.hpp"
-#include "Util.hpp"
 #include "TaskDescriptor.hpp"
 #include "UART.hpp"
 
 #define FOREVER for(;;)
-
-extern "C" {
-	#include <bwio.h>
-}
-
 
 class Kernel {
 
@@ -54,9 +49,6 @@ class Kernel {
         int handleMyTid();
         int handleMyParentTid();
         void handleExit();
-
-        // Starts the first task
-        // static int firstTask();
 
     public:
 

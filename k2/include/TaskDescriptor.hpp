@@ -1,6 +1,7 @@
-#include "RingBuffer.hpp"
-#include "Constants.hpp"
+#ifndef TASK_DESCRIPTOR_HPP
+#define TASK_DESCRIPTOR_HPP
 
+#include "Constants.hpp"
 
 class TaskDescriptor {
 
@@ -22,3 +23,4 @@ class TaskDescriptor {
         int stack[Constants::TD_STACK_SIZE];
 
 };
+#endif

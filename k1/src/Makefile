@@ -16,7 +16,7 @@ io:
 clean:
 	cd main
 	-rm -f *.s *.a *.o main.elf
-	cd ../kern
+	cd kern
 	-rm -f *.s *.a *.o
-	cd ../io
+	cd io
 	-rm -f *.s *.a *.o

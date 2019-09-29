@@ -1,6 +1,4 @@
 #include "../../include/Kernel.hpp"
-#include <cstring>
-#include <cstdint>
 
 typedef void (*funcvoid0_t)();
 extern funcvoid0_t __init_array_start, __init_array_end;
