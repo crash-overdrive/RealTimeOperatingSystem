@@ -1,12 +1,22 @@
-#ifndef MESSAGE_H
-#define MESSAGE_H
+#ifndef MESSAGE_HPP
+#define MESSAGE_HPP
 
-struct Message {
+class TaskDescriptor;
+
+class SendRequest {
+public:
     int tid;
     const char *msg;
     int msglen;
     char *reply;
     int rplen;
+};
+
+class KernelSendRequest {
+public:
+    TaskDescriptor *receiverTD;
+    TaskDescriptor *senderTD;
+    SendRequest *sendRequest;
 };
 
 #endif

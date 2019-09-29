@@ -14,8 +14,8 @@ class Kernel {
     private:
         DataStructures::PriorityQueue<TaskDescriptor, Constants::NUM_PRIORITIES, Constants::Q_LENGTH> ready_queue;
         DataStructures::RingBuffer<TaskDescriptor, Constants::Q_LENGTH> blocked_queue;
-        DataStructures::RingBuffer<TaskDescriptor, Constants::EXIT_Q_LENGTH> exit_queue;
 
+        DataStructures::RingBuffer<TaskDescriptor, Constants::EXIT_Q_LENGTH> exit_queue;
         
         TaskDescriptor tasks[Constants::NUM_TASKS];
 
@@ -49,6 +49,18 @@ class Kernel {
         int handleMyTid();
         int handleMyParentTid();
         void handleExit();
+        int handleSend(SendRequest *sr);
+        int handleReceive(int *tid, int *msg);
+        int handleReply();
+
+        /*
+         * Lookup TD by tid
+         * 
+         * Returns:
+         *   TD*    : pointer to task descriptor if tid corresponds to an existing task
+         *   nullptr: null otherwise
+         */
+        TaskDescriptor *lookupTD(int tid);
 
     public:
 

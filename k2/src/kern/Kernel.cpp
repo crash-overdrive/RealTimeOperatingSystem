@@ -1,8 +1,10 @@
+#include <cstring>
 #include "../../include/Kernel.hpp"
 #include "../../include/UserSyscall.hpp"
 #include "../../include/bwio.h"
 #include "../../include/ts7200.h"
 #include "../../include/Util.hpp"
+#include "../../include/Message.hpp"
 
 #define print(str) bwprintf(COM2, str)
 
@@ -51,6 +53,13 @@ void Kernel::initialize() {
     // Setup comm
     uart.setConfig(COM1, BPF8, OFF, ON, OFF);
 	uart.setConfig(COM2, BPF8, OFF, OFF, OFF);
+
+    // Setup TaskDescriptors
+    for (int i = 0; i < Constants::NUM_TASKS; ++i) {
+        // Set all task ids to -1 so lookup can be performed safely
+        tasks[i].tid = -1;
+        tasks[i].kSendRequest.senderTD = &tasks[i];
+    }
 
     // Create the system's first task
     handleCreate(2, firstTask);
@@ -128,6 +137,18 @@ void Kernel::handle(int request)  {
             handleExit();
             break;
 
+        case 7:
+            handleSend((SendRequest *) arg1);
+            break;
+
+        case 8:
+            handleReceive((int *) arg1, (int *) arg2);
+            break;
+
+        case 9:
+            handleReply();
+            break;
+
         default:
             break;
     }
@@ -142,7 +163,12 @@ void Kernel::handle(int request)  {
             break;
 
         case Constants::ACTIVE:
-            bwprintf(COM2, "Task shouldnt have ACTIVE state\n");
+            bwprintf(COM2, "Task shouldn't have ACTIVE state\n");
+            break;
+
+        case Constants::SEND_BLOCKED:
+        case Constants::RECEIVE_BLOCKED:
+        case Constants::REPLY_BLOCKED:
             break;
 
         default:
@@ -217,6 +243,52 @@ int Kernel::handleMyParentTid() {
 
 void Kernel::handleExit() {
     activeTask->taskState = Constants::ZOMBIE;
+}
+
+int Kernel::handleSend(SendRequest *sendRequest) {
+    TaskDescriptor *receiver = lookupTD(sendRequest->tid);
+    if (receiver == nullptr) {
+        // HANDLE ERROR CASE
+    }
+    activeTask->kSendRequest.receiverTD = receiver;
+    activeTask->kSendRequest.sendRequest = sendRequest;
+    if (receiver->taskState == Constants::RECEIVE_BLOCKED) {
+        // Transition the receiver to be ready and puts them on the ready queue
+        ready_queue.push(receiver, receiver->priority);
+        receiver->taskState = Constants::READY;
+        receiver->receiveQueue.push(&activeTask->kSendRequest);
+        // Transition the sender to be reply blocked
+        activeTask->taskState = Constants::REPLY_BLOCKED;
+    } else {
+        // Transition the sender to be send blocked
+        activeTask->taskState = Constants::SEND_BLOCKED;
+    }
+}
+
+int Kernel::handleReceive(int *tid, int *msg) {
+    if (!activeTask->receiveQueue.empty()) {
+        KernelSendRequest *kSendRequest = activeTask->receiveQueue.pop();
+        memcpy(msg, kSendRequest->sendRequest->msg, kSendRequest->sendRequest->msglen);
+        *tid = kSendRequest->senderTD->tid;
+        // Transition sender to be reply blocked now
+        kSendRequest->senderTD->taskState = Constants::REPLY_BLOCKED;
+    } else {
+        activeTask->taskState = Constants::RECEIVE_BLOCKED;
+    }
+}
+
+int Kernel::handleReply() {
+    // Todo: implement me
+}
+
+TaskDescriptor *Kernel::lookupTD(int tid) {
+    for (int i = 0; i < Constants::NUM_TASKS; ++i) {
+        if (tasks[i].tid == tid) {
+            if (tasks[i].taskState == Constants::ZOMBIE) { return nullptr; }
+            return &tasks[i];
+        }
+    }
+    return nullptr;
 }
 
 void Kernel::run() {

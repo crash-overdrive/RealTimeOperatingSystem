@@ -57,7 +57,7 @@ void sysExit();
  *   -1  : tid is not the task id of an existing task.
  *   -2  : send-receive-reply transaction could not be completed.
  */
-int sysSend(Message message);
+int sysSend(SendRequest *sendRequest);
 
 /*
  * Blocks until a message is sent to the caller, then returns with the message in its message buffer and tid set to the task id of the task that sent the

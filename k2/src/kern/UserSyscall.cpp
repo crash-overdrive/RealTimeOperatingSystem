@@ -33,13 +33,13 @@ void Exit() {
 int Send(int tid, const char *msg, int msglen, char *reply, int rplen) {
     // TODO: create struct for passing info into sysSend.
     // sysSend();
-    Message message;
-    message.tid = tid;
-    message.msg = msg;
-    message.msglen = msglen;
-    message.reply = reply;
-    message.rplen = rplen;
-    sysSend(message);
+    SendRequest sendRequest;
+    sendRequest.tid = tid;
+    sendRequest.msg = msg;
+    sendRequest.msglen = msglen;
+    sendRequest.reply = reply;
+    sendRequest.rplen = rplen;
+    sysSend(&sendRequest);
     return 0;
 }
 

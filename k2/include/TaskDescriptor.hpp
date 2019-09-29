@@ -2,6 +2,8 @@
 #define TASK_DESCRIPTOR_HPP
 
 #include "Constants.hpp"
+#include "RingBuffer.hpp"
+#include "Message.hpp"
 
 class TaskDescriptor {
 
@@ -9,7 +11,9 @@ class TaskDescriptor {
         // TaskStack *;
         
         int tid;
+        // TaskDescriptor *myTD;
         int parentTid;
+        // TaskDescriptor *myParentTD; TODO: Determine is this would be useful
 
         Constants::STATE taskState;
 
@@ -21,6 +25,9 @@ class TaskDescriptor {
         int priority;
 
         int stack[Constants::TD_STACK_SIZE];
+
+        DataStructures::RingBuffer<KernelSendRequest, Constants::RECEIVE_QUEUE_LENGTH> receiveQueue;
+        KernelSendRequest kSendRequest;
 
 };
 #endif

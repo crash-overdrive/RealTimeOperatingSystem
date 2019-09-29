@@ -13,6 +13,7 @@ int sysCreate(int priority, void (*function)()) {
     int retval;
     asm volatile("stmdb sp!, {r1-r3, r12}");
     asm volatile("swi 2");
+    // TODO: Determine if we can force this to use a specific register
     asm volatile("mov %0, r0" : "=r"(retval));
     asm volatile("ldmia sp!, {r1-r3, r12}");
     return retval;
@@ -48,7 +49,7 @@ void sysExit() {
     asm volatile("ldmia sp!, {r0-r3, r12}");
 }
 
-int sysSend(Message message) {
+int sysSend(SendRequest *sendRequest) {
     int retval;
     asm volatile("stmdb sp!, {r1-r3, r12}");
     asm volatile("swi 7");
