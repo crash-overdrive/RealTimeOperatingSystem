@@ -95,7 +95,7 @@ io-O2:
 io-O3:
 	cd src/io && $(MAKE) install-O3
 
-kern.elf: main
+kern.elf: main-03
 	cd build && $(LD) $(LDFLAGS) -o $@ main.o bwio.o ContextSwitch.o Kernel.o Syscall.o UART.o UserSyscall.o -lgcc -lc
 
 kern-O0.elf: main-O0
