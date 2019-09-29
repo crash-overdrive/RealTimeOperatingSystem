@@ -15,26 +15,121 @@ LDFLAGS = -static -e main -nmagic -T ../src/linker.ld -L $(XLIBDIR1) -L lib -L $
 
 .PHONY: all
 all: kern.elf
+	echo '\e[31m'"!!!!YOU DIDNT INSTALL!!!!"'\e[0m'
+
+.PHONY: O0
+O0: kern-O0.elf
+	echo '\e[31m'"!!!!YOU DIDNT INSTALL!!!!"'\e[0m'
+
+.PHONY: O1
+O1: kern-O1.elf
+	echo '\e[31m'"!!!!YOU DIDNT INSTALL!!!!"'\e[0m'
+
+.PHONY: O2
+O2: kern-O2.elf
+	echo '\e[31m'"!!!!YOU DIDNT INSTALL!!!!"'\e[0m'
+
+.PHONY: O3
+O3: kern-O3.elf
+	echo '\e[31m'"!!!!YOU DIDNT INSTALL!!!!"'\e[0m'
 
 .PHONY: main
 main: io kern
-	cd src/main && $(MAKE) clean && $(MAKE) install
+	cd src/main && $(MAKE) install
+	
+.PHONY: main-O0
+main-O0: io-O0 kern-O0
+	cd src/main && $(MAKE) install-O0
+
+.PHONY: main-O1
+main-O1: io-O1 kern-O1
+	cd src/main && $(MAKE) install-O1
+
+.PHONY: main-O2
+main-O2: io-O2 kern-O2
+	cd src/main && $(MAKE) install-O2
+
+.PHONY: main-O3
+main-O3: io-O3 kern-O3
+	cd src/main && $(MAKE) install-O3
+
 
 .PHONY: kern
 kern:
-	cd src/kern && $(MAKE) clean && $(MAKE) install
+	cd src/kern && $(MAKE) install
+
+.PHONY: kern-O0
+kern-O0:
+	cd src/kern && $(MAKE) install-O0
+
+.PHONY: kern-O1
+kern-O1:
+	cd src/kern && $(MAKE) install-O1
+
+.PHONY: kern-O2
+kern-O2:
+	cd src/kern && $(MAKE) install-O2
+
+.PHONY: kern-O3
+kern-O3:
+	cd src/kern && $(MAKE) install-O3
+
 
 .PHONY: io
 io:
-	cd src/io && $(MAKE) clean && $(MAKE) install
+	cd src/io && $(MAKE) install
 
-kern.elf: io kern main
+.PHONY: io-O0
+io-O0:
+	cd src/io && $(MAKE) install-O0
+
+.PHONY: io-O1
+io-O1:
+	cd src/io && $(MAKE) install-O1
+
+.PHONY: io-O2
+io-O2:
+	cd src/io && $(MAKE) install-O2
+
+.PHONY: io-O3
+io-O3:
+	cd src/io && $(MAKE) install-O3
+
+kern.elf: main
 	cd build && $(LD) $(LDFLAGS) -o $@ main.o bwio.o ContextSwitch.o Kernel.o Syscall.o UART.o UserSyscall.o -lgcc -lc
 
-install: kern.elf
+kern-O0.elf: main-O0
+	cd build && $(LD) $(LDFLAGS) -o $@ main.o bwio.o ContextSwitch.o Kernel.o Syscall.o UART.o UserSyscall.o -lgcc -lc
+
+kern-O1.elf: main-O1
+	cd build && $(LD) $(LDFLAGS) -o $@ main.o bwio.o ContextSwitch.o Kernel.o Syscall.o UART.o UserSyscall.o -lgcc -lc
+
+kern-O2.elf: main-O2
+	cd build && $(LD) $(LDFLAGS) -o $@ main.o bwio.o ContextSwitch.o Kernel.o Syscall.o UART.o UserSyscall.o -lgcc -lc
+
+kern-O3.elf: main-O3
+	cd build && $(LD) $(LDFLAGS) -o $@ main.o bwio.o ContextSwitch.o Kernel.o Syscall.o UART.o UserSyscall.o -lgcc -lc
+
+install: all
 	cd build && cp kern.elf /u/cs452/tftp/ARM/spratap/k2.elf
 	chmod 777 /u/cs452/tftp/ARM/spratap/k2.elf
 
+install-O0: O0
+	cd build && cp kern-O0.elf /u/cs452/tftp/ARM/spratap/k2.elf
+	chmod 777 /u/cs452/tftp/ARM/spratap/k2.elf
+
+install-O1: O1
+	cd build && cp kern-O1.elf /u/cs452/tftp/ARM/spratap/k2.elf
+	chmod 777 /u/cs452/tftp/ARM/spratap/k2.elf
+
+install-O2: O2
+	cd build && cp kern-O2.elf /u/cs452/tftp/ARM/spratap/k2.elf
+	chmod 777 /u/cs452/tftp/ARM/spratap/k2.elf
+
+install-O3: O3
+	cd build && cp kern-O3.elf /u/cs452/tftp/ARM/spratap/k2.elf
+	chmod 777 /u/cs452/tftp/ARM/spratap/k2.elf
+
 clean:
-	cd build && rm -f *.s *.o *.elf
+	cd build && rm -f *.s *.o *.S *.elf
 	
