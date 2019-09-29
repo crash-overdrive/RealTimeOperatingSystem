@@ -16,6 +16,7 @@ class Kernel {
         DataStructures::RingBuffer<TaskDescriptor, Constants::Q_LENGTH> blocked_queue;
 
         DataStructures::RingBuffer<TaskDescriptor, Constants::EXIT_Q_LENGTH> exit_queue;
+        DataStructures::RingBuffer<KernelSendRequest, Constants::REPLY_QUEUE_LENGTH> replyQueue;
         
         TaskDescriptor tasks[Constants::NUM_TASKS];
 
@@ -50,8 +51,8 @@ class Kernel {
         int handleMyParentTid();
         void handleExit();
         int handleSend(SendRequest *sr);
-        int handleReceive(int *tid, int *msg);
-        int handleReply();
+        int handleReceive(int *tid, int *msg, int msglen);
+        int handleReply(int tid, const char *reply, int rplen);
 
         /*
          * Lookup TD by tid

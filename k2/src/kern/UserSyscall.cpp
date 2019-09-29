@@ -39,14 +39,13 @@ int Send(int tid, const char *msg, int msglen, char *reply, int rplen) {
     sendRequest.msglen = msglen;
     sendRequest.reply = reply;
     sendRequest.rplen = rplen;
-    sysSend(&sendRequest);
-    return 0;
+    return sysSend(&sendRequest);
 }
 
 int Receive(int *tid, char *msg, int msglen) {
-    return 0;
+    return sysReceive(tid, msg, msglen);
 }
 
 int Reply(int tid, const char *reply, int rplen) {
-    return 0;
+    return sysReply(tid, reply, rplen);
 }

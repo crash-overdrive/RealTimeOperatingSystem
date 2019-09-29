@@ -4,10 +4,11 @@
 namespace Constants {
     const int NUM_PRIORITIES = 8;
     const int Q_LENGTH = 4;
-    const int EXIT_Q_LENGTH = 128;
-    const int RECEIVE_QUEUE_LENGTH = 32;
-    const int TD_STACK_SIZE = 32768;
     const int NUM_TASKS = 128;
+    const int EXIT_Q_LENGTH = NUM_TASKS;
+    const int RECEIVE_QUEUE_LENGTH = 32;
+    const int REPLY_QUEUE_LENGTH = NUM_TASKS;
+    const int TD_STACK_SIZE = 32768;
     enum STATE {
         ACTIVE,
         READY,

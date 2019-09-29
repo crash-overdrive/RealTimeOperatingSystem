@@ -142,11 +142,11 @@ void Kernel::handle(int request)  {
             break;
 
         case 8:
-            handleReceive((int *) arg1, (int *) arg2);
+            handleReceive((int *) arg1, (int *) arg2, (int) arg3);
             break;
 
         case 9:
-            handleReply();
+            handleReply((int) arg1, (const char *)arg2, (int) arg3);
             break;
 
         default:
@@ -265,20 +265,39 @@ int Kernel::handleSend(SendRequest *sendRequest) {
     }
 }
 
-int Kernel::handleReceive(int *tid, int *msg) {
+int Kernel::handleReceive(int *tid, int *msg, int msglen) {
     if (!activeTask->receiveQueue.empty()) {
         KernelSendRequest *kSendRequest = activeTask->receiveQueue.pop();
+        // TODO: compare msglen and ksr messagelen and do appropriate action
         memcpy(msg, kSendRequest->sendRequest->msg, kSendRequest->sendRequest->msglen);
         *tid = kSendRequest->senderTD->tid;
         // Transition sender to be reply blocked now
+        replyQueue.push(kSendRequest);
         kSendRequest->senderTD->taskState = Constants::REPLY_BLOCKED;
     } else {
         activeTask->taskState = Constants::RECEIVE_BLOCKED;
     }
 }
 
-int Kernel::handleReply() {
-    // Todo: implement me
+int Kernel::handleReply(int tid, const char *reply, int rplen) {
+    KernelSendRequest *kSendRequest;
+    for (int i = 0; i < replyQueue.size(); ++i) {
+        kSendRequest = replyQueue.pop();
+        if (kSendRequest->senderTD->tid == tid) {
+            // TODO: Compare lengths
+            memcpy(kSendRequest->sendRequest->reply, reply, rplen);
+            ready_queue.push(kSendRequest->senderTD, kSendRequest->senderTD->priority);
+            kSendRequest->senderTD->taskState = Constants::READY;
+        } else {
+            replyQueue.push(kSendRequest);
+        }
+    }
+    // TODO: How do we check for this?
+    return -2; // tid is not the tid of an existing task
+    return -3; // tid is not the tid of a reply-blocked task
+    // check if tid is reply blocked
+    // check if tid is an existing task
+    // if message is truncated return -1 but copy what you can
 }
 
 TaskDescriptor *Kernel::lookupTD(int tid) {
