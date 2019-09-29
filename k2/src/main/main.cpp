@@ -13,7 +13,7 @@ int main () {
      * Bits 2 and 12 set ICache and DCache respectively (instruction and data caches)
      * Bits start from 0.... :( tricky tricky
      *   To turn on ICache
-     *     | 0x800
+     *     | 0x800 
      *   To turn off ICache
      *     & 0x7FF
      *   To turn on DCache
@@ -21,7 +21,7 @@ int main () {
      *   To turn off DCache
      *     & 0xD
      *   To turn on both
-     *     | 0x802
+     *     | 0x804
      *   To turn off both
      *     & 0x7FD
      */
