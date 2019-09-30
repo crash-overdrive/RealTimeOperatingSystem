@@ -82,7 +82,7 @@ void rpsClientPAPER() {
     char* paper = "p";
     char response[5];
     int nameServer = 2;
-    
+
     int rpsServer = 3;
 
     int reply = Send(rpsServer, signup, 2, response, 5);
@@ -273,6 +273,8 @@ void rpsServer() {
             }
 
             if (hasPlayer1Responded && hasPlayer2Responded) {  
+                bwprintf(COM2, "Press any key to continue...\n\r");
+                bwgetc(COM2);
                 if (responsePlayer1 == responsePlayer2) { 
                     Reply(tidPlayer1, draw, 2);
                     Reply(tidPlayer2, draw, 2);
@@ -304,8 +306,10 @@ int firstTask() {
     tid = Create(1, rpsClientROCK);
     tid = Create(1, rpsClientROCK);
     tid = Create(1, rpsClientSCISSOR);
-    tid = Create(1, rpsClientROCK);
+    tid = Create(1, rpsClientPAPER);
     tid = Create(1, rpsClientSCISSOR);
+    // tid = Create(1, sendTask);
+    // tid = Create(1, receiveTask);
 
     Exit();
 }
