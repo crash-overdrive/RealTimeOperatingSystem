@@ -35,25 +35,118 @@ void testTask() {
     Exit();
 }
 
-int firstTask() {
-    int tid;
-    tid = Create(3, testTask);
-    bwprintf(COM2, "FirstUserTask: Created Task: %d\n\r", tid);
-    tid = Create(3, testTask);
-    bwprintf(COM2, "FirstUserTask: Created Task: %d\n\r", tid);
-    tid = Create(1, testTask);
-    bwprintf(COM2, "FirstUserTask: Created Task: %d\n\r", tid);
-    tid = Create(1, testTask);
-    bwprintf(COM2, "FirstUserTask: Created Task: %d\n\r", tid);
-    bwprintf(COM2, "FirstUserTask: exiting\n\r");
+void rpsClientROCK() {
+    char* signup = "s";
+    char* quit = "q";
+    char* rock = "r";
+    char response[5];
+
+    int reply = Send(3, signup, 2, response, 5);
+
+    if (reply == 2 && response[0] == 'r') {
+        for (int i = 1; i <= 3; ++i) {
+            reply = Send(3, rock, 2, response, 5);
+            if (reply == 2) {
+                if (response[0] == 'w') {
+                    bwprintf(COM2, "Rock server won");
+                } else if (response[0] == 'l') {
+                    bwprintf(COM2, "Rock server lost");
+                } else if (response[0] == 'q') {
+                    bwprintf(COM2, "Other player quit..");
+                    break;
+                } else {
+                    bwprintf(COM2, "RPS CLIENT ROCK Received bad value: %s", response);
+                }
+
+            } else {
+                bwprintf(COM2, "RPS CLIENT ROCK Received incorrect length - bad value: %s", response);
+            }
+        }
+        reply = Send(3, quit, 2, response, 5);
+    } else {
+        bwprintf(COM2, "RPS CLIENT ROCK Received incorrect length - bad value: %s", response);
+    }
+
+    Exit();
+
+}
+
+void rpsClientPAPER() {
+    char* signup = "s";
+    char* quit = "q";
+    char* paper ="p";
+    char response[5];
+
+    int reply = Send(3, signup, 2, response, 5);
+
+    if (reply == 2 && response[0] == 'r') {
+        for (int i = 1; i <= 3; ++i) {
+            reply = Send(3 , paper, 2, response, 5);
+            if (reply == 2) {
+                if (response[0] == 'w') {
+                    bwprintf(COM2, "Paper server won");
+                } else if (response[0] == 'l') {
+                    bwprintf(COM2, "Paper server lost");
+                } else if (response[0] == 'q') {
+                    bwprintf(COM2, "Other player quit..");
+                    break;
+                } else {
+                    bwprintf(COM2, "RPS CLIENT Paper Received bad value: %s", response);
+                }
+
+            } else {
+                bwprintf(COM2, "RPS CLIENT Paper Received incorrect length - bad value: %s", response);
+            }
+        }
+        reply = Send(3, quit, 2, response, 5);
+    } else {
+        bwprintf(COM2, "RPS CLIENT Paper Received incorrect length - bad value: %s", response);
+    }
+    Exit();
+    
+}
+
+void rpsClientScissor() {
+    char* signup = "s";
+    char* quit = "q";
+    char* scissor ="x";
+
+    char response[5];
+
+    int reply = Send(3, signup, 2, response, 5);
+
+    if (reply == 2 && response[0] == 'r') {
+        for (int i = 1; i <= 3; ++i) {
+            reply = Send(3, scissor, 2, response, 5);
+            if (reply == 2) {
+                if (response[0] == 'w') {
+                    bwprintf(COM2, "scissor server won");
+                } else if (response[0] == 'l') {
+                    bwprintf(COM2, "scissor server lost");
+                } else if (response[0] == 'q') {
+                    bwprintf(COM2, "Other player quit..");
+                    break;
+                } else {
+                    bwprintf(COM2, "RPS CLIENT scissor Received bad value: %s", response);
+                }
+
+            } else {
+                bwprintf(COM2, "RPS CLIENT scissor Received incorrect length - bad value: %s", response);
+            }
+        }
+        reply = Send(3, quit, 2, response, 5);
+    } else {
+        bwprintf(COM2, "RPS CLIENT scissor Received incorrect length - bad value: %s", response);
+    }
     Exit();
 }
 
 void nameServer() {
-
+    
 }
 
 void rpsServer() {
+
     // TODO: evaluate the size, put it in constants file as well
     DataStructures::RingBuffer<int, 10> registrationList;
 
@@ -94,8 +187,8 @@ void rpsServer() {
 
                 gameOver = false;
 
-                Reply(tidPlayer1, ready, 1);
-                Reply(tidPlayer2, ready, 1);
+                Reply(tidPlayer1, ready, 2);
+                Reply(tidPlayer2, ready, 2);
             }
 
         } else if (msg[0] == 'q') { //QUIT
@@ -103,7 +196,7 @@ void rpsServer() {
             // TODO: what to do if both send q at same time???
 
             // Let the client go
-            Reply(*sendProcessTid, quit, 1);
+            Reply(*sendProcessTid, quit, 2);
 
             // Set gameover state to be true so that on next iteration other task can be let go
             gameOver = true;
@@ -113,7 +206,7 @@ void rpsServer() {
             // If one client has already called quits to the game
             if (gameOver) {
                 // send quit signal to the other process that the game has ended
-                Reply(*sendProcessTid, quit, 1);
+                Reply(*sendProcessTid, quit, 2);
 
                 // handle popping off next elements which are ready and then get out of this loop
                 if (registrationList.size() >= 2) {
@@ -123,8 +216,8 @@ void rpsServer() {
 
                     gameOver = false;
 
-                    Reply(tidPlayer1, ready, 1);
-                    Reply(tidPlayer2, ready, 1);   
+                    Reply(tidPlayer1, ready, 2);
+                    Reply(tidPlayer2, ready, 2);   
                     continue;
                 }
             }
@@ -141,18 +234,18 @@ void rpsServer() {
 
             if (hasPlayer1Responded && hasPlayer2Responded) {  
                 if (responsePlayer1 == responsePlayer2) { 
-                    Reply(tidPlayer1, draw, 1);
-                    Reply(tidPlayer2, draw, 1);
+                    Reply(tidPlayer1, draw, 2);
+                    Reply(tidPlayer2, draw, 2);
 
-                } else if ((responsePlayer1 == 'p' && responsePlayer2 = 's') ||
-                (responsePlayer1 == 'x' && responsePlayer2 = 'p') ||
-                (responsePlayer1 == 's' && responsePlayer2 = 'x')) {  
-                    Reply(tidPlayer1, win, 1);
-                    Reply(tidPlayer2, loss, 1);
+                } else if ((responsePlayer1 == 'p' && responsePlayer2 == 's') ||
+                (responsePlayer1 == 'x' && responsePlayer2 == 'p') ||
+                (responsePlayer1 == 's' && responsePlayer2 == 'x')) {  
+                    Reply(tidPlayer1, win, 2);
+                    Reply(tidPlayer2, loss, 2);
                 } else {
 
-                    Reply(tidPlayer1, loss, 1);
-                    Reply(tidPlayer2, win, 1);
+                    Reply(tidPlayer1, loss, 2);
+                    Reply(tidPlayer2, win, 2);
 
                 }
                 responsePlayer1 = responsePlayer2 = '\0';
@@ -167,6 +260,20 @@ void rpsServer() {
         }
 
     }   
+}
+
+int firstTask() {
+    int tid;
+    tid = Create(2, nameServer);
+    tid = Create(2, rpsServer);
+    tid = Create(1, rpsClientROCK);
+    tid = Create(1, rpsClientROCK);
+    tid = Create(1, rpsClientPAPER);
+    tid = Create(1, rpsClientPAPER);
+    tid = Create(1, rpsClientScissor);
+    tid = Create(1, rpsClientScissor);
+
+    Exit();
 }
 
 void Kernel::initialize() {
@@ -190,7 +297,7 @@ void Kernel::initialize() {
     asm volatile("str r12, [r3]");
 
     // Create the system's first task
-    handleCreate(2, firstTask);
+    handleCreate(0, firstTask);
 }
 
 void Kernel::schedule() {
