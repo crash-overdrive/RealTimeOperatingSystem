@@ -5,6 +5,7 @@
 #include "../../include/ts7200.h"
 #include "../../include/Util.hpp"
 #include "../../include/Message.hpp"
+#include "../../include/TimingTasks.hpp"
 
 #define print(str) bwprintf(COM2, str)
 
@@ -37,6 +38,10 @@ void testTask() {
 
 int firstTask() {
     int tid;
+    tid = Create(4, sendTask);
+    bwprintf(COM2, "FirstUserTask: Created Sender Task: %d\n\r", tid);
+    tid = Create(4, receiveTask);
+    bwprintf(COM2, "FirstUserTask: Created Server Task: %d\n\r", tid);
     tid = Create(3, testTask);
     bwprintf(COM2, "FirstUserTask: Created Task: %d\n\r", tid);
     tid = Create(3, testTask);
@@ -138,15 +143,15 @@ void Kernel::handle(int request)  {
             break;
 
         case 7:
-            handleSend((SendRequest *) arg1);
+            activeTask->r0 = handleSend((SendRequest *) arg1);
             break;
 
         case 8:
-            handleReceive((int *) arg1, (int *) arg2, (int) arg3);
+            activeTask->r0 = handleReceive((int *) arg1, (int *) arg2, (int) arg3);
             break;
 
         case 9:
-            handleReply((int) arg1, (const char *)arg2, (int) arg3);
+            activeTask->r0 = handleReply((int) arg1, (const char *)arg2, (int) arg3);
             break;
 
         default:
@@ -163,7 +168,7 @@ void Kernel::handle(int request)  {
             break;
 
         case Constants::ACTIVE:
-            bwprintf(COM2, "Task shouldn't have ACTIVE state\n");
+            bwprintf(COM2, "Task shouldn't have ACTIVE state\n\r");
             break;
 
         case Constants::SEND_BLOCKED:
@@ -172,7 +177,7 @@ void Kernel::handle(int request)  {
             break;
 
         default:
-            bwprintf(COM2, "Got invalid task State: %d \n", activeTask->taskState);
+            bwprintf(COM2, "Received invalid task State: %d \n\r", activeTask->taskState);
             break;
     }
     
@@ -256,20 +261,22 @@ int Kernel::handleSend(SendRequest *sendRequest) {
     activeTask->kSendRequest.receiverTD = receiver;
     activeTask->kSendRequest.sendRequest = sendRequest;
 
+    receiver->receiveQueue.push(&activeTask->kSendRequest);
+
     if (receiver->taskState == Constants::RECEIVE_BLOCKED) {
         // Transition the receiver to be ready and puts them on the ready queue
         ready_queue.push(receiver, receiver->priority);
         receiver->taskState = Constants::READY;
-        receiver->receiveQueue.push(&activeTask->kSendRequest);
         // Transition the sender to be reply blocked
         activeTask->taskState = Constants::REPLY_BLOCKED;
+        // TODO: copy here
 
         return -3; // Not returning
     } else {
         // Transition the sender to be send blocked
         activeTask->taskState = Constants::SEND_BLOCKED;
 
-        return sendRequest->rplen; // Return reply length (set by handleReply)
+        return -4; // In this case the return value will be set by handleReply
     }
 }
 
@@ -307,13 +314,14 @@ int Kernel::handleReply(int tid, const char *reply, int rplen) {
             // if reply is truncated return -1 but copy what you can
             if (rplen > kSendRequest->sendRequest->rplen) {
                 memcpy(kSendRequest->sendRequest->reply, reply, kSendRequest->sendRequest->rplen);
+                kSendRequest->senderTD->r0 = kSendRequest->sendRequest->rplen;
                 kSendRequest->senderTD->taskState = Constants::READY;
                 ready_queue.push(kSendRequest->senderTD, kSendRequest->senderTD->priority);
 
                 return -1; // reply was truncated
             } else {
                 memcpy(kSendRequest->sendRequest->reply, reply, rplen);
-                kSendRequest->sendRequest->rplen = rplen;
+                kSendRequest->senderTD->r0 = rplen; // Reply length was shorter so save that information
                 kSendRequest->senderTD->taskState = Constants::READY;
                 ready_queue.push(kSendRequest->senderTD, kSendRequest->senderTD->priority);
 
