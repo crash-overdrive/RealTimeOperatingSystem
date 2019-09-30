@@ -6,4 +6,3 @@
 .nfs*
 .vscode
 *.out
-*/build
