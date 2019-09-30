@@ -54,6 +54,126 @@ int firstTask() {
     Exit();
 }
 
+void nameServer() {
+
+}
+
+void rpsServer() {
+    // TODO: evaluate the size, put it in constants file as well
+    DataStructures::RingBuffer<int, 10> registrationList;
+
+    int* sendProcessTid;
+    // TODO: evaluate the size, put it in constants file as well
+    int msglen = 5; 
+    char msg[msglen];
+    int responseSize;
+
+    int tidPlayer1 = -1;
+    int tidPlayer2 = -1;
+    char responsePlayer1 = '\0';
+    char responsePlayer2 = '\0';
+    bool hasPlayer1Responded = false;
+    bool hasPlayer2Responded = false;
+    char* ready = "r";
+    char* quit = "q";
+    char* win = "w";
+    char* loss = "l";
+    char* draw = "d";
+    bool gameOver = true;
+
+    FOREVER {
+        responseSize = Receive(sendProcessTid, msg, msglen);
+
+        // process the value of what we received
+        if (responseSize != 1) {
+            bwprintf(COM2, "Response Size while receiving in RPS is not 1: %d", responseSize);
+            Util::assert(false);
+        }
+  
+        if (msg[0] == 's') { //SIGN UP       
+            registrationList.push(sendProcessTid);
+
+            if (registrationList.size() >= 2 && gameOver) {
+                tidPlayer1 = *registrationList.pop();
+                tidPlayer2 = *registrationList.pop();
+
+                gameOver = false;
+
+                Reply(tidPlayer1, ready, 1);
+                Reply(tidPlayer2, ready, 1);
+            }
+
+        } else if (msg[0] == 'q') { //QUIT
+
+            // TODO: what to do if both send q at same time???
+
+            // Let the client go
+            Reply(*sendProcessTid, quit, 1);
+
+            // Set gameover state to be true so that on next iteration other task can be let go
+            gameOver = true;
+
+        } else if (msg[0] == 'r' || msg [0] == 'p' || msg[0] == 'x') { // PLAY
+
+            // If one client has already called quits to the game
+            if (gameOver) {
+                // send quit signal to the other process that the game has ended
+                Reply(*sendProcessTid, quit, 1);
+
+                // handle popping off next elements which are ready and then get out of this loop
+                if (registrationList.size() >= 2) {
+                    // release the next 2 if available
+                    tidPlayer1 = *registrationList.pop();
+                    tidPlayer2 = *registrationList.pop();
+
+                    gameOver = false;
+
+                    Reply(tidPlayer1, ready, 1);
+                    Reply(tidPlayer2, ready, 1);   
+                    continue;
+                }
+            }
+
+            if (*sendProcessTid == tidPlayer1) {
+                responsePlayer1 = msg[0];
+                hasPlayer1Responded = true;
+            } else if (*sendProcessTid == tidPlayer2) {
+                responsePlayer2 = msg[0];
+                hasPlayer2Responded = true;
+            } else {
+                bwprintf(COM2, "A task which shouldnt have sent message, sent a message!");
+            }
+
+            if (hasPlayer1Responded && hasPlayer2Responded) {  
+                if (responsePlayer1 == responsePlayer2) { 
+                    Reply(tidPlayer1, draw, 1);
+                    Reply(tidPlayer2, draw, 1);
+
+                } else if ((responsePlayer1 == 'p' && responsePlayer2 = 's') ||
+                (responsePlayer1 == 'x' && responsePlayer2 = 'p') ||
+                (responsePlayer1 == 's' && responsePlayer2 = 'x')) {  
+                    Reply(tidPlayer1, win, 1);
+                    Reply(tidPlayer2, loss, 1);
+                } else {
+
+                    Reply(tidPlayer1, loss, 1);
+                    Reply(tidPlayer2, win, 1);
+
+                }
+                responsePlayer1 = responsePlayer2 = '\0';
+                hasPlayer1Responded = false;
+                hasPlayer2Responded = false;             
+            }            
+        } else { // INVALID
+
+            bwprintf(COM2, "Got garbage message from the Client task: %c", msg[0]);
+            Util::assert(false);
+
+        }
+
+    }   
+}
+
 void Kernel::initialize() {
     // Setup comm
     uart.setConfig(COM1, BPF8, OFF, ON, OFF);
@@ -66,9 +186,6 @@ void Kernel::initialize() {
         tasks[i].kSendRequest.senderTD = &tasks[i];
     }
 
-    // Create the system's first task
-    handleCreate(2, firstTask);
-
     // Setup 0x8, 0x28
     // asm volatile("mov r12, #0xe59ff018"); // e59ff018 = ldr pc, [pc, #24]
     // asm volatile("str r12, #0x8");
@@ -76,6 +193,9 @@ void Kernel::initialize() {
     asm volatile("ldr r12, =context_switch_entry");
     asm volatile("ldr r3, =0x28");
     asm volatile("str r12, [r3]");
+
+    // Create the system's first task
+    handleCreate(2, firstTask);
 }
 
 void Kernel::schedule() {

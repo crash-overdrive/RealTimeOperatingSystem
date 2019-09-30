@@ -18,6 +18,13 @@ namespace Constants {
         BLOCKED,
         ZOMBIE
     };
+
+    enum RPS_SERVER {
+        SIGN_UP,
+        PLAY,
+        QUIT,
+        INVALID
+    };
 };
 
 #endif
