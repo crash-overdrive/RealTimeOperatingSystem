@@ -284,11 +284,18 @@ int Kernel::handleReply(int tid, const char *reply, int rplen) {
     for (int i = 0; i < replyQueue.size(); ++i) {
         kSendRequest = replyQueue.pop();
         if (kSendRequest->senderTD->tid == tid) {
-            // TODO: Compare lengths
             // if message is truncated return -1 but copy what you can
-            memcpy(kSendRequest->sendRequest->reply, reply, rplen);
-            ready_queue.push(kSendRequest->senderTD, kSendRequest->senderTD->priority);
-            kSendRequest->senderTD->taskState = Constants::READY;
+            if (rplen > kSendRequest->sendRequest->rplen) {
+                memcpy(kSendRequest->sendRequest->reply, reply, kSendRequest->sendRequest->rplen);
+                kSendRequest->senderTD->taskState = Constants::READY;
+                ready_queue.push(kSendRequest->senderTD, kSendRequest->senderTD->priority);
+                return -1; // reply was truncated
+            } else {
+                memcpy(kSendRequest->sendRequest->reply, reply, rplen);
+                kSendRequest->senderTD->taskState = Constants::READY;
+                ready_queue.push(kSendRequest->senderTD, kSendRequest->senderTD->priority);
+                return 0; // successful reply
+            }
         } else {
             replyQueue.push(kSendRequest);
         }
