@@ -38,10 +38,10 @@ void testTask() {
 
 int firstTask() {
     int tid;
-    tid = Create(4, sendTask);
-    bwprintf(COM2, "FirstUserTask: Created Sender Task: %d\n\r", tid);
     tid = Create(4, receiveTask);
     bwprintf(COM2, "FirstUserTask: Created Server Task: %d\n\r", tid);
+    tid = Create(4, sendTask);
+    bwprintf(COM2, "FirstUserTask: Created Sender Task: %d\n\r", tid);
     tid = Create(3, testTask);
     bwprintf(COM2, "FirstUserTask: Created Task: %d\n\r", tid);
     tid = Create(3, testTask);
@@ -149,9 +149,9 @@ void rpsServer() {
                     Reply(tidPlayer1, draw, 1);
                     Reply(tidPlayer2, draw, 1);
 
-                } else if ((responsePlayer1 == 'p' && responsePlayer2 = 's') ||
-                (responsePlayer1 == 'x' && responsePlayer2 = 'p') ||
-                (responsePlayer1 == 's' && responsePlayer2 = 'x')) {  
+                } else if ((responsePlayer1 == 'p' && responsePlayer2 == 's') ||
+                (responsePlayer1 == 'x' && responsePlayer2 == 'p') ||
+                (responsePlayer1 == 's' && responsePlayer2 == 'x')) {
                     Reply(tidPlayer1, win, 1);
                     Reply(tidPlayer2, loss, 1);
                 } else {
@@ -384,14 +384,24 @@ int Kernel::handleSend(SendRequest *sendRequest) {
     receiver->receiveQueue.push(&activeTask->kSendRequest);
 
     if (receiver->taskState == Constants::RECEIVE_BLOCKED) {
+        // Receiver is already ready for message to be copied
+        *(receiver->kReceiveRequest.tid) = activeTask->tid;
+        if (receiver->kReceiveRequest.msglen <= sendRequest->msglen) {
+            memcpy(receiver->kReceiveRequest.msg, sendRequest->msg, receiver->kReceiveRequest.msglen);
+            receiver->r0 = receiver->kReceiveRequest.msglen;
+        } else {
+            memcpy(receiver->kReceiveRequest.msg, sendRequest->msg, sendRequest->msglen);
+            receiver->r0 = sendRequest->msglen;
+        }
+
         // Transition the receiver to be ready and puts them on the ready queue
         ready_queue.push(receiver, receiver->priority);
         receiver->taskState = Constants::READY;
         // Transition the sender to be reply blocked
+        replyQueue.push(&activeTask->kSendRequest);
         activeTask->taskState = Constants::REPLY_BLOCKED;
-        // TODO: copy here
 
-        return -3; // Not returning
+        return -3; // the return value will be set by handleReply
     } else {
         // Transition the sender to be send blocked
         activeTask->taskState = Constants::SEND_BLOCKED;
@@ -417,6 +427,11 @@ int Kernel::handleReceive(int *tid, int *msg, int msglen) {
 
         return msglen <= kSendRequest->sendRequest->msglen ? msglen : kSendRequest->sendRequest->msglen; // return the lesser of the two message lengths
     } else {
+        // Setup kernel receive request for later retrieval
+        activeTask->kReceiveRequest.tid = tid;
+        activeTask->kReceiveRequest.msg = msg;
+        activeTask->kReceiveRequest.msglen = msglen;
+
         // Transition receiver to be receive blocked
         activeTask->taskState = Constants::RECEIVE_BLOCKED;
 

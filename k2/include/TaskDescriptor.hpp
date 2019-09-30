@@ -28,6 +28,7 @@ class TaskDescriptor {
 
         DataStructures::RingBuffer<KernelSendRequest, Constants::RECEIVE_QUEUE_LENGTH> receiveQueue;
         KernelSendRequest kSendRequest;
+        KernelRecieveRequest kReceiveRequest;
 
 };
 #endif

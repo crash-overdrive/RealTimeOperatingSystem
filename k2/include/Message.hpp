@@ -19,4 +19,11 @@ public:
     SendRequest *sendRequest;
 };
 
+class KernelRecieveRequest {
+public:
+    int *tid;
+    int *msg;
+    int msglen;
+};
+
 #endif

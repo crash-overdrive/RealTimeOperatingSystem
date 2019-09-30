@@ -5,12 +5,12 @@
 
 void sendTask() {
     // int receiveServer = WhoIs("ReceiveServer");
-    char msg[14] = "Hello World!\n";
+    char msg[12] = "Hello World";
     char reply[32];
     int replySize = 100;
     // replySize = Send(receiveServer, msg, 14, &reply, 32);
     Yield();
-    replySize = Send(3, msg, 14, reply, 42);
+    replySize = Send(2, msg, 12, reply, 42);
     bwprintf(COM2, "DEBUG: Size of message returned to SEND is %d with msg %s\n\r", replySize, reply);
     Exit();
 }
