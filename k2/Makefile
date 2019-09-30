@@ -96,19 +96,19 @@ io-O3:
 	cd src/io && $(MAKE) install-O3
 
 kern.elf: main-O3
-	cd build && $(LD) $(LDFLAGS) -o $@ main.o bwio.o ContextSwitch.o Kernel.o Syscall.o UART.o UserSyscall.o -lgcc -lc
+	cd build && $(LD) $(LDFLAGS) -o $@ main.o bwio.o ContextSwitch.o Kernel.o Syscall.o UART.o UserSyscall.o TimingTasks.o -lgcc -lc
 
 kern-O0.elf: main-O0
-	cd build && $(LD) $(LDFLAGS) -o $@ main.o bwio.o ContextSwitch.o Kernel.o Syscall.o UART.o UserSyscall.o -lgcc -lc
+	cd build && $(LD) $(LDFLAGS) -o $@ main.o bwio.o ContextSwitch.o Kernel.o Syscall.o UART.o UserSyscall.o TimingTasks.o -lgcc -lc
 
 kern-O1.elf: main-O1
-	cd build && $(LD) $(LDFLAGS) -o $@ main.o bwio.o ContextSwitch.o Kernel.o Syscall.o UART.o UserSyscall.o -lgcc -lc
+	cd build && $(LD) $(LDFLAGS) -o $@ main.o bwio.o ContextSwitch.o Kernel.o Syscall.o UART.o UserSyscall.o TimingTasks.o -lgcc -lc
 
 kern-O2.elf: main-O2
-	cd build && $(LD) $(LDFLAGS) -o $@ main.o bwio.o ContextSwitch.o Kernel.o Syscall.o UART.o UserSyscall.o -lgcc -lc
+	cd build && $(LD) $(LDFLAGS) -o $@ main.o bwio.o ContextSwitch.o Kernel.o Syscall.o UART.o UserSyscall.o TimingTasks.o -lgcc -lc
 
 kern-O3.elf: main-O3
-	cd build && $(LD) $(LDFLAGS) -o $@ main.o bwio.o ContextSwitch.o Kernel.o Syscall.o UART.o UserSyscall.o -lgcc -lc
+	cd build && $(LD) $(LDFLAGS) -o $@ main.o bwio.o ContextSwitch.o Kernel.o Syscall.o UART.o UserSyscall.o TimingTasks.o -lgcc -lc
 
 install: kern.elf
 	cd build && cp kern.elf /u/cs452/tftp/ARM/spratap/k2.elf

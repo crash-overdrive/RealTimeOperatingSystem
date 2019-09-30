@@ -17,7 +17,7 @@ AS = $(XBINDIR)/arm-none-eabi-as
 CPPFLAGS = -fno-exceptions -fno-unwind-tables -fno-rtti -std=c++17 -g -S -fPIC -Wall -mcpu=arm920t -msoft-float -I. -I../../include -lstdc++
 
 .PHONY: all
-all: Kernel.o Syscall.o UserSyscall.o ContextSwitch.o
+all: Kernel.o Syscall.o UserSyscall.o ContextSwitch.o TimingTasks.o
 
 Kernel.s: Kernel.cpp
 	$(CC) -S $(CPPFLAGS) Kernel.cpp
@@ -39,6 +39,12 @@ UserSyscall.o: UserSyscall.s
 
 ContextSwitch.o:
 	$(AS) $(ASFLAGS) -o ContextSwitch.o ContextSwitch.S
+
+TimingTasks.s: TimingTasks.cpp
+	$(CC) -S $(CPPFLAGS) TimingTasks.cpp
+
+TimingTasks.o: TimingTasks.s
+	$(AS) $(ASFLAGS) -o TimingTasks.o TimingTasks.s
 
 .PHONY: install
 install: all

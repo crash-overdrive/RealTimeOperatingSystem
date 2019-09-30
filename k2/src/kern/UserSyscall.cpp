@@ -1,6 +1,7 @@
 #include "../../include/UserSyscall.hpp"
 #include "../../include/Syscall.hpp"
 #include "../../include/Message.hpp"
+#include "../../include/bwio.h"
 
 enum SYSCALL {
     CREATE = 2,

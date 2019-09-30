@@ -1,5 +1,6 @@
 #include "../../include/Syscall.hpp"
 #include "../../include/Message.hpp"
+#include "../../include/bwio.h"
 
 enum SYSCALL {
     CREATE = 2,
@@ -52,6 +53,7 @@ void sysExit() {
 int sysSend(SendRequest *sendRequest) {
     int retval;
     asm volatile("stmdb sp!, {r1-r3, r12}");
+    asm volatile("mov r0, %0" :: "r"(sendRequest));
     asm volatile("swi 7");
     asm volatile("mov %0, r0" : "=r"(retval));
     asm volatile("ldmia sp!, {r1-r3, r12}");
