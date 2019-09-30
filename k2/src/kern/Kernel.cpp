@@ -300,16 +300,16 @@ void rpsServer() {
 
 int firstTask() {
     int tid;
-    tid = Create(2, nameServer);
-    tid = Create(2, rpsServer);
-    tid = Create(1, rpsClientPAPER);
-    tid = Create(1, rpsClientROCK);
-    tid = Create(1, rpsClientROCK);
-    tid = Create(1, rpsClientSCISSOR);
-    tid = Create(1, rpsClientPAPER);
-    tid = Create(1, rpsClientSCISSOR);
-    // tid = Create(1, sendTask);
-    // tid = Create(1, receiveTask);
+    // tid = Create(2, nameServer);
+    // tid = Create(2, rpsServer);
+    // tid = Create(1, rpsClientPAPER);
+    // tid = Create(1, rpsClientROCK);
+    // tid = Create(1, rpsClientROCK);
+    // tid = Create(1, rpsClientSCISSOR);
+    // tid = Create(1, rpsClientPAPER);
+    // tid = Create(1, rpsClientSCISSOR);
+    tid = Create(1, receiveTask);
+    tid = Create(1, sendTask);
 
     Exit();
 }
