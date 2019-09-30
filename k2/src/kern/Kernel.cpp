@@ -268,14 +268,20 @@ int Kernel::handleSend(SendRequest *sendRequest) {
 int Kernel::handleReceive(int *tid, int *msg, int msglen) {
     if (!activeTask->receiveQueue.empty()) {
         KernelSendRequest *kSendRequest = activeTask->receiveQueue.pop();
-        // TODO: compare msglen and ksr messagelen and do appropriate action
-        memcpy(msg, kSendRequest->sendRequest->msg, kSendRequest->sendRequest->msglen);
+        if (msglen <= kSendRequest->sendRequest->msglen) {
+            memcpy(msg, kSendRequest->sendRequest->msg, msglen);
+        } else {
+            memcpy(msg, kSendRequest->sendRequest->msg, kSendRequest->sendRequest->msglen);
+        }
         *tid = kSendRequest->senderTD->tid;
-        // Transition sender to be reply blocked now
+        // Transition sender to be reply blocked
         replyQueue.push(kSendRequest);
         kSendRequest->senderTD->taskState = Constants::REPLY_BLOCKED;
+        return msglen <= kSendRequest->sendRequest->msglen ? msglen : kSendRequest->sendRequest->msglen; // return the lesser of the two message lengths
     } else {
+        // Transition receiver to be receive blocked
         activeTask->taskState = Constants::RECEIVE_BLOCKED;
+        return -1;
     }
 }
 
@@ -284,7 +290,7 @@ int Kernel::handleReply(int tid, const char *reply, int rplen) {
     for (int i = 0; i < replyQueue.size(); ++i) {
         kSendRequest = replyQueue.pop();
         if (kSendRequest->senderTD->tid == tid) {
-            // if message is truncated return -1 but copy what you can
+            // if reply is truncated return -1 but copy what you can
             if (rplen > kSendRequest->sendRequest->rplen) {
                 memcpy(kSendRequest->sendRequest->reply, reply, kSendRequest->sendRequest->rplen);
                 kSendRequest->senderTD->taskState = Constants::READY;
