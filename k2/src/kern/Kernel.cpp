@@ -285,6 +285,7 @@ int Kernel::handleReply(int tid, const char *reply, int rplen) {
         kSendRequest = replyQueue.pop();
         if (kSendRequest->senderTD->tid == tid) {
             // TODO: Compare lengths
+            // if message is truncated return -1 but copy what you can
             memcpy(kSendRequest->sendRequest->reply, reply, rplen);
             ready_queue.push(kSendRequest->senderTD, kSendRequest->senderTD->priority);
             kSendRequest->senderTD->taskState = Constants::READY;
@@ -292,12 +293,12 @@ int Kernel::handleReply(int tid, const char *reply, int rplen) {
             replyQueue.push(kSendRequest);
         }
     }
-    // TODO: How do we check for this?
+    for (int i = 0; i < Constants::NUM_TASKS; ++i) {
+        if (tasks[i].tid == tid && tasks[i].taskState != Constants::REPLY_BLOCKED && tasks[i].taskState != Constants::ZOMBIE) {
+            return -3; // tid is not the tid of a reply-blocked task
+        }
+    }
     return -2; // tid is not the tid of an existing task
-    return -3; // tid is not the tid of a reply-blocked task
-    // check if tid is reply blocked
-    // check if tid is an existing task
-    // if message is truncated return -1 but copy what you can
 }
 
 TaskDescriptor *Kernel::lookupTD(int tid) {
