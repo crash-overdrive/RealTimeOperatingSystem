@@ -247,11 +247,15 @@ void Kernel::handleExit() {
 
 int Kernel::handleSend(SendRequest *sendRequest) {
     TaskDescriptor *receiver = lookupTD(sendRequest->tid);
-    if (receiver == nullptr) {
-        // HANDLE ERROR CASE
+
+    // Check if the task exists
+    if (receiver == nullptr || receiver->taskState == Constants::ZOMBIE) {
+        return -1; // Task id did not correspond to a living task
     }
+
     activeTask->kSendRequest.receiverTD = receiver;
     activeTask->kSendRequest.sendRequest = sendRequest;
+
     if (receiver->taskState == Constants::RECEIVE_BLOCKED) {
         // Transition the receiver to be ready and puts them on the ready queue
         ready_queue.push(receiver, receiver->priority);
@@ -259,34 +263,44 @@ int Kernel::handleSend(SendRequest *sendRequest) {
         receiver->receiveQueue.push(&activeTask->kSendRequest);
         // Transition the sender to be reply blocked
         activeTask->taskState = Constants::REPLY_BLOCKED;
+
+        return -3; // Not returning
     } else {
         // Transition the sender to be send blocked
         activeTask->taskState = Constants::SEND_BLOCKED;
+
+        return sendRequest->rplen; // Return reply length (set by handleReply)
     }
 }
 
 int Kernel::handleReceive(int *tid, int *msg, int msglen) {
     if (!activeTask->receiveQueue.empty()) {
         KernelSendRequest *kSendRequest = activeTask->receiveQueue.pop();
+
         if (msglen <= kSendRequest->sendRequest->msglen) {
             memcpy(msg, kSendRequest->sendRequest->msg, msglen);
         } else {
             memcpy(msg, kSendRequest->sendRequest->msg, kSendRequest->sendRequest->msglen);
         }
+
         *tid = kSendRequest->senderTD->tid;
         // Transition sender to be reply blocked
         replyQueue.push(kSendRequest);
         kSendRequest->senderTD->taskState = Constants::REPLY_BLOCKED;
+
         return msglen <= kSendRequest->sendRequest->msglen ? msglen : kSendRequest->sendRequest->msglen; // return the lesser of the two message lengths
     } else {
         // Transition receiver to be receive blocked
         activeTask->taskState = Constants::RECEIVE_BLOCKED;
+
         return -1;
     }
 }
 
 int Kernel::handleReply(int tid, const char *reply, int rplen) {
     KernelSendRequest *kSendRequest;
+
+    // Check if the task is reply-blocked
     for (int i = 0; i < replyQueue.size(); ++i) {
         kSendRequest = replyQueue.pop();
         if (kSendRequest->senderTD->tid == tid) {
@@ -295,22 +309,28 @@ int Kernel::handleReply(int tid, const char *reply, int rplen) {
                 memcpy(kSendRequest->sendRequest->reply, reply, kSendRequest->sendRequest->rplen);
                 kSendRequest->senderTD->taskState = Constants::READY;
                 ready_queue.push(kSendRequest->senderTD, kSendRequest->senderTD->priority);
+
                 return -1; // reply was truncated
             } else {
                 memcpy(kSendRequest->sendRequest->reply, reply, rplen);
+                kSendRequest->sendRequest->rplen = rplen;
                 kSendRequest->senderTD->taskState = Constants::READY;
                 ready_queue.push(kSendRequest->senderTD, kSendRequest->senderTD->priority);
+
                 return 0; // successful reply
             }
         } else {
             replyQueue.push(kSendRequest);
         }
     }
+
+    // Check if the task exists
     for (int i = 0; i < Constants::NUM_TASKS; ++i) {
         if (tasks[i].tid == tid && tasks[i].taskState != Constants::REPLY_BLOCKED && tasks[i].taskState != Constants::ZOMBIE) {
             return -3; // tid is not the tid of a reply-blocked task
         }
     }
+
     return -2; // tid is not the tid of an existing task
 }
 
