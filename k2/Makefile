@@ -23,6 +23,9 @@ LDFLAGS = -static -e main -nmagic -T ../src/linker.ld -L $(XLIBDIR1) -L lib -L $
 # -msoft-float: no FP co-processor
 CPPFLAGS = -fno-exceptions -fno-unwind-tables -fno-rtti -std=c++17 -g -S -fPIC -Wall -mcpu=arm920t -msoft-float -I. -I./include -lstdc++
 
+OPTIMIZATION := $(if $(O),$(addprefix -O, $(O)),-O3)
+CPPFLAGS += $(OPTIMIZATION)
+
 CPPFILES := $(shell find src -name '*.cpp')
 
 ASMFILES := $(patsubst %.cpp,%.s,$(CPPFILES))
@@ -31,6 +34,8 @@ OBJECTS := $(patsubst %.s, %.o, $(ASMFILES))
 
 ELF := k2.elf
 
+test: $(ELF)
+	echo $O
 all : $(ELF)
 	cp build/k2.elf /u/cs452/tftp/ARM/spratap
 
