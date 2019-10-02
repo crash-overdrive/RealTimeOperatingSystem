@@ -1,14 +1,6 @@
-#include "../../include/Syscall.hpp"
-#include "../../include/Message.hpp"
-#include "../../include/bwio.h"
-
-enum SYSCALL {
-    CREATE = 2,
-    MY_TID,
-    PARENT_TID,
-    YIELD,
-    EXIT
-};
+#include "kern/Syscall.hpp"
+#include "kern/Message.hpp"
+#include "io/bwio.h"
 
 int sysCreate(int priority, void (*function)()) {
     int retval;

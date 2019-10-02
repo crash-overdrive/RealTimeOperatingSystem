@@ -1,5 +1,5 @@
-#include "../include/RingBuffer.hpp"
-#include "../include/Util.hpp" 
+#include "RingBuffer.hpp"
+#include "Util.hpp" 
 
 struct TestData {
     int priority;

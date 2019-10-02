@@ -2,8 +2,8 @@
 #define TASK_DESCRIPTOR_HPP
 
 #include "Constants.hpp"
-#include "RingBuffer.hpp"
-#include "Message.hpp"
+#include "data-structures/RingBuffer.hpp"
+#include "kern/Message.hpp"
 
 class TaskDescriptor {
 

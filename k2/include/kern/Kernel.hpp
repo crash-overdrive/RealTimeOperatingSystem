@@ -1,11 +1,11 @@
 #ifndef KERNEL_HPP
 #define KERNEL_HPP
 
-#include "PriorityQueue.hpp"
-#include "RingBuffer.hpp"
+#include "data-structures/PriorityQueue.hpp"
+#include "data-structures/RingBuffer.hpp"
 #include "Constants.hpp"
-#include "TaskDescriptor.hpp"
-#include "UART.hpp"
+#include "kern/TaskDescriptor.hpp"
+#include "io/UART.hpp"
 
 #define FOREVER for(;;)
 
@@ -20,7 +20,6 @@ class Kernel {
         
         TaskDescriptor tasks[Constants::NUM_TASKS];
 
-        //TODO: Group all these 3 together?
         UART uart;
 
         TaskDescriptor* activeTask = nullptr;
@@ -46,7 +45,7 @@ class Kernel {
         // TODO: determine if this should return anything.
         void handle(int request);
 
-        int handleCreate(int priority, int (*function)());
+        int handleCreate(int priority, void (*function)());
         int handleMyTid();
         int handleMyParentTid();
         void handleExit();
@@ -61,7 +60,7 @@ class Kernel {
          *   TD*    : pointer to task descriptor if tid corresponds to an existing task
          *   nullptr: null otherwise
          */
-        TaskDescriptor *lookupTD(int tid);
+        TaskDescriptor* lookupTD(int tid);
 
     public:
 

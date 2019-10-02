@@ -1,5 +1,5 @@
-#include "../include/PriorityQueue.hpp"
-#include "../include/Util.hpp" 
+#include "PriorityQueue.hpp"
+#include "Util.hpp" 
 
 struct TestClass {
 

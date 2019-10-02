@@ -2,7 +2,7 @@
 #define UTIL_HPP
 
 
-#include "bwio.h"
+#include "io/bwio.h"
 
 
 namespace Util {
