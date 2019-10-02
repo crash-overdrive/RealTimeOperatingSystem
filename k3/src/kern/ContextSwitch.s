@@ -97,3 +97,23 @@ context_switch_exit:
  
     // Go back to user mode
     movs pc, lr
+
+.text irq_handler
+irq_handler:
+
+    // Begin in interrupt mode, so enter system mode to save user stack state
+    msr cpsr_c, #0b11111
+
+    // Save user state on the user stack
+    stmdb sp!, {r0-r12}
+    stmdb sp!, r14
+
+irq_return:
+    // TODO: lr - 4
+
+    // Restore
+    ldmai sp!, r14
+    ldmai sp!, {r0-r12}
+
+    @ this should be to lr - 4 not lr
+    @ movs r15, lr
