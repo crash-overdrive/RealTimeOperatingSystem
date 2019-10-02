@@ -5,7 +5,7 @@ XDIR=/u/cs452/public/xdev
 XBINDIR=$(XDIR)/bin
 XLIBDIR1=$(XDIR)/arm-none-eabi/lib
 XLIBDIR2=$(XDIR)/lib/gcc/arm-none-eabi/9.2.0/
-CC = $(XBINDIR)/arm-none-eabi-gcc
+CPP = $(XBINDIR)/arm-none-eabi-g++
 AS = $(XBINDIR)/arm-none-eabi-as
 LD = $(XBINDIR)/arm-none-eabi-ld
 
@@ -13,7 +13,7 @@ LD = $(XBINDIR)/arm-none-eabi-ld
 # -e: set entry point
 # -nmagic: no page alignment
 # -T: use linker script
-LDFLAGS = -static -e main -nmagic -T src/linker.ld -L $(XLIBDIR1) -L lib -L $(XLIBDIR2) -lstdc++
+LDFLAGS = -static -e main -nmagic -T ../src/linker.ld -L $(XLIBDIR1) -L lib -L $(XLIBDIR2) -lstdc++
 
 # -g: include debug information for gdb
 # -S: only compile and emit assembly
@@ -24,23 +24,26 @@ LDFLAGS = -static -e main -nmagic -T src/linker.ld -L $(XLIBDIR1) -L lib -L $(XL
 CPPFLAGS = -fno-exceptions -fno-unwind-tables -fno-rtti -std=c++17 -g -S -fPIC -Wall -mcpu=arm920t -msoft-float -I. -I./include -lstdc++
 
 CPPFILES := $(shell find src -name '*.cpp')
-ASMFILES := $(shell find build -name '*.s')
 
-ASM := $(patsubst src/%.cpp, build/%.s , $(CPPFILES))
-OBJECTS := $(patsubst build/%.s, build/%.o, $(ASMFILES))
+ASMFILES := $(patsubst %.cpp,%.s,$(CPPFILES))
 
-build/%.s: src/%.cpp
-	$(CC) $(CPPFLAGS) $< -o build/$(notdir $@)
-	
+OBJECTS := $(patsubst %.s, %.o, $(ASMFILES))
+
+ELF := k3.elf
+
+all : $(ELF)
+	cp build/k3.elf /u/cs452/tftp/ARM/spratap
 
 $(ELF): $(OBJECTS)
-	$(LD) $(LDFLAGS) -o $@ main.o bwio.o ContextSwitch.o Kernel.o Syscall.o UART.o UserSyscall.o TimingTasks.o -lgcc -lc
+	cd build && $(LD) $(LDFLAGS) -o $@ *.o -lgcc -lc
 
-$(OBJECTS): $(ASM)
-	$(AS) $(ASFLAGS) -o Kernel.o Kernel.s
+$(OBJECTS): %.o : %.s
+	$(AS) $(ASFLAGS) -o $(addprefix build/, $(notdir $@)) $(addprefix build/, $(notdir $<)) 
+	$(AS) $(ASFLAGS) -o build/ContextSwitch.o src/kern/ContextSwitch.s
 
-
+$(ASMFILES): %.s : %.cpp
+	$(CPP) $(CPPFLAGS) $< -o $(addprefix build/, $(notdir $@))
 
 clean:
-	cd build && rm -f *.s *.o *.S *.elf
+	cd build && rm -f *.s *.o *.elf
 	

@@ -45,5 +45,5 @@ $(ASMFILES): %.s : %.cpp
 	$(CPP) $(CPPFLAGS) $< -o $(addprefix build/, $(notdir $@))
 
 clean:
-	cd build && rm -f *.s *.o *.S *.elf
+	cd build && rm -f *.s *.o *.elf
 	

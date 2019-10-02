@@ -1,5 +1,5 @@
 /*
- * bwio.c - busy-wait I/O routines for diagnosis
+ * bwio.cpp - busy-wait I/O routines for diagnosis
  *
  * Specific to the TS-7200 ARM evaluation board
  *

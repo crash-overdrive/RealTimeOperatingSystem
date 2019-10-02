@@ -1,9 +1,8 @@
 *.a
 *.o
-*.s
 *.elf
 *.swp
 .nfs*
 .vscode
 *.out
-build/*.S
+*/build/*.s

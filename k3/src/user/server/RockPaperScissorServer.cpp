@@ -5,7 +5,7 @@
 
 #define FOREVER for(;;)
 
-void rpsServer() {
+void rockPaperScissorServer() {
     // TODO: evaluate the size, put it in constants file as well
     DataStructures::RingBuffer<int, 10> registrationList;
 
