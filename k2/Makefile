@@ -34,8 +34,6 @@ OBJECTS := $(patsubst %.s, %.o, $(ASMFILES))
 
 ELF := k2.elf
 
-test: $(ELF)
-	echo $O
 all : $(ELF)
 	cp build/k2.elf /u/cs452/tftp/ARM/spratap
 
