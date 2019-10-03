@@ -7,14 +7,7 @@
 #include "kern/Kernel.hpp"
 #include "kern/Message.hpp"
 
-volatile int reg0;
-volatile int reg1;
-volatile int reg2;
-volatile int reg3;
-volatile int reg4;
-volatile int reg5;
-volatile int reg6;
-volatile int reg7;
+extern "C" int* kernelExit(int stackPointer);
 
 void Kernel::initialize() {
     // Setup comm
@@ -32,7 +25,7 @@ void Kernel::initialize() {
     // asm volatile("mov r12, #0xe59ff018"); // e59ff018 = ldr pc, [pc, #24]
     // asm volatile("str r12, #0x8");
     *(int*)0x8 = 0xe59ff018; // e59ff018 = ldr pc, [pc, #24]
-    asm volatile("ldr r12, =context_switch_entry");
+    asm volatile("ldr r12, =context_switch_enter");
     asm volatile("ldr r3, =0x28");
     asm volatile("str r12, [r3]");
 
@@ -45,52 +38,40 @@ void Kernel::schedule() {
     activeTask = ready_queue.pop();
 }
 
-int Kernel::activate() {
-    reg0 = activeTask->cpsr;
-    reg1 = (int)activeTask->pc;
-    reg2 = activeTask->r0;
-    reg3 = (int)activeTask->sp;
+int* Kernel::activate() {
+    activeTask->sp[2] = activeTask->returnValue;
 
-    asm volatile("ldr pc, =context_switch_exit");
+    int* stackPointer = kernelExit((int) activeTask->sp);
+    activeTask->sp = stackPointer;
+    return stackPointer;
 
-    // Should never reach here!! some bug if it reached here!
-    bwprintf(COM2, "If you see this then something is really wrong\n");
-    Util::assert(false);
-
-    asm volatile(".globl kernel_entry");
-    asm volatile("kernel_entry:");
-    arg1 = (void *) reg0;
-    arg2 = (void *) reg1;
-    arg3 = (void *) reg2;
-    arg4 = (void *) reg3;
-    activeTask->sp = (int *) reg5;
-    activeTask->pc = reg7;
-
-    return reg4;
-    
 }
 
-void Kernel::handle(int request)  {
+void Kernel::handle(int* stackPointer)  {
     // Set the state of the activeTask to be READY
     // If it needs to be changed then the appropriate handler will do it
     activeTask->taskState = Constants::READY;
 
+    // TODO: get value of request from stackPointer
+    int request = *(int*)(stackPointer[0] - 4) & 0xffffff;
+    // bwprintf(COM2, "Got SWI: %d\n\r", request);
+    // TODO: get value of r0-r3 from stackPointer
+    void* arg1 = (void*)stackPointer[2];
+    void* arg2 = (void*)stackPointer[3];
+    void* arg3 = (void*)stackPointer[4];
+    void* arg4 = (void*)stackPointer[5];
+
     switch(request) {
-        int kernelRequestResponse;
         case 2:
-            // TODO: refactor this to eliminate intermediate value
-            kernelRequestResponse = handleCreate((int)arg1, (void (*)())arg2);
-            activeTask->r0 = kernelRequestResponse;
+            activeTask->returnValue = handleCreate((int)arg1, (void (*)())arg2);
             break;
 
         case 3:
-            kernelRequestResponse = handleMyTid();
-            activeTask->r0 = kernelRequestResponse;
+            activeTask->returnValue = handleMyTid();
             break;
 
         case 4:
-            kernelRequestResponse = handleMyParentTid();
-            activeTask->r0 = kernelRequestResponse;
+            activeTask->returnValue = handleMyParentTid();
             break;
 
         case 5:
@@ -102,28 +83,28 @@ void Kernel::handle(int request)  {
 
         case 7:
             // bwprintf(COM2, "Active Task Tid before handleSend: %d\n\r", activeTask->tid);
-            activeTask->r0 = handleSend((SendRequest *) arg1);
+            activeTask->returnValue = handleSend((SendRequest *) arg1);
             // bwprintf(COM2, "Active Task Tid after handleSend: %d\n\r", activeTask->tid);
             // bwprintf(COM2, "Came out from handlesend\n\r");
             break;
 
         case 8:
-            activeTask->r0 = handleReceive((int *) arg1, (int *) arg2, (int) arg3);
+            activeTask->returnValue = handleReceive((int *) arg1, (int *) arg2, (int) arg3);
             // bwprintf(COM2, "Came out from handleReceive\n\r");
             break;
 
         case 9:
-            activeTask->r0 = handleReply((int) arg1, (const char *)arg2, (int) arg3);
+            activeTask->returnValue = handleReply((int) arg1, (const char *)arg2, (int) arg3);
             // bwprintf(COM2, "Came out from handleReply\n\r");
             break;
 
         default:
+            bwprintf(COM2, "Invalid SWI: %d\n\r", request);
             break;
     }
 
     switch (activeTask->taskState) {
         case Constants::READY:
-            // bwprintf(COM2, "Rescheduled task tid: %d\n\r", activeTask->tid);
             ready_queue.push(activeTask, activeTask->priority);
             break;
 
@@ -154,11 +135,12 @@ void Kernel::handle(int request)  {
 
 
 void Kernel::run() {
+    int* stackPointer;
     initialize();
     FOREVER {
         schedule();
         if (activeTask == nullptr) { bwprintf(COM2, "No active tasks scheduled!"); break; }
-        request = activate();
-        handle(request);
+        stackPointer = activate();
+        handle(stackPointer);
     }
 }

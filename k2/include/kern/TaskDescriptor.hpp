@@ -8,21 +8,17 @@
 class TaskDescriptor {
 
     public:
-        // TaskStack *;
-        
         int tid;
-        // TaskDescriptor *myTD;
         int parentTid;
         // TaskDescriptor *myParentTD; TODO: Determine is this would be useful
 
         Constants::STATE taskState;
 
         int* sp;
-        int cpsr;
-        int r0;
-        int pc;
 
         int priority;
+
+        int returnValue;
 
         int stack[Constants::TD_STACK_SIZE];
 

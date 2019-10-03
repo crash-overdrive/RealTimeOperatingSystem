@@ -6,3 +6,4 @@
 .vscode
 *.out
 */build/*.s
+*.gdbinit

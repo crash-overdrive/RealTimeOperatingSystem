@@ -24,8 +24,6 @@ void Exit() {
 }
 
 int Send(int tid, const char *msg, int msglen, char *reply, int rplen) {
-    // TODO: create struct for passing info into sysSend.
-    // sysSend();
     SendRequest sendRequest;
     sendRequest.tid = tid;
     sendRequest.msg = msg;

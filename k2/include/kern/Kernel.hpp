@@ -23,14 +23,8 @@ class Kernel {
         UART uart;
 
         TaskDescriptor* activeTask = nullptr;
-        volatile int request;
 
-        void* arg1;
-        void* arg2; 
-        void* arg3;
-        void* arg4;
-
-        volatile int availableTid = 0;
+        volatile int availableTid = -1;
 
         volatile int taskNumber = -1;
 
@@ -40,10 +34,10 @@ class Kernel {
         void schedule();
 
         // Activates the current active task.
-        int activate();
+        int* activate();
 
         // TODO: determine if this should return anything.
-        void handle(int request);
+        void handle(int* stackPointer);
 
         int handleCreate(int priority, void (*function)());
         int handleMyTid();

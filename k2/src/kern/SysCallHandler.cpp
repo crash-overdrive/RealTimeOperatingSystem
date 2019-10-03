@@ -1,5 +1,6 @@
 #include <cstring>
 #include "kern/Kernel.hpp"
+#include "kern/TaskDescriptor.hpp"
 
 int Kernel::handleCreate(int priority, void (*function)()) {
     taskNumber++;
@@ -26,29 +27,31 @@ int Kernel::handleCreate(int priority, void (*function)()) {
     
     newTD->priority = priority;
     newTD->taskState = Constants::READY;
-    newTD->r0 = 0;
-    newTD->cpsr = 0b10000;
 
-    // TODO: check validity of pc
-    // TODO: wrap function in another function with exit()
-    newTD->pc = (int)function;
-
-    // set the stack to dummy values [r4-r11, lr]
+    // TODO: do this properly!!!
+    // set the stack to dummy values [r0-r12, lr, pc, cpsr]
     newTD->stack[32767] = 0xdeadbeef; // for debugging purposes
-    newTD->stack[32766] = 0; // r4
-    newTD->stack[32765] = 0; // r5
-    newTD->stack[32764] = 0; // r6
-    newTD->stack[32763] = 0; // r7
-    newTD->stack[32762] = 0; // r8
-    newTD->stack[32761] = 0; // r9
-    newTD->stack[32760] = 0; // r10
-    newTD->stack[32759] = 0; // r11
-    newTD->stack[32758] = 0; // TODO: fix lr's values after we wrap function in another exit function
+    newTD->stack[32766] = 13; // lr
+    newTD->stack[32765] = 12; // r12
+    newTD->stack[32764] = 11; // r11
+    newTD->stack[32763] = 10; // r10
+    newTD->stack[32762] = 9; // r9
+    newTD->stack[32761] = 8; // r8
+    newTD->stack[32760] = 7; // r7
+    newTD->stack[32759] = 6; // r6
+    newTD->stack[32758] = 5; // r5
+    newTD->stack[32757] = 4; // r4
+    newTD->stack[32756] = 3; // r3
+    newTD->stack[32755] = 2; // r2
+    newTD->stack[32754] = 1; // r1
+    newTD->stack[32753] = 0; // r0
+    newTD->stack[32752] = 0b10000; // cpsr
+    newTD->stack[32751] = (int)function; // pc
 
-    newTD->sp = &(newTD->stack[32758]);
+    newTD->sp = &(newTD->stack[32751]);
+    newTD->returnValue = 0xbeef;
 
     ready_queue.push(newTD, newTD->priority);
-
 
     return availableTid;
 }
@@ -83,10 +86,10 @@ int Kernel::handleSend(SendRequest *sendRequest) {
         *(receiver->kReceiveRequest.tid) = activeTask->tid;
         if (receiver->kReceiveRequest.msglen <= sendRequest->msglen) {
             memcpy(receiver->kReceiveRequest.msg, sendRequest->msg, receiver->kReceiveRequest.msglen);
-            receiver->r0 = receiver->kReceiveRequest.msglen;
+            receiver->returnValue = receiver->kReceiveRequest.msglen;
         } else {
             memcpy(receiver->kReceiveRequest.msg, sendRequest->msg, sendRequest->msglen);
-            receiver->r0 = sendRequest->msglen;
+            receiver->returnValue = sendRequest->msglen;
         }
 
         // Transition the receiver to be ready and puts them on the ready queue
@@ -146,14 +149,14 @@ int Kernel::handleReply(int tid, const char *reply, int rplen) {
             // if reply is truncated return -1 but copy what you can
             if (rplen > kSendRequest->sendRequest->rplen) {
                 memcpy(kSendRequest->sendRequest->reply, reply, kSendRequest->sendRequest->rplen);
-                kSendRequest->senderTD->r0 = kSendRequest->sendRequest->rplen;
+                kSendRequest->senderTD->returnValue = kSendRequest->sendRequest->rplen;
                 kSendRequest->senderTD->taskState = Constants::READY;
                 ready_queue.push(kSendRequest->senderTD, kSendRequest->senderTD->priority);
 
                 return -1; // reply was truncated
             } else {
                 memcpy(kSendRequest->sendRequest->reply, reply, rplen);
-                kSendRequest->senderTD->r0 = rplen; // Reply length was shorter so save that information
+                kSendRequest->senderTD->returnValue = rplen; // Reply length was shorter so save that information
                 kSendRequest->senderTD->taskState = Constants::READY;
                 ready_queue.push(kSendRequest->senderTD, kSendRequest->senderTD->priority);
 
