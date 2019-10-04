@@ -52,10 +52,9 @@ void Kernel::handle(int* stackPointer)  {
     // If it needs to be changed then the appropriate handler will do it
     activeTask->taskState = Constants::READY;
 
-    // TODO: get value of request from stackPointer
     int request = *(int*)(stackPointer[0] - 4) & 0xffffff;
     // bwprintf(COM2, "Got SWI: %d\n\r", request);
-    // TODO: get value of r0-r3 from stackPointer
+    
     void* arg1 = (void*)stackPointer[2];
     void* arg2 = (void*)stackPointer[3];
     void* arg3 = (void*)stackPointer[4];

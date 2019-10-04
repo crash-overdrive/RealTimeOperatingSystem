@@ -1,5 +1,6 @@
 #include <cstring>
 #include "kern/Kernel.hpp"
+#include "kern/TaskDescriptor.hpp"
 
 int Kernel::handleCreate(int priority, void (*function)()) {
     taskNumber++;
@@ -26,29 +27,29 @@ int Kernel::handleCreate(int priority, void (*function)()) {
     
     newTD->priority = priority;
     newTD->taskState = Constants::READY;
-    newTD->r0 = 0;
-    newTD->cpsr = 0b10000;
 
-    // TODO: check validity of pc
-    // TODO: wrap function in another function with exit()
-    newTD->pc = (int)function;
+    // set the stack to dummy values [r0-r12, lr, pc, cpsr]
+    newTD->stack[Constants::TD_STACK_SIZE - 1] = 0xdeadbeef; // for debugging purposes
+    newTD->stack[Constants::TD_STACK_SIZE - 2] = 13; // lr
+    newTD->stack[Constants::TD_STACK_SIZE - 3] = 12; // r12
+    newTD->stack[Constants::TD_STACK_SIZE - 4] = 11; // r11
+    newTD->stack[Constants::TD_STACK_SIZE - 5] = 10; // r10
+    newTD->stack[Constants::TD_STACK_SIZE - 6] = 9; // r9
+    newTD->stack[Constants::TD_STACK_SIZE - 7] = 8; // r8
+    newTD->stack[Constants::TD_STACK_SIZE - 8] = 7; // r7
+    newTD->stack[Constants::TD_STACK_SIZE - 9] = 6; // r6
+    newTD->stack[Constants::TD_STACK_SIZE - 10] = 5; // r5
+    newTD->stack[Constants::TD_STACK_SIZE - 11] = 4; // r4
+    newTD->stack[Constants::TD_STACK_SIZE - 12] = 3; // r3
+    newTD->stack[Constants::TD_STACK_SIZE - 13] = 2; // r2
+    newTD->stack[Constants::TD_STACK_SIZE - 14] = 1; // r1
+    newTD->stack[Constants::TD_STACK_SIZE - 15] = 0; // r0
+    newTD->stack[Constants::TD_STACK_SIZE - 16] = 0b10000; // cpsr
+    newTD->stack[Constants::TD_STACK_SIZE - 17] = (int)function; // pc
 
-    // set the stack to dummy values [r4-r11, lr]
-    newTD->stack[32767] = 0xdeadbeef; // for debugging purposes
-    newTD->stack[32766] = 0; // r4
-    newTD->stack[32765] = 0; // r5
-    newTD->stack[32764] = 0; // r6
-    newTD->stack[32763] = 0; // r7
-    newTD->stack[32762] = 0; // r8
-    newTD->stack[32761] = 0; // r9
-    newTD->stack[32760] = 0; // r10
-    newTD->stack[32759] = 0; // r11
-    newTD->stack[32758] = 0; // TODO: fix lr's values after we wrap function in another exit function
-
-    newTD->sp = &(newTD->stack[32758]);
-
+    newTD->sp = &(newTD->stack[Constants::TD_STACK_SIZE - 17]);
+    
     ready_queue.push(newTD, newTD->priority);
-
 
     return availableTid;
 }
@@ -83,10 +84,10 @@ int Kernel::handleSend(SendRequest *sendRequest) {
         *(receiver->kReceiveRequest.tid) = activeTask->tid;
         if (receiver->kReceiveRequest.msglen <= sendRequest->msglen) {
             memcpy(receiver->kReceiveRequest.msg, sendRequest->msg, receiver->kReceiveRequest.msglen);
-            receiver->r0 = receiver->kReceiveRequest.msglen;
+            receiver->returnValue = receiver->kReceiveRequest.msglen;
         } else {
             memcpy(receiver->kReceiveRequest.msg, sendRequest->msg, sendRequest->msglen);
-            receiver->r0 = sendRequest->msglen;
+            receiver->returnValue = sendRequest->msglen;
         }
 
         // Transition the receiver to be ready and puts them on the ready queue
@@ -146,14 +147,14 @@ int Kernel::handleReply(int tid, const char *reply, int rplen) {
             // if reply is truncated return -1 but copy what you can
             if (rplen > kSendRequest->sendRequest->rplen) {
                 memcpy(kSendRequest->sendRequest->reply, reply, kSendRequest->sendRequest->rplen);
-                kSendRequest->senderTD->r0 = kSendRequest->sendRequest->rplen;
+                kSendRequest->senderTD->returnValue = kSendRequest->sendRequest->rplen;
                 kSendRequest->senderTD->taskState = Constants::READY;
                 ready_queue.push(kSendRequest->senderTD, kSendRequest->senderTD->priority);
 
                 return -1; // reply was truncated
             } else {
                 memcpy(kSendRequest->sendRequest->reply, reply, rplen);
-                kSendRequest->senderTD->r0 = rplen; // Reply length was shorter so save that information
+                kSendRequest->senderTD->returnValue = rplen; // Reply length was shorter so save that information
                 kSendRequest->senderTD->taskState = Constants::READY;
                 ready_queue.push(kSendRequest->senderTD, kSendRequest->senderTD->priority);
 
@@ -175,11 +176,9 @@ int Kernel::handleReply(int tid, const char *reply, int rplen) {
 }
 
 TaskDescriptor* Kernel::lookupTD(int tid) {
-    for (int i = 0; i < Constants::NUM_TASKS; ++i) {
-        if (tasks[i].tid == tid) {
-            if (tasks[i].taskState == Constants::ZOMBIE) { return nullptr; }
-            return &tasks[i];
-        }
+    if (tid < 0 || tid >= Constants::NUM_TASKS || tasks[tid].taskState == Constants::ZOMBIE) {
+        return nullptr;
     }
-    return nullptr;
+    
+    return &tasks[tid];
 }

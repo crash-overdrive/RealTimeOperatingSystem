@@ -28,29 +28,27 @@ int Kernel::handleCreate(int priority, void (*function)()) {
     newTD->priority = priority;
     newTD->taskState = Constants::READY;
 
-    // TODO: do this properly!!!
     // set the stack to dummy values [r0-r12, lr, pc, cpsr]
-    newTD->stack[32767] = 0xdeadbeef; // for debugging purposes
-    newTD->stack[32766] = 13; // lr
-    newTD->stack[32765] = 12; // r12
-    newTD->stack[32764] = 11; // r11
-    newTD->stack[32763] = 10; // r10
-    newTD->stack[32762] = 9; // r9
-    newTD->stack[32761] = 8; // r8
-    newTD->stack[32760] = 7; // r7
-    newTD->stack[32759] = 6; // r6
-    newTD->stack[32758] = 5; // r5
-    newTD->stack[32757] = 4; // r4
-    newTD->stack[32756] = 3; // r3
-    newTD->stack[32755] = 2; // r2
-    newTD->stack[32754] = 1; // r1
-    newTD->stack[32753] = 0; // r0
-    newTD->stack[32752] = 0b10000; // cpsr
-    newTD->stack[32751] = (int)function; // pc
+    newTD->stack[Constants::TD_STACK_SIZE - 1] = 0xdeadbeef; // for debugging purposes
+    newTD->stack[Constants::TD_STACK_SIZE - 2] = 13; // lr
+    newTD->stack[Constants::TD_STACK_SIZE - 3] = 12; // r12
+    newTD->stack[Constants::TD_STACK_SIZE - 4] = 11; // r11
+    newTD->stack[Constants::TD_STACK_SIZE - 5] = 10; // r10
+    newTD->stack[Constants::TD_STACK_SIZE - 6] = 9; // r9
+    newTD->stack[Constants::TD_STACK_SIZE - 7] = 8; // r8
+    newTD->stack[Constants::TD_STACK_SIZE - 8] = 7; // r7
+    newTD->stack[Constants::TD_STACK_SIZE - 9] = 6; // r6
+    newTD->stack[Constants::TD_STACK_SIZE - 10] = 5; // r5
+    newTD->stack[Constants::TD_STACK_SIZE - 11] = 4; // r4
+    newTD->stack[Constants::TD_STACK_SIZE - 12] = 3; // r3
+    newTD->stack[Constants::TD_STACK_SIZE - 13] = 2; // r2
+    newTD->stack[Constants::TD_STACK_SIZE - 14] = 1; // r1
+    newTD->stack[Constants::TD_STACK_SIZE - 15] = 0; // r0
+    newTD->stack[Constants::TD_STACK_SIZE - 16] = 0b10000; // cpsr
+    newTD->stack[Constants::TD_STACK_SIZE - 17] = (int)function; // pc
 
-    newTD->sp = &(newTD->stack[32751]);
-    newTD->returnValue = 0xbeef;
-
+    newTD->sp = &(newTD->stack[Constants::TD_STACK_SIZE - 17]);
+    
     ready_queue.push(newTD, newTD->priority);
 
     return availableTid;

@@ -24,8 +24,6 @@ void Exit() {
 }
 
 int Send(int tid, const char *msg, int msglen, char *reply, int rplen) {
-    // TODO: create struct for passing info into sysSend.
-    // sysSend();
     SendRequest sendRequest;
     sendRequest.tid = tid;
     sendRequest.msg = msg;
@@ -41,4 +39,12 @@ int Receive(int *tid, char *msg, int msglen) {
 
 int Reply(int tid, const char *reply, int rplen) {
     return sysReply(tid, reply, rplen);
+}
+
+int RegisterAs(const char* name) {
+    return sysRegisterAs(name);
+}
+
+int WhoIs(const char* name) {
+    return sysWhoIs(name);
 }
