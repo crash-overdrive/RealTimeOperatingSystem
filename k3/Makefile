@@ -28,6 +28,8 @@ CPPFLAGS += $(OPTIMIZATION)
 
 CPPFILES := $(shell find src -name '*.cpp')
 
+SFILES := $(patsubst %.s, %.o, $(shell find src -name '*.s'))
+
 ASMFILES := $(patsubst %.cpp,%.s,$(CPPFILES))
 
 OBJECTS := $(patsubst %.s, %.o, $(ASMFILES))
@@ -37,12 +39,14 @@ ELF := k3.elf
 all : $(ELF)
 	cp build/k3.elf /u/cs452/tftp/ARM/spratap
 
-$(ELF): $(OBJECTS)
+$(ELF): $(OBJECTS) $(SFILES)
 	cd build && $(LD) $(LDFLAGS) -o $@ *.o -lgcc -lc
 
 $(OBJECTS): %.o : %.s
 	$(AS) $(ASFLAGS) -o $(addprefix build/, $(notdir $@)) $(addprefix build/, $(notdir $<)) 
-	$(AS) $(ASFLAGS) -o build/ContextSwitch.o src/kern/ContextSwitch.s
+
+$(SFILES): %.o : %.s
+	$(AS) $(ASFLAGS) -o   $(addprefix build/, $(notdir $@)) $<
 
 $(ASMFILES): %.s : %.cpp
 	$(CPP) $(CPPFLAGS) $< -o $(addprefix build/, $(notdir $@))

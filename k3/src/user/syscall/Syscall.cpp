@@ -52,7 +52,3 @@ int sysReply(int tid, const char *reply, int rplen) {
     asm volatile("mov %0, r0" : "=r"(retval));
     return retval;
 }
-
-int sysRegisterAs(const char* name) {
-    
-}

@@ -9,6 +9,7 @@ namespace Constants {
     const int RECEIVE_QUEUE_LENGTH = 32;
     const int REPLY_QUEUE_LENGTH = NUM_TASKS;
     const int TD_STACK_SIZE = 32768;
+    const int TASK_NAME_SIZE = 16;
     enum STATE {
         ACTIVE,
         READY,
@@ -17,13 +18,6 @@ namespace Constants {
         REPLY_BLOCKED,
         BLOCKED,
         ZOMBIE
-    };
-
-    enum RPS_SERVER {
-        SIGN_UP,
-        PLAY,
-        QUIT,
-        INVALID
     };
 };
 
