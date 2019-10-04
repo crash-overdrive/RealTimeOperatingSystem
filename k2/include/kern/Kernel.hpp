@@ -46,6 +46,8 @@ class Kernel {
         int handleSend(SendRequest *sr);
         int handleReceive(int *tid, int *msg, int msglen);
         int handleReply(int tid, const char *reply, int rplen);
+        int handleRegisterAs(const char* name);
+        int handleWhoIs(const char* name);
 
         /*
          * Lookup TD by tid

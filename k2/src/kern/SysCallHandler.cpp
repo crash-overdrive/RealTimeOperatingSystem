@@ -178,11 +178,9 @@ int Kernel::handleReply(int tid, const char *reply, int rplen) {
 }
 
 TaskDescriptor* Kernel::lookupTD(int tid) {
-    for (int i = 0; i < Constants::NUM_TASKS; ++i) {
-        if (tasks[i].tid == tid) {
-            if (tasks[i].taskState == Constants::ZOMBIE) { return nullptr; }
-            return &tasks[i];
-        }
+    if (tid < 0 || tid >= Constants::NUM_TASKS || tasks[tid].taskState == Constants::ZOMBIE) {
+        return nullptr;
     }
-    return nullptr;
+    
+    return &tasks[tid];
 }
