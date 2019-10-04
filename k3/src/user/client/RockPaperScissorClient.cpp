@@ -8,7 +8,7 @@ void rockPaperScissorClient() {
     char* rock = "r";
     char response[5];
 
-    int rpsServer = 3;
+    int rpsServer = 2;
 
     int reply = Send(rpsServer, signup, 2, response, 5);
 

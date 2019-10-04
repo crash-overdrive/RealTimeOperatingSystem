@@ -84,4 +84,26 @@ int sysReceive(int *tid, char *msg, int msglen);
  */
 int sysReply(int tid, const char *reply, int rplen);
 
+/*
+ * registers the task id of the caller under the given name. On return without error it is guaranteed that all WhoIs() calls by any task will return the task id 
+ * of the caller until the registration is overwritten. If another task has already registered with the given name, its registration is overwritten. 
+ * RegisterAs() is actually a wrapper covering a send to the name server.
+ * 
+ * Return Value
+ *    0: success.
+ *   -1: invalid name server task id inside wrapper. 
+*/
+int sysRegisterAs(const char* name);
+
+/*
+ * asks the name server for the task id of the task that is registered under the given name. Whether WhoIs() blocks waiting for a registration or returns 
+ * with an error, if no task is registered under the given name, is implementation-dependent. There is guaranteed to be a unique task id associated with 
+ * each registered name, but the registered task may change at any time after a call to WhoIs(). WhoIs() is actually a wrapper covering a send to the name server.
+ *
+ * Return Value
+ *   tid: task id of the registered task.
+ *    -1: invalid name server task id inside wrapper. 
+*/
+int sysWhoIs(const char* name);
+
 #endif

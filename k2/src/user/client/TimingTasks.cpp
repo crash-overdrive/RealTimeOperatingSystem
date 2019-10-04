@@ -11,6 +11,7 @@
 #define TIMER3_LOAD 0x80810080
 #define TIMER3_VALUE 0x80810084
 #define TIMER3_CONTROL 0x80810088
+#define NUMBER_OF_TESTS 1000000
 
 void sendTask() {
     // int receiveServer = WhoIs("ReceiveServer");
@@ -18,8 +19,8 @@ void sendTask() {
     char reply[4];
     int replySize = 4;
     // replySize = Send(receiveServer, msg, 14, &reply, 32);
-    for (int i = 0; i < 1000000; ++i) {
-        replySize = Send(3, msg, 4, reply, 4);
+    for (int i = 0; i < NUMBER_OF_TESTS; ++i) {
+        replySize = Send(2, msg, 4, reply, 4);
     }
     
     // bwprintf(COM2, "DEBUG: Size of message returned to SEND is %d with msg %s\n\r", replySize, reply);
@@ -30,7 +31,6 @@ void receiveTask() {
     WRITE_REGISTER TIMER3_LOAD = 0xFFFFFFFF;
 	WRITE_REGISTER TIMER3_CONTROL = 0x88; // set with free running mode at 508 KHz
     
-
     int tid = 0;
     char msg[4];
     int msglen = 0;
@@ -39,7 +39,7 @@ void receiveTask() {
 
     unsigned int startTime = READ_REGISTER TIMER3_VALUE;
     
-    for (int i = 0; i < 1000000; ++i) {
+    for (int i = 0; i < NUMBER_OF_TESTS; ++i) {
         msglen = Receive(&tid, msg, 4);
         // bwprintf(COM2, "DEBUG: RECEIVED a message <%s> with length %d from tid %d\n\r", msg, msglen, tid);
         repret = Reply(tid, reply, 4);
@@ -47,7 +47,7 @@ void receiveTask() {
     }
 
     unsigned int endTime = READ_REGISTER TIMER3_VALUE;
-    int timeTaken = (startTime - endTime)/1000000;
+    int timeTaken = (startTime - endTime) / 508 * 1000;
     bwprintf(COM2, "Start Time: %d\n\r", startTime);
     bwprintf(COM2, "End Time: %d\n\r", endTime);
     bwprintf(COM2, "Time taken for 1 SRR: %d\n\r", timeTaken);
