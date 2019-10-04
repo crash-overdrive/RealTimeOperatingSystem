@@ -1,7 +1,7 @@
 #include "Util.hpp"
 #include "user/client/TimingTasks.hpp"
 #include "user/syscall/UserSyscall.hpp"
-#include "io/bwio.h"
+#include "io/bwio.hpp"
 
 #define TIMER_START_VALUE 0xFFFFFFFF
 

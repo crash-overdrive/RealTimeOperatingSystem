@@ -1,14 +1,12 @@
-#include "kern/Syscall.hpp"
+#include "user/syscall/Syscall.hpp"
 #include "kern/Message.hpp"
-#include "io/bwio.h"
+#include "io/bwio.hpp"
 
 int sysCreate(int priority, void (*function)()) {
     int retval;
-    // asm volatile("stmdb sp!, {r1-r3, r12}");
     asm volatile("swi 2");
     // TODO: Determine if we can force this to use a specific register
     asm volatile("mov %0, r0" : "=r"(retval));
-    // asm volatile("ldmia sp!, {r1-r3, r12}");
     return retval;
 }
 
@@ -56,9 +54,5 @@ int sysReply(int tid, const char *reply, int rplen) {
 }
 
 int sysRegisterAs(const char* name) {
-
-}
-
-int sysWhoIs(const char* name) {
     
 }

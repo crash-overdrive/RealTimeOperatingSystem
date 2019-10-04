@@ -1,6 +1,6 @@
 #include "data-structures/RingBuffer.hpp"
 #include "user/syscall/UserSyscall.hpp"
-#include "io/bwio.h"
+#include "io/bwio.hpp"
 #include "Util.hpp"
 
 #define FOREVER for(;;)

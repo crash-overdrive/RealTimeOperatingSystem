@@ -1,7 +1,7 @@
 #include "user/syscall/UserSyscall.hpp"
-#include "kern/Syscall.hpp"
+#include "user/syscall/Syscall.hpp"
 #include "kern/Message.hpp"
-#include "io/bwio.h"
+#include "io/bwio.hpp"
 
 int Create(int priority, void (*function)()) {
     return sysCreate(priority, function);
@@ -42,9 +42,5 @@ int Reply(int tid, const char *reply, int rplen) {
 }
 
 int RegisterAs(const char* name) {
-    return sysRegisterAs(name);
-}
-
-int WhoIs(const char* name) {
-    return sysWhoIs(name);
+    
 }

@@ -1,6 +1,6 @@
 #include "user/client/TestClient.hpp"
 #include "user/syscall/UserSyscall.hpp"
-#include "io/bwio.h"
+#include "io/bwio.hpp"
 
 void testClient() {
     int tid, ptid;
