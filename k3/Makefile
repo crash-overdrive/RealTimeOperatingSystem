@@ -37,8 +37,8 @@ OBJECTS := $(patsubst %.s, %.o, $(ASMFILES))
 ELF := k3.elf
 
 all : $(ELF)
-	cp build/k3.elf /u/cs452/tftp/ARM/$(USER)
-	chmod 777 /u/cs452/tftp/ARM/$(USER)
+	cp build/$(ELF) /u/cs452/tftp/ARM/$(USER)
+	chmod 777 /u/cs452/tftp/ARM/$(USER)/$(ELF)
 
 $(ELF): $(OBJECTS) $(SFILES)
 	cd build && $(LD) $(LDFLAGS) -o $@ *.o -lgcc -lc
