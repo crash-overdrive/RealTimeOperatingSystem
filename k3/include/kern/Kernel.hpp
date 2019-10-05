@@ -26,8 +26,6 @@ class Kernel {
 
         TaskDescriptor* activeTask = nullptr;
 
-        volatile int availableTid = -1;
-
         volatile int taskNumber = -1;
 
         void initialize();

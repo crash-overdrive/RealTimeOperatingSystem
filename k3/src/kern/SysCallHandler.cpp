@@ -5,7 +5,6 @@
 
 int Kernel::handleCreate(int priority, void (*function)()) {
     taskNumber++;
-    availableTid++;
 
     if (priority < 0 || priority >= Constants::NUM_PRIORITIES) {
         return -1;
@@ -17,8 +16,8 @@ int Kernel::handleCreate(int priority, void (*function)()) {
     
     TaskDescriptor* newTD = &tasks[taskNumber];
 
-    newTD->tid = availableTid;
-    // bwprintf(COM2, "Created task with TID: %d\n\r", availableTid);
+    newTD->tid = taskNumber;
+    // bwprintf(COM2, "Created task with TID: %d\n\r", taskNumber);
 
     if (activeTask == nullptr) {
         newTD->parentTid = 0;
@@ -53,7 +52,7 @@ int Kernel::handleCreate(int priority, void (*function)()) {
     
     ready_queue.push(newTD, newTD->priority);
 
-    return availableTid;
+    return taskNumber;
 }
 
 int Kernel::handleMyTid() {

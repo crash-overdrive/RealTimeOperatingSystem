@@ -13,7 +13,7 @@ void bootLoader() {
     // Create(2, mainClient);
     bwprintf(COM2, "THIS IS JUST A TEST\n\r");
 
-    tid = Create(2, nameServer);
+    tid = Create(3, nameServer);
     tid = Create(2, rockPaperScissorServer);
     tid = Create(1, rockPaperScissorClient);
     tid = Create(1, rockPaperScissorClient);

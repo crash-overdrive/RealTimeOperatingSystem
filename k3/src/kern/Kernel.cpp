@@ -67,7 +67,7 @@ void Kernel::handle(int* stackPointer)  {
 
         if (vic1Status & TC1UI_MASK) {
             bwprintf(COM2, "\n\rThe interrupt was a timer 3 underflow interrupt\n\r");
-            *(int *)(TIMER1_BASE + CLR_OFFSET) = 1;
+            *(int *)(TIMER1_BASE + CLR_OFFSET) = 1; // Clear the interrupt
             // handleTimerUnderflow(1);
         } else if (vic1Status & TC2UI_MASK) {
             bwprintf(COM2, "\n\rThe interrupt was a timer 2 underflow interrupt\n\r");
