@@ -92,15 +92,15 @@ handle_interrupt:
     mov r0, sp
 
     // ENTER INTERRUPT MODE
-    @ msr cpsr_c, #0b11010010
+    msr cpsr_c, #0b11010010
 
     // ENTER SUPERVISOR MODE
-    msr cpsr_c, #0b11010011
+    @ msr cpsr_c, #0b11010011
 
-    // save pc of the user process in r1, which is gonna be in lr_svc
+    // save pc of the user process in r1, which is gonna be in lr_irq
     sub r1, lr, #4
 
-    // save cpsr of the user process in r2, which is gonna be in spsr_svc
+    // save cpsr of the user process in r2, which is gonna be in spsr_irq
     mrs r2, spsr
 
     // save lr and cpsr on sp_usr
@@ -109,6 +109,9 @@ handle_interrupt:
     // Store sentinal value for IRQ
     mov r3, #1
     stmfd r0!, {r3}
+
+    // ENTER SUPERVISOR MODE
+    msr cpsr_c, #0b11010011
 
     // Retrieve Kernal State from Kernal Stack
     ldmfd sp!, {r12}
