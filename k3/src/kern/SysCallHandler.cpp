@@ -1,6 +1,7 @@
 #include <cstring>
 #include "kern/Kernel.hpp"
 #include "kern/TaskDescriptor.hpp"
+#include "io/bwio.hpp"
 
 int Kernel::handleCreate(int priority, void (*function)()) {
     taskNumber++;
@@ -44,10 +45,11 @@ int Kernel::handleCreate(int priority, void (*function)()) {
     newTD->stack[Constants::TD_STACK_SIZE - 13] = 2; // r2
     newTD->stack[Constants::TD_STACK_SIZE - 14] = 1; // r1
     newTD->stack[Constants::TD_STACK_SIZE - 15] = 0; // r0
-    newTD->stack[Constants::TD_STACK_SIZE - 16] = 0b10000; // cpsr
+    newTD->stack[Constants::TD_STACK_SIZE - 16] = 0b01010000; // cpsr
     newTD->stack[Constants::TD_STACK_SIZE - 17] = (int)function; // pc
+    newTD->stack[Constants::TD_STACK_SIZE - 18] = 0; // IRQ handle sentinal
 
-    newTD->sp = &(newTD->stack[Constants::TD_STACK_SIZE - 17]);
+    newTD->sp = &(newTD->stack[Constants::TD_STACK_SIZE - 18]);
     
     ready_queue.push(newTD, newTD->priority);
 

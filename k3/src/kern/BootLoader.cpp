@@ -11,8 +11,9 @@
 void bootLoader() {
     int tid;
     // Create(2, mainClient);
+    bwprintf(COM2, "THIS IS JUST A TEST\n\r");
 
-    tid = Create(2, nameServer);
+    // tid = Create(2, nameServer);
     tid = Create(2, rockPaperScissorServer);
     tid = Create(1, rockPaperScissorClient);
     tid = Create(1, rockPaperScissorClient);
@@ -21,7 +22,7 @@ void bootLoader() {
     tid = Create(1, rockPaperScissorClient);
     tid = Create(1, rockPaperScissorClient);
 
-    
+    bwprintf(COM2, "THIS IS JUST A SECOND TEST\n\r");
 
     // tid = Create(1, sendTask);
     // tid = Create(1, receiveTask);

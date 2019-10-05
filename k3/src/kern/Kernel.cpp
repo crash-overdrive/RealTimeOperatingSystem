@@ -1,8 +1,9 @@
 #include "Util.hpp"
 #include "io/bwio.hpp"
+#include "io/ep9302.h"
 #include "io/ts7200.h"
-#include "user/syscall/UserSyscall.hpp"
 #include "user/client/TimingTasks.hpp"
+#include "user/syscall/UserSyscall.hpp"
 #include "kern/BootLoader.hpp"
 #include "kern/Kernel.hpp"
 #include "kern/Message.hpp"
@@ -21,12 +22,20 @@ void Kernel::initialize() {
         tasks[i].kSendRequest.senderTD = &tasks[i];
     }
 
+    // TODO: Refactor interrupt setup to be in Config.s
+    
     // Setup 0x8, 0x28
     // asm volatile("mov r12, #0xe59ff018"); // e59ff018 = ldr pc, [pc, #24]
     // asm volatile("str r12, #0x8");
     *(int*)0x8 = 0xe59ff018; // e59ff018 = ldr pc, [pc, #24]
     asm volatile("ldr r12, =context_switch_enter");
     asm volatile("ldr r3, =0x28");
+    asm volatile("str r12, [r3]");
+
+    // Setup 0x18, 0x38
+    // *(int*)0x18 = 0xe59ff018; // e59ff018 = ldr pc, [pc, #20] TODO: Why doesn't this work???
+    asm volatile("ldr r12, =handle_interrupt");
+    asm volatile("ldr r3, =0x38");
     asm volatile("str r12, [r3]");
 
     // Create the system's first task
@@ -39,12 +48,12 @@ void Kernel::schedule() {
 }
 
 int* Kernel::activate() {
-    activeTask->sp[2] = activeTask->returnValue;
+    activeTask->sp[3] = activeTask->returnValue;
 
     int* stackPointer = kernelExit((int) activeTask->sp);
     activeTask->sp = stackPointer;
-    return stackPointer;
 
+    return stackPointer;
 }
 
 void Kernel::handle(int* stackPointer)  {
@@ -52,54 +61,59 @@ void Kernel::handle(int* stackPointer)  {
     // If it needs to be changed then the appropriate handler will do it
     activeTask->taskState = Constants::READY;
 
-    int request = *(int*)(stackPointer[0] - 4) & 0xffffff;
-    // bwprintf(COM2, "Got SWI: %d\n\r", request);
-    
-    void* arg1 = (void*)stackPointer[2];
-    void* arg2 = (void*)stackPointer[3];
-    void* arg3 = (void*)stackPointer[4];
-    void* arg4 = (void*)stackPointer[5];
+    if (stackPointer[0]) {
+        bwprintf(COM2, "WE INTERCEPTED AN INTERUPT AND DIED!\n\r");
+        FOREVER {}
+    } else {
+        int request = *(int*)(stackPointer[1] - 4) & 0xffffff;
+        // bwprintf(COM2, "Got SWI: %d\n\r", request);
 
-    switch(request) {
-        case 2:
-            activeTask->returnValue = handleCreate((int)arg1, (void (*)())arg2);
-            break;
+        void* arg1 = (void*)stackPointer[3];
+        void* arg2 = (void*)stackPointer[4];
+        void* arg3 = (void*)stackPointer[5];
+        void* arg4 = (void*)stackPointer[6];
 
-        case 3:
-            activeTask->returnValue = handleMyTid();
-            break;
+        switch(request) {
+            case 2:
+                activeTask->returnValue = handleCreate((int)arg1, (void (*)())arg2);
+                break;
 
-        case 4:
-            activeTask->returnValue = handleMyParentTid();
-            break;
+            case 3:
+                activeTask->returnValue = handleMyTid();
+                break;
 
-        case 5:
-            break;
+            case 4:
+                activeTask->returnValue = handleMyParentTid();
+                break;
 
-        case 6:
-            handleExit();
-            break;
+            case 5:
+                break;
 
-        case 7:
-            // bwprintf(COM2, "Active Task Tid before handleSend: %d\n\r", activeTask->tid);
-            activeTask->returnValue = handleSend((SendRequest *) arg1);
-            // bwprintf(COM2, "Active Task Tid after handleSend: %d\n\r", activeTask->tid);
-            // bwprintf(COM2, "Came out from handlesend\n\r");
-            break;
+            case 6:
+                handleExit();
+                break;
 
-        case 8:
-            activeTask->returnValue = handleReceive((int *) arg1, (int *) arg2, (int) arg3);
-            // bwprintf(COM2, "Came out from handleReceive\n\r");
-            break;
+            case 7:
+                // bwprintf(COM2, "Active Task Tid before handleSend: %d\n\r", activeTask->tid);
+                activeTask->returnValue = handleSend((SendRequest *) arg1);
+                // bwprintf(COM2, "Active Task Tid after handleSend: %d\n\r", activeTask->tid);
+                // bwprintf(COM2, "Came out from handlesend\n\r");
+                break;
 
-        case 9:
-            activeTask->returnValue = handleReply((int) arg1, (const char *)arg2, (int) arg3);
-            // bwprintf(COM2, "Came out from handleReply\n\r");
-            break;
+            case 8:
+                activeTask->returnValue = handleReceive((int *) arg1, (int *) arg2, (int) arg3);
+                // bwprintf(COM2, "Came out from handleReceive\n\r");
+                break;
 
-        default:
-            bwprintf(COM2, "Invalid SWI: %d\n\r", request);
-            break;
+            case 9:
+                activeTask->returnValue = handleReply((int) arg1, (const char *)arg2, (int) arg3);
+                // bwprintf(COM2, "Came out from handleReply\n\r");
+                break;
+
+            default:
+                bwprintf(COM2, "Invalid SWI: %d\n\r", request);
+                break;
+        }
     }
 
     switch (activeTask->taskState) {
@@ -136,8 +150,13 @@ void Kernel::handle(int* stackPointer)  {
 void Kernel::run() {
     int* stackPointer;
     initialize();
+    *(int *)TIMER1_BASE = 500;
+    *(int *)(TIMER1_BASE + CRTL_OFFSET) = ENABLE_MASK | MODE_MASK; // | CLKSEL_MASK;
     FOREVER {
         schedule();
+        bwprintf(COM2, "THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG!THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG!\n\r");
+        bwprintf(COM2, "TIMER CTRL: %d\n\r", *(int *)(TIMER1_BASE + CRTL_OFFSET));
+        bwprintf(COM2, "TIMER VALUE: %d\n\r", *(int *)(TIMER1_BASE + VAL_OFFSET));
         if (activeTask == nullptr) { bwprintf(COM2, "No active tasks scheduled!"); break; }
         stackPointer = activate();
         handle(stackPointer);

@@ -37,7 +37,7 @@ OBJECTS := $(patsubst %.s, %.o, $(ASMFILES))
 ELF := k3.elf
 
 all : $(ELF)
-	cp build/k3.elf /u/cs452/tftp/ARM/spratap
+	cp build/k3.elf /u/cs452/tftp/ARM/sgaweda
 
 $(ELF): $(OBJECTS) $(SFILES)
 	cd build && $(LD) $(LDFLAGS) -o $@ *.o -lgcc -lc
