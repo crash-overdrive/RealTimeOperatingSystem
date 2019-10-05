@@ -9,6 +9,8 @@
 
 #define FOREVER for(;;)
 
+#define TRAP for(;;) {}
+
 class Kernel {
 
     private:

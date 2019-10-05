@@ -62,8 +62,26 @@ void Kernel::handle(int* stackPointer)  {
     activeTask->taskState = Constants::READY;
 
     if (stackPointer[0]) {
-        bwprintf(COM2, "WE INTERCEPTED AN INTERUPT AND DIED!\n\r");
-        FOREVER {}
+        int vic1Status = *(int *)(VIC1_IRQ_BASE + IRQ_STATUS_OFFSET);
+        int vic2Status = *(int *)(VIC1_IRQ_BASE + IRQ_STATUS_OFFSET);
+
+        if (vic1Status & TC1UI_MASK) {
+            bwprintf(COM2, "\n\rThe interrupt was a timer 3 underflow interrupt\n\r");
+            *(int *)(TIMER1_BASE + CLR_OFFSET) = 1;
+            // handleTimerUnderflow(1);
+        } else if (vic1Status & TC2UI_MASK) {
+            bwprintf(COM2, "\n\rThe interrupt was a timer 2 underflow interrupt\n\r");
+            *(int *)(TIMER2_BASE + CLR_OFFSET) = 1;
+            // handleTimerUnderflow(2);
+        } else if (vic2Status & TC3UI_MASK) {
+            bwprintf(COM2, "\n\rThe interrupt was a timer 3 underflow interrupt\n\r");
+            *(int *)(TIMER3_BASE + CLR_OFFSET) = 1;
+            // handleTimerUnderflow(3);
+        } else {
+            bwprintf(COM2, "ERROR: Kernel interrupted with unknown interrupt\n\r");
+            TRAP
+        }
+
     } else {
         int request = *(int*)(stackPointer[1] - 4) & 0xffffff;
         // bwprintf(COM2, "Got SWI: %d\n\r", request);
@@ -150,13 +168,15 @@ void Kernel::handle(int* stackPointer)  {
 void Kernel::run() {
     int* stackPointer;
     initialize();
-    *(int *)TIMER1_BASE = 500;
+    *(int *)TIMER1_BASE = 500; // This is just for testing interrupts
     *(int *)(TIMER1_BASE + CRTL_OFFSET) = ENABLE_MASK | MODE_MASK; // | CLKSEL_MASK;
     FOREVER {
         schedule();
+        // Testing interrupts
         bwprintf(COM2, "THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG!THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG!\n\r");
         bwprintf(COM2, "TIMER CTRL: %d\n\r", *(int *)(TIMER1_BASE + CRTL_OFFSET));
         bwprintf(COM2, "TIMER VALUE: %d\n\r", *(int *)(TIMER1_BASE + VAL_OFFSET));
+        // Testing interrupts
         if (activeTask == nullptr) { bwprintf(COM2, "No active tasks scheduled!"); break; }
         stackPointer = activate();
         handle(stackPointer);
