@@ -2,6 +2,7 @@
 #include "user/syscall/UserSyscall.hpp"
 #include "io/bwio.hpp"
 #include "Util.hpp"
+#include "string.h"
 
 #define FOREVER for(;;)
 
@@ -27,18 +28,29 @@ void rockPaperScissorServer() {
     char* loss = "l";
     char* draw = "d";
     bool gameOver = true;
+    char name[] = "wRPS SERVER";
+    int size = strlen(name);
 
+    int x,y;
+    x = RegisterAs("rRPS SERVER");
+
+    y = WhoIs("wRPS SERVER");
+    // bwprintf(COM2, "Result of Asking: %d %d\n\r", x, y);
+
+    x = RegisterAs("rRPS SERVER");
+
+    y = WhoIs("wRPS SERVER");
+    // bwprintf(COM2, "Result of Asking: %d %d\n\r", x, y);
     FOREVER {
         
         responseSize = Receive(&sendProcessTid, msg, msglen);
 
         // process the value of what we received
         if (responseSize != 2) {
-            bwprintf(COM2, "Response Size while receiving in RPS is not 2: %d", responseSize);
+            bwprintf(COM2, "Response Size while receiving in RPS is not 2: %d %d %s\n\r", responseSize, sendProcessTid, msg);
             Util::assert(false);
         }
-  
-        if (msg[0] == 's') { //SIGN UP       
+        else if (msg[0] == 's') { //SIGN UP       
             registrationList.push((int *)sendProcessTid);
 
             if (registrationList.size() >= 2 && gameOver) {

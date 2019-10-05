@@ -2,7 +2,7 @@
 #include "user/syscall/Syscall.hpp"
 #include "kern/Message.hpp"
 #include "io/bwio.hpp"
-#include <cstring>
+#include <string.h>
 
 #define NAME_SERVER_TID 1
 #define CLOCK_SERVER_TID 2
@@ -48,20 +48,24 @@ int Reply(int tid, const char *reply, int rplen) {
 //TODO: find a way to encode the request
 int RegisterAs(const char* name) {
     char reply[2];
-    int response = Send(NAME_SERVER_TID, name, strlen(name), reply, 2);
-    if (response > 0) {
-        if (reply[0] = 's') {
-            return 0;
-        }
+    int response = Send(NAME_SERVER_TID, name, strlen(name) + 1, reply, 2);
+    
+    if (response > 0 && reply[0] == 's') {
+                    
+        return 0;
+        
     }
     return -1;
 }
 
 int WhoIs(const char* name) {
     char reply[2];
-    int response = Send(NAME_SERVER_TID, name, strlen(name), reply, 1);
-    if (response > 0) {
+    int response = Send(NAME_SERVER_TID, name, strlen(name) + 1, reply, 2);
+    
+    if (response > 0 && reply[0] != 'w') {
+
         return (int)reply[0];
+
     }
     return -1;
 }

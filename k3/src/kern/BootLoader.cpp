@@ -12,7 +12,7 @@ void bootLoader() {
     int tid;
     // Create(2, mainClient);
 
-    tid = Create(2, nameServer);
+    tid = Create(3, nameServer);
     tid = Create(2, rockPaperScissorServer);
     tid = Create(1, rockPaperScissorClient);
     tid = Create(1, rockPaperScissorClient);
