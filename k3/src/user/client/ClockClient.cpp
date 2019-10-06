@@ -3,6 +3,6 @@
 
 void clockClient() {
 
-
+    // Send();
     int clockServerTid = WhoIs("wCLOCK SERVER");
 }

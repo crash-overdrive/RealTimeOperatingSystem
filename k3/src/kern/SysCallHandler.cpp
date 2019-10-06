@@ -176,6 +176,30 @@ int Kernel::handleReply(int tid, const char *reply, int rplen) {
     return -2; // tid is not the tid of an existing task
 }
 
+int Kernel::handleAwaitEvent(int eventId) {
+    // for now its only even gonna be timer Interrupts
+    switch (eventId) {
+    case Constants::TIMER_INTERRUPT:
+        activeTask->taskState = Constants::TIMER_BLOCKED;
+        break;
+    
+    default:
+        bwprintf(COM2, "Unknown Await Event encountered: %d\n\r", eventId);
+        break;
+    }
+    return 1;
+}
+
+void Kernel::handleTimerInterrupt(int timerValue) {
+    while(!timerBlockedQueue.empty()) {
+        TaskDescriptor* task = timerBlockedQueue.pop();
+        bwprintf(COM2, "Popping TaskId: %d off the timer blocked queue\n\r", task->tid);
+        task->taskState = Constants::READY;
+        bwprintf(COM2, "Pushing %d to ready queue\n\r", task->tid);
+        ready_queue.push(task, task->priority);
+    }
+}
+
 TaskDescriptor *Kernel::lookupTD(int tid) {
     for (int i = 0; i < Constants::NUM_TASKS; ++i) {
         if (tasks[i].tid == tid) {
@@ -185,3 +209,4 @@ TaskDescriptor *Kernel::lookupTD(int tid) {
     }
     return nullptr;
 }
+

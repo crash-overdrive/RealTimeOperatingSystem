@@ -52,3 +52,19 @@ int sysReply(int tid, const char *reply, int rplen) {
     asm volatile("mov %0, r0" : "=r"(retval));
     return retval;
 }
+
+
+int sysAwaitEvent(int eventId) {
+    int retval;
+    int lr;
+    asm volatile("mov %0, lr" :: "r"(lr));
+    bwprintf(COM2, "Value 2: %d \n\r", lr);
+    asm volatile("swi 10");
+    // bwprintf(COM2, "returned from swi 10 \n\r");
+    asm volatile("mov %0, r0" : "=r"(retval));
+    asm volatile("mov %0, lr" :: "r"(lr));    
+    bwprintf(COM2, "Value 3: %d \n\r", lr);
+    return retval;
+    // return 42;
+    
+}

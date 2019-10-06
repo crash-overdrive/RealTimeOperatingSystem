@@ -17,7 +17,11 @@ namespace Constants {
         RECEIVE_BLOCKED,
         REPLY_BLOCKED,
         BLOCKED,
-        ZOMBIE
+        ZOMBIE,
+        TIMER_BLOCKED
+    };
+    enum EVENTS {
+        TIMER_INTERRUPT
     };
 };
 

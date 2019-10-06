@@ -69,3 +69,17 @@ int WhoIs(const char* name) {
     }
     return -1;
 }
+
+int AwaitEvent(int eventId) {
+    int lr, retval;
+    // asm volatile("mov %0, lr" :: "r"(lr));
+    // bwprintf(COM2, "Value 1: %d \n\r", lr);
+    // bwprintf(COM2, "Calling sysAwaitEvent\n\r");
+    // int response = sysAwaitEvent(eventId);
+    // bwprintf(COM2, "Returned from sysAwaitEvent\n\r");
+    // asm volatile("mov %0, lr" :: "r"(lr));    
+    // bwprintf(COM2, "Value 4: %d \n\r", lr);
+    asm volatile("swi 10");
+    asm volatile("mov %0, r0" : "=r"(retval));
+    return retval;
+}

@@ -46,12 +46,22 @@ void Kernel::initialize() {
 void Kernel::schedule() {
     // TODO: what happens when ready_queue is empty?
     activeTask = ready_queue.pop();
+    // bwprintf(COM2, "Schedulding tid: %d to run\n\r", activeTask->tid);
+}
+
+
+void printStack(int* stackPointer) {
+    for (int i = 0; i < 45; ++i) {
+        bwprintf(COM2, "%d - %d\n\r", i, stackPointer[i]);
+    }
 }
 
 int* Kernel::activate() {
     activeTask->sp[3] = activeTask->returnValue;
-
+    bwprintf(COM2, "Value of lr is: %d\n\r", activeTask->sp[16]);
+    // printStack(activeTask->sp);
     int* stackPointer = kernelExit((int) activeTask->sp);
+    bwprintf(COM2, "Value of lr is: %d\n\r", stackPointer[16]);
     activeTask->sp = stackPointer;
 
     return stackPointer;
@@ -61,6 +71,7 @@ void Kernel::handle(int* stackPointer)  {
     // Set the state of the activeTask to be READY
     // If it needs to be changed then the appropriate handler will do it
     activeTask->taskState = Constants::READY;
+    
 
     if (stackPointer[0]) {
         int vic1Status = *(int *)(VIC1_IRQ_BASE + IRQ_STATUS_OFFSET);
@@ -69,6 +80,7 @@ void Kernel::handle(int* stackPointer)  {
         if (vic1Status & TC1UI_MASK) {
             bwprintf(COM2, "\n\rThe interrupt was a timer 1 underflow interrupt\n\r");
             *(int *)(TIMER1_BASE + CLR_OFFSET) = 1; // Clear the interrupt
+            handleTimerInterrupt(1);
             // handleTimerUnderflow(1);
         } else if (vic1Status & TC2UI_MASK) {
             bwprintf(COM2, "\n\rThe interrupt was a timer 2 underflow interrupt\n\r");
@@ -131,6 +143,9 @@ void Kernel::handle(int* stackPointer)  {
                 // bwprintf(COM2, "Came out from handleReply\n\r");
                 break;
 
+            case 10:
+                activeTask->returnValue = handleAwaitEvent((int)arg1);
+                break;
             default:
                 bwprintf(COM2, "Invalid SWI: %d\n\r", request);
                 break;
@@ -140,6 +155,7 @@ void Kernel::handle(int* stackPointer)  {
     // bwprintf(COM2, "Task state is: %d %d\n\r", activeTask->tid, activeTask->taskState);
     switch (activeTask->taskState) {
         case Constants::READY:
+            bwprintf(COM2, "Pushing %d to ready queue\n\r", activeTask->tid);
             ready_queue.push(activeTask, activeTask->priority);
             break;
 
@@ -159,6 +175,11 @@ void Kernel::handle(int* stackPointer)  {
             break;
         case Constants::REPLY_BLOCKED:
             // bwprintf(COM2, "TID: %d on REPLY_BLOCKED\n\r", activeTask->tid);
+            break;
+
+        case Constants::TIMER_BLOCKED:
+            bwprintf(COM2, "Putting %d on timerBlockedQueue\n\r", activeTask->tid);
+            timerBlockedQueue.push(activeTask);
             break;
 
         default:
@@ -188,5 +209,7 @@ void Kernel::run() {
         }
         stackPointer = activate();
         handle(stackPointer);
+        // bwprintf(COM2, "Got here\n\r");
     }
 }
+
