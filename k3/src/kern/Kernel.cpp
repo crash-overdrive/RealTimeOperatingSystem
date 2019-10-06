@@ -27,13 +27,14 @@ void Kernel::initialize() {
     // Setup 0x8, 0x28
     // asm volatile("mov r12, #0xe59ff018"); // e59ff018 = ldr pc, [pc, #24]
     // asm volatile("str r12, #0x8");
-    *(int*)0x8 = 0xe59ff018; // e59ff018 = ldr pc, [pc, #24]
+    *(volatile int*)0x8 = 0xe59ff018; // e59ff018 = ldr pc, [pc, #24]
     asm volatile("ldr r12, =context_switch_enter");
     asm volatile("ldr r3, =0x28");
     asm volatile("str r12, [r3]");
 
     // Setup 0x18, 0x38
-    // *(int*)0x18 = 0xe59ff018; // e59ff018 = ldr pc, [pc, #20] TODO: Why doesn't this work???
+    // asm volatile("TEST: ");
+    // *(volatile int*)0x18 = 0xe59ff018; // e59ff018 = ldr pc, [pc, #24] TODO: Why doesn't this work???
     asm volatile("ldr r12, =handle_interrupt");
     asm volatile("ldr r3, =0x38");
     asm volatile("str r12, [r3]");
@@ -66,7 +67,7 @@ void Kernel::handle(int* stackPointer)  {
         int vic2Status = *(int *)(VIC1_IRQ_BASE + IRQ_STATUS_OFFSET);
 
         if (vic1Status & TC1UI_MASK) {
-            bwprintf(COM2, "\n\rThe interrupt was a timer 3 underflow interrupt\n\r");
+            bwprintf(COM2, "\n\rThe interrupt was a timer 1 underflow interrupt\n\r");
             *(int *)(TIMER1_BASE + CLR_OFFSET) = 1; // Clear the interrupt
             // handleTimerUnderflow(1);
         } else if (vic1Status & TC2UI_MASK) {
@@ -83,8 +84,10 @@ void Kernel::handle(int* stackPointer)  {
         }
 
     } else {
+        
         int request = *(int*)(stackPointer[1] - 4) & 0xffffff;
         // bwprintf(COM2, "Got SWI: %d\n\r", request);
+        // bwprintf(COM2, "Software Interrupt: %d\n\r", request);
 
         void* arg1 = (void*)stackPointer[3];
         void* arg2 = (void*)stackPointer[4];
@@ -134,6 +137,7 @@ void Kernel::handle(int* stackPointer)  {
         }
     }
 
+    // bwprintf(COM2, "Task state is: %d %d\n\r", activeTask->tid, activeTask->taskState);
     switch (activeTask->taskState) {
         case Constants::READY:
             ready_queue.push(activeTask, activeTask->priority);
@@ -168,16 +172,20 @@ void Kernel::handle(int* stackPointer)  {
 void Kernel::run() {
     int* stackPointer;
     initialize();
-    *(int *)TIMER1_BASE = 500; // This is just for testing interrupts
+    *(int *)(TIMER1_BASE + LDR_OFFSET) = 2000; // This is just for testing interrupts
     *(int *)(TIMER1_BASE + CRTL_OFFSET) = ENABLE_MASK | MODE_MASK; // | CLKSEL_MASK;
     FOREVER {
         schedule();
         // Testing interrupts
-        bwprintf(COM2, "THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG!THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG!\n\r");
-        bwprintf(COM2, "TIMER CTRL: %d\n\r", *(int *)(TIMER1_BASE + CRTL_OFFSET));
-        bwprintf(COM2, "TIMER VALUE: %d\n\r", *(int *)(TIMER1_BASE + VAL_OFFSET));
+        // bwprintf(COM2, "THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG!THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG!\n\r");
+        // bwprintf(COM2, "TIMER CTRL: %d\n\r", *(int *)(TIMER1_BASE + CRTL_OFFSET));
+        // bwprintf(COM2, "TIMER VALUE: %d\n\r", *(int *)(TIMER1_BASE + VAL_OFFSET));
         // Testing interrupts
-        if (activeTask == nullptr) { bwprintf(COM2, "No active tasks scheduled!"); break; }
+        if (activeTask == nullptr) { 
+            bwprintf(COM2, "No active tasks scheduled!"); 
+            // asm volatile("msr cpsr_c, #0b10010011");
+            break; 
+        }
         stackPointer = activate();
         handle(stackPointer);
     }

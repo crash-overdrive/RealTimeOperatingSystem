@@ -1,5 +1,5 @@
 /*
- * bwio.h
+ * bwio.hpp
  */
 
 typedef char *va_list;

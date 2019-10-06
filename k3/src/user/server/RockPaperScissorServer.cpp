@@ -28,19 +28,10 @@ void rockPaperScissorServer() {
     char* loss = "l";
     char* draw = "d";
     bool gameOver = true;
-    char name[] = "wRPS SERVER";
-    int size = strlen(name);
+    char name[] = "rRPS SERVER";
 
-    int x,y;
-    x = RegisterAs("rRPS SERVER");
+    RegisterAs(name);
 
-    y = WhoIs("wRPS SERVER");
-    // bwprintf(COM2, "Result of Asking: %d %d\n\r", x, y);
-
-    x = RegisterAs("rRPS SERVER");
-
-    y = WhoIs("wRPS SERVER");
-    // bwprintf(COM2, "Result of Asking: %d %d\n\r", x, y);
     FOREVER {
         
         responseSize = Receive(&sendProcessTid, msg, msglen);
@@ -52,12 +43,15 @@ void rockPaperScissorServer() {
         }
         else if (msg[0] == 's') { //SIGN UP       
             registrationList.push((int *)sendProcessTid);
+            bwprintf(COM2, "Got sign up request from %d %d\n\r", sendProcessTid, registrationList.size());
 
             if (registrationList.size() >= 2 && gameOver) {
                 tidPlayer1 = (int)registrationList.pop();
                 tidPlayer2 = (int)registrationList.pop();
             
                 gameOver = false;
+
+                bwprintf(COM2, "Sending ready signals to %d %d\n\r", tidPlayer1, tidPlayer2);
 
                 Reply(tidPlayer1, ready, 2);
                 Reply(tidPlayer2, ready, 2);
