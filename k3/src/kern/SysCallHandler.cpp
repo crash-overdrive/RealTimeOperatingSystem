@@ -78,8 +78,6 @@ int Kernel::handleSend(SendRequest *sendRequest) {
     activeTask->kSendRequest.receiverTD = receiver;
     activeTask->kSendRequest.sendRequest = sendRequest;
 
-    receiver->receiveQueue.push(&activeTask->kSendRequest);
-
     if (receiver->taskState == Constants::RECEIVE_BLOCKED) {
         // Receiver is already ready for message to be copied
         *(receiver->kReceiveRequest.tid) = activeTask->tid;
@@ -100,6 +98,9 @@ int Kernel::handleSend(SendRequest *sendRequest) {
 
         return -3; // the return value will be set by handleReply
     } else {
+        // Place sender on the receiver's receive queue
+        receiver->receiveQueue.push(&activeTask->kSendRequest);
+
         // Transition the sender to be send blocked
         activeTask->taskState = Constants::SEND_BLOCKED;
 
