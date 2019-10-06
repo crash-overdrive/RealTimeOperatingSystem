@@ -1,7 +1,8 @@
+#include "Constants.hpp"
+#include "io/bwio.hpp"
+#include "kern/Message.hpp"
 #include "user/syscall/UserSyscall.hpp"
 #include "user/syscall/Syscall.hpp"
-#include "kern/Message.hpp"
-#include "io/bwio.hpp"
 #include <string.h>
 
 #define NAME_SERVER_TID 1
@@ -71,7 +72,7 @@ int WhoIs(const char* name) {
 }
 
 int AwaitEvent(int eventId) {
-    int lr, retval;
+    int retval;
     // asm volatile("mov %0, lr" :: "r"(lr));
     // bwprintf(COM2, "Value 1: %d \n\r", lr);
     // bwprintf(COM2, "Calling sysAwaitEvent\n\r");
@@ -79,7 +80,12 @@ int AwaitEvent(int eventId) {
     // bwprintf(COM2, "Returned from sysAwaitEvent\n\r");
     // asm volatile("mov %0, lr" :: "r"(lr));    
     // bwprintf(COM2, "Value 4: %d \n\r", lr);
-    asm volatile("swi 10");
+    asm volatile("swi %c0" :: "i"(Constants::SWI::AWAIT_EVENT));
+    // asm volatile("swi 10");
     asm volatile("mov %0, r0" : "=r"(retval));
     return retval;
+}
+
+int Halt() {
+    return sysHalt();
 }

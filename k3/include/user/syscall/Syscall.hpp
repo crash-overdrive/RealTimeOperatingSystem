@@ -2,6 +2,7 @@
 #define SYSCALL_HPP
 
 #include "kern/Message.hpp"
+
 /*
  * Allocates and initializes a task descriptor, using the given priority, and the given function pointer as a pointer to the entry point of executable code,
  * essentially a function with no arguments and no return value. When Create returns, the task descriptor has all the state needed to run the task, the task’s
@@ -85,13 +86,22 @@ int sysReceive(int *tid, char *msg, int msglen);
 int sysReply(int tid, const char *reply, int rplen);
 
 /*
- * blocks until the event identified by eventid occurs then returns with volatile data, if any.
+ * Blocks until the event identified by eventid occurs then returns with volatile data, if any.
  * 
- * Return Value
- * >-1	volatile data, in the form of a positive integer.
- * -1	invalid event.
- * -2	corrupted volatile data. 
- * 
+ * Returns:
+ *   >-1: volatile data, in the form of a positive integer.
+ *    -1: invalid event.
+ *    -2: corrupted volatile data.
 */
 int sysAwaitEvent(int eventId);
+
+/*
+ * Triggers a system halt until next interrupt. Can only be executed by tasks with the lowest priority in the system.
+ * 
+ * Returns:
+ *   idle: idle percent ddd.ddd% represented by integer dddddd
+ *     -1: calling task does not have lowest priority
+ */
+int sysHalt();
+
 #endif

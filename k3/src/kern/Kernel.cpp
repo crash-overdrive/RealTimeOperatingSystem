@@ -98,6 +98,7 @@ void Kernel::handle(int* stackPointer)  {
     } else {
         
         int request = *(int*)(stackPointer[1] - 4) & 0xffffff;
+        int halt = 0;
         // bwprintf(COM2, "Got SWI: %d\n\r", request);
         // bwprintf(COM2, "Software Interrupt: %d\n\r", request);
 
@@ -145,6 +146,12 @@ void Kernel::handle(int* stackPointer)  {
 
             case Constants::SWI::AWAIT_EVENT:
                 activeTask->returnValue = handleAwaitEvent((int)arg1);
+                break;
+
+            case Constants::SWI::HALT:
+                bwprintf(COM2, "SWI halt executed!\n\r");
+                halt = *(int *)0x80930008; // Puts the system into idle mode
+                bwprintf(COM2, "Returned after halt?!\n\r");
                 break;
 
             default:

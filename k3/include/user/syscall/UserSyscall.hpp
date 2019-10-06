@@ -107,13 +107,22 @@ int WhoIs(const char* name);
 
 
 /*
- * blocks until the event identified by eventid occurs then returns with volatile data, if any.
+ * Blocks until the event identified by eventid occurs then returns with volatile data, if any.
  * 
- * Return Value
- * >-1	volatile data, in the form of a positive integer.
- * -1	invalid event.
- * -2	corrupted volatile data. 
- * 
+ * Returns:
+ *   >-1: volatile data, in the form of a positive integer.
+ *    -1: invalid event.
+ *    -2: corrupted volatile data.
 */
 int AwaitEvent(int eventId);
+
+/*
+ * Triggers a system halt until next interrupt. Can only be executed by tasks with the lowest priority in the system.
+ * 
+ * Returns:
+ *   idle: idle percent ddd.ddd% represented by integer dddddd
+ *     -1: calling task does not have lowest priority
+ */
+int Halt();
+
 #endif
