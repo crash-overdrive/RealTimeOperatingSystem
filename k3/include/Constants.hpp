@@ -20,6 +20,18 @@ namespace Constants {
         ZOMBIE,
         TIMER_BLOCKED
     };
+    enum SWI {
+        CREATE = 2,
+        MY_TID,
+        MY_PARENT_TID,
+        YIELD,
+        EXIT,
+        SEND,
+        RECIEVE,
+        REPLY,
+        AWAIT_EVENT,
+        HALT
+    };
     enum EVENTS {
         TIMER_INTERRUPT
     };

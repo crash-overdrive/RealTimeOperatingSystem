@@ -107,45 +107,46 @@ void Kernel::handle(int* stackPointer)  {
         void* arg4 = (void*)stackPointer[6];
 
         switch(request) {
-            case 2:
+            case Constants::SWI::CREATE:
                 activeTask->returnValue = handleCreate((int)arg1, (void (*)())arg2);
                 break;
 
-            case 3:
+            case Constants::SWI::MY_TID:
                 activeTask->returnValue = handleMyTid();
                 break;
 
-            case 4:
+            case Constants::SWI::MY_PARENT_TID:
                 activeTask->returnValue = handleMyParentTid();
                 break;
 
-            case 5:
+            case Constants::SWI::YIELD:
                 break;
 
-            case 6:
+            case Constants::SWI::EXIT:
                 handleExit();
                 break;
 
-            case 7:
+            case Constants::SWI::SEND:
                 // bwprintf(COM2, "Active Task Tid before handleSend: %d\n\r", activeTask->tid);
                 activeTask->returnValue = handleSend((SendRequest *) arg1);
                 // bwprintf(COM2, "Active Task Tid after handleSend: %d\n\r", activeTask->tid);
                 // bwprintf(COM2, "Came out from handlesend\n\r");
                 break;
 
-            case 8:
+            case Constants::SWI::RECIEVE:
                 activeTask->returnValue = handleReceive((int *) arg1, (int *) arg2, (int) arg3);
                 // bwprintf(COM2, "Came out from handleReceive\n\r");
                 break;
 
-            case 9:
+            case Constants::SWI::REPLY:
                 activeTask->returnValue = handleReply((int) arg1, (const char *)arg2, (int) arg3);
                 // bwprintf(COM2, "Came out from handleReply\n\r");
                 break;
 
-            case 10:
+            case Constants::SWI::AWAIT_EVENT:
                 activeTask->returnValue = handleAwaitEvent((int)arg1);
                 break;
+
             default:
                 bwprintf(COM2, "Invalid SWI: %d\n\r", request);
                 break;
