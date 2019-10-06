@@ -8,8 +8,8 @@ void rockPaperScissorClient() {
     char* rock = "r";
     char response[5];
 
-    int rpsServer = 2;
-    // int rpsServer = WhoIs("wRPS SERVER");
+    // int rpsServer = 2;
+    int rpsServer = WhoIs("wRPS SERVER");
     // bwprintf(COM2, "RPS Server TID: %d\n\r", rpsServer);
     bwprintf(COM2, "Sending sign up request\n\r");
     int reply = Send(rpsServer, signup, 2, response, 5);

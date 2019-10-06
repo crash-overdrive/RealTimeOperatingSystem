@@ -71,7 +71,7 @@ int WhoIs(const char* name) {
 }
 
 int AwaitEvent(int eventId) {
-    int lr, retval;
+    int retval;
     // asm volatile("mov %0, lr" :: "r"(lr));
     // bwprintf(COM2, "Value 1: %d \n\r", lr);
     // bwprintf(COM2, "Calling sysAwaitEvent\n\r");
@@ -82,4 +82,18 @@ int AwaitEvent(int eventId) {
     asm volatile("swi 10");
     asm volatile("mov %0, r0" : "=r"(retval));
     return retval;
+}
+
+int Time(int tid) {
+    int clockServerTid = WhoIs("wCLOCK SERVER");
+    char replyMessage[2];
+    char time[] = "t";
+    int replySize = Send(clockServerTid, time, 2, replyMessage, 2);
+    if(replySize == 2) {
+        bwprintf(COM2, "Syscall Time - Got number of ticks: %d\n\r", replyMessage[0]);
+        return replyMessage[0];
+    } else {
+        bwprintf(COM2, "Syscall Time - Got invalid value from clock server: %c\n\r", replyMessage[0]);
+        return -1;
+    }
 }

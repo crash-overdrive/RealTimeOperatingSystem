@@ -116,4 +116,37 @@ int WhoIs(const char* name);
  * 
 */
 int AwaitEvent(int eventId);
+
+/* 
+ * returns the number of ticks since the clock server was created and initialized. With a 10 millisecond tick and a 32-bit unsigned int for the time wraparound is almost 12,000 hours, plenty of time for your demo. Time is actually a wrapper for a send to the clock server. The argument is the tid of the clock server.
+ * 
+ * Return Value
+ * >-1	time in ticks since the clock server initialized.
+ * -1	tid is not a valid clock server task. 
+ *
+*/
+int Time(int tid);
+
+/*
+ * returns after the given number of ticks has elapsed. How long after is not guaranteed because the caller may have to wait on higher priority tasks. Delay() is (almost) identical to Yield() if ticks is zero. Delay() is actually a wrapper for a send to the clock server.
+ * 
+ * Return Value
+ * >-1	success. The current time returned (as in Time())
+ * -1	tid is not a valid clock server task.
+ * -2	negative delay. 
+ * 
+*/ 
+int Delay(int tid, int ticks);
+
+/*
+ * returns when the time since clock server initialization is greater or equal than the given number of ticks. How long after is not guaranteed because the caller may have to wait on higher priority tasks. Also, DelayUntil(tid, Time(tid) + ticks) may differ from Delay(tid, ticks) by a small amount. DelayUntil is actually a wrapper for a send to the clock server.
+ * 
+ * Return Value
+ * >-1	success. The current time returned (as in Time())
+ * -1	tid is not a valid clock server task.
+ * -2	negative delay. 
+ *
+*/
+int DelayUntil(int tid, int ticks);
+
 #endif

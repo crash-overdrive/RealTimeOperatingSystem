@@ -58,10 +58,10 @@ void printStack(int* stackPointer) {
 
 int* Kernel::activate() {
     activeTask->sp[3] = activeTask->returnValue;
-    bwprintf(COM2, "Value of lr is: %d\n\r", activeTask->sp[16]);
+    // bwprintf(COM2, "Value of lr is: %d\n\r", activeTask->sp[16]);
     // printStack(activeTask->sp);
     int* stackPointer = kernelExit((int) activeTask->sp);
-    bwprintf(COM2, "Value of lr is: %d\n\r", stackPointer[16]);
+    // bwprintf(COM2, "Value of lr is: %d\n\r", stackPointer[16]);
     activeTask->sp = stackPointer;
 
     return stackPointer;
@@ -78,20 +78,20 @@ void Kernel::handle(int* stackPointer)  {
         int vic2Status = *(int *)(VIC1_IRQ_BASE + IRQ_STATUS_OFFSET);
 
         if (vic1Status & TC1UI_MASK) {
-            bwprintf(COM2, "\n\rThe interrupt was a timer 1 underflow interrupt\n\r");
+            bwprintf(COM2, "Kernel - The interrupt was a timer 1 underflow interrupt\n\r");
             *(int *)(TIMER1_BASE + CLR_OFFSET) = 1; // Clear the interrupt
             handleTimerInterrupt(1);
             // handleTimerUnderflow(1);
         } else if (vic1Status & TC2UI_MASK) {
-            bwprintf(COM2, "\n\rThe interrupt was a timer 2 underflow interrupt\n\r");
+            bwprintf(COM2, "Kernel - The interrupt was a timer 2 underflow interrupt\n\r");
             *(int *)(TIMER2_BASE + CLR_OFFSET) = 1;
             // handleTimerUnderflow(2);
         } else if (vic2Status & TC3UI_MASK) {
-            bwprintf(COM2, "\n\rThe interrupt was a timer 3 underflow interrupt\n\r");
+            bwprintf(COM2, "Kernel - The interrupt was a timer 3 underflow interrupt\n\r");
             *(int *)(TIMER3_BASE + CLR_OFFSET) = 1;
             // handleTimerUnderflow(3);
         } else {
-            bwprintf(COM2, "ERROR: Kernel interrupted with unknown interrupt\n\r");
+            bwprintf(COM2, "Kernel - ERROR: Kernel interrupted with unknown interrupt\n\r");
             TRAP
         }
 
@@ -147,7 +147,7 @@ void Kernel::handle(int* stackPointer)  {
                 activeTask->returnValue = handleAwaitEvent((int)arg1);
                 break;
             default:
-                bwprintf(COM2, "Invalid SWI: %d\n\r", request);
+                bwprintf(COM2, "Kernel - Invalid SWI: %d\n\r", request);
                 break;
         }
     }
@@ -155,7 +155,7 @@ void Kernel::handle(int* stackPointer)  {
     // bwprintf(COM2, "Task state is: %d %d\n\r", activeTask->tid, activeTask->taskState);
     switch (activeTask->taskState) {
         case Constants::READY:
-            bwprintf(COM2, "Pushing %d to ready queue\n\r", activeTask->tid);
+            // bwprintf(COM2, "Pushing %d to ready queue\n\r", activeTask->tid);
             ready_queue.push(activeTask, activeTask->priority);
             break;
 
@@ -164,7 +164,7 @@ void Kernel::handle(int* stackPointer)  {
             break;
 
         case Constants::ACTIVE:
-            bwprintf(COM2, "Task shouldn't have ACTIVE state\n\r");
+            bwprintf(COM2, "Kernel - Task shouldn't have ACTIVE state\n\r");
             break;
 
         case Constants::SEND_BLOCKED:
@@ -178,12 +178,12 @@ void Kernel::handle(int* stackPointer)  {
             break;
 
         case Constants::TIMER_BLOCKED:
-            bwprintf(COM2, "Putting %d on timerBlockedQueue\n\r", activeTask->tid);
+            bwprintf(COM2, "Kernel - Putting %d on timerBlockedQueue\n\r", activeTask->tid);
             timerBlockedQueue.push(activeTask);
             break;
 
         default:
-            bwprintf(COM2, "Received invalid task State: %d \n\r", activeTask->taskState);
+            bwprintf(COM2, "Kernel - Received invalid task State: %d \n\r", activeTask->taskState);
             break;
     }
     
@@ -203,8 +203,8 @@ void Kernel::run() {
         // bwprintf(COM2, "TIMER VALUE: %d\n\r", *(int *)(TIMER1_BASE + VAL_OFFSET));
         // Testing interrupts
         if (activeTask == nullptr) { 
-            bwprintf(COM2, "No active tasks scheduled!"); 
-            // asm volatile("msr cpsr_c, #0b10010011");
+            bwprintf(COM2, "Kernel - No active tasks scheduled!"); 
+            // asm volatile("msr cpsr_c, #0b11010011");
             break; 
         }
         stackPointer = activate();
