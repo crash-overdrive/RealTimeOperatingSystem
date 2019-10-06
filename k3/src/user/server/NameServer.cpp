@@ -14,7 +14,7 @@ class nameServerEntry {
 
 void nameServer() {
     // initiliaze
-    bwprintf(COM2, "Created Name server\n\r");
+    bwprintf(COM2, "Name Server - Created Name server\n\r");
     nameServerEntry nameServerEntries[Constants::NUM_TASKS];
     int numberOfEntries = -1;
     
@@ -35,7 +35,7 @@ void nameServer() {
 
         messageSize = Receive(&sendProcessTid, name, nameLength);
 
-        bwprintf(COM2, "Received from %d - %s - %d - %c\n\r", sendProcessTid, name, messageSize, name[0]);
+        bwprintf(COM2, "Name Server - Received from %d - %s - %d - %c\n\r", sendProcessTid, name, messageSize, name[0]);
         
         if (messageSize > 0) {
             // process the input
@@ -51,7 +51,7 @@ void nameServer() {
                     if (strcmp((nameServerEntries[i].taskName), name+1) == 0) {
                         
                         nameServerEntries[i].tid = sendProcessTid;
-                        bwprintf(COM2, "Created name server entry at index: %d %d - %s\n\r", i, sendProcessTid, nameServerEntries[i].taskName);
+                        bwprintf(COM2, "Name Server - MATCH found Created name server entry at index: %d %d - %s\n\r", i, sendProcessTid, nameServerEntries[i].taskName);
                         Reply(sendProcessTid, success, 2);
                         matchFound = true;
                         break;
@@ -64,7 +64,7 @@ void nameServer() {
                     ++numberOfEntries;
                     memcpy(nameServerEntries[numberOfEntries].taskName, name+1, messageSize-1);
                     nameServerEntries[numberOfEntries].tid = sendProcessTid;
-                    bwprintf(COM2, "MATCH not found - Created name server entry: %d - %s - %d\n\r", sendProcessTid, nameServerEntries[numberOfEntries].taskName, numberOfEntries);
+                    bwprintf(COM2, "Name Server - MATCH not found - Created name server entry: %d - %s - %d\n\r", sendProcessTid, nameServerEntries[numberOfEntries].taskName, numberOfEntries);
                     Reply(sendProcessTid, success, 2);
                 }                    
 
@@ -75,7 +75,7 @@ void nameServer() {
                     if (strcmp((nameServerEntries[i].taskName), name+1) == 0) {
 
                         matchFound = true;
-                        bwprintf(COM2, "Found name server entry at index - %d - %s - %d\n\r", i, name+1, nameServerEntries[i].tid);
+                        bwprintf(COM2, "Name Server - Found name server entry at index - %d - %s - %d\n\r", i, name+1, nameServerEntries[i].tid);
                         requestResponse[0] = (char) nameServerEntries[i].tid;
                         requestResponse[1] = '\0';
                         Reply(sendProcessTid, requestResponse, 2);

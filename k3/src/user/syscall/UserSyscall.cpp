@@ -86,6 +86,20 @@ int AwaitEvent(int eventId) {
     return retval;
 }
 
+int Time(int tid) {
+    int clockServerTid = WhoIs("wCLOCK SERVER");
+    char replyMessage[2];
+    char time[] = "t";
+    int replySize = Send(clockServerTid, time, 2, replyMessage, 2);
+    if(replySize == 2) {
+        bwprintf(COM2, "Syscall Time - Got number of ticks: %d\n\r", replyMessage[0]);
+        return replyMessage[0];
+    } else {
+        bwprintf(COM2, "Syscall Time - Got invalid value from clock server: %c\n\r", replyMessage[0]);
+        return -1;
+    }
+}
+
 int Halt() {
     return sysHalt();
 }

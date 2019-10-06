@@ -19,7 +19,7 @@ void sendTask() {
     char reply[4];
     int replySize = 4;
     // replySize = Send(receiveServer, msg, 14, &reply, 32);
-    for (int i = 0; i < NUMBER_OF_TESTS*2; ++i) {
+    for (int i = 0; i < NUMBER_OF_TESTS; ++i) {
         bwprintf(COM2, "DEBUG: Size of message sending from SEND is %d with msg %s\n\r", 4, msg);
         replySize = Send(1, msg, 4, reply, 4);
     }
@@ -40,7 +40,7 @@ void receiveTask() {
 
     unsigned int startTime = READ_REGISTER TIMER3_VALUE;
     
-    for (int i = 0; i < NUMBER_OF_TESTS *4; ++i) {
+    for (int i = 0; i < NUMBER_OF_TESTS *2; ++i) {
         msglen = Receive(&tid, msg, 4);
 
         bwprintf(COM2, "DEBUG: RECEIVED a message <%s> with length %d from tid %d\n\r", msg, msglen, tid);
