@@ -50,8 +50,11 @@ void Kernel::initialize() {
 
     // Create the system's first task
     handleCreate(0, bootLoader);
+
+    // Create the system's idle task and intialize timing
     haltTD = lookupTD(handleCreate(Constants::NUM_PRIORITIES-1, halt));
     haltActivate = haltReturn = lastHaltActivate = *(int *)(TIMER3_BASE + VAL_OFFSET);
+    updateTick = 0;
 }
 
 void Kernel::drawGUI() {
@@ -60,22 +63,23 @@ void Kernel::drawGUI() {
     // bwprintf(COM2, "\033[4;40f║ \033[4mIdle Time:\033[24m   \033[41m0.000%\033[47m ║");
     // bwprintf(COM2, "\033[5;40f╚═════════════════════╝\0338");
 
-    bwprintf(COM2, "\0337\033[33;60f\033[37m╔═════════════════════╗");
-    bwprintf(COM2, "\033[34;60f║ \033[4mIdle Time:\033[24m   \033[31m0.000%%\033[37m ║");
-    bwprintf(COM2, "\033[35;60f╚═════════════════════╝\0338");
+    bwprintf(COM2, "\0337\033[2J\033[3;3f\033[37m╔═════════════════════╗");
+    bwprintf(COM2, "\033[4;3f║ \033[4mIdle Time:\033[24m   \033[31m0.000%%\033[37m ║");
+    bwprintf(COM2, "\033[5;3f╚═════════════════════╝\0338");
 }
 
 void Kernel::displayIdle(unsigned int idlePercent) {
-    // -> ddd.ddd
     // -> dddddd
+    // -> ddd.ddd
     if (idlePercent < 50000) {
-        bwprintf(COM2, "\0337\033[34;72f\033[31m<%d.%d%%\0338", idlePercent/1000, idlePercent%1000);
+        // The column is +14 from the location we use in the gui
+        bwprintf(COM2, "\0337\033[4;17f\033[31m%d.%d%%\0338", idlePercent/1000, idlePercent%1000);
         // bwprintf(COM2, "   RED: Idle percent %d\n\r", idlePercent);
     } else if (idlePercent < 80000) {
-        bwprintf(COM2, "\0337\033[34;72f\033[33m<%d.%d%%\0338", idlePercent/1000, idlePercent%1000);
+        bwprintf(COM2, "\0337\033[4;17f\033[33m%d.%d%%\0338", idlePercent/1000, idlePercent%1000);
         // bwprintf(COM2, "YELLOW: Idle percent %d\n\r", idlePercent);
     } else {
-        bwprintf(COM2, "\0337\033[34;72f\033[32m>%d.%d%%\0338", idlePercent/1000, idlePercent%1000);
+        bwprintf(COM2, "\0337\033[4;17f\033[32m%d.%d%%\0338", idlePercent/1000, idlePercent%1000);
         // bwprintf(COM2, " GREEN: Idle percent %d\n\r", idlePercent);
     }
 }
@@ -83,7 +87,7 @@ void Kernel::displayIdle(unsigned int idlePercent) {
 void Kernel::schedule() {
     // TODO: what happens when ready_queue is empty?
     activeTask = ready_queue.pop();
-    bwprintf(COM2, "Schedulding tid: %d to run with priority %d\n\r", activeTask->tid, activeTask->priority);
+    // bwprintf(COM2, "Schedulding tid: %d to run with priority %d\n\r", activeTask->tid, activeTask->priority);
 }
 
 
@@ -98,6 +102,13 @@ int* Kernel::activate() {
     if (activeTask == haltTD) {
         lastHaltActivate = haltActivate;
         haltActivate = *(unsigned int *)(TIMER3_BASE + VAL_OFFSET);
+        // Sadly, GCC clobbers the shit out of this update loop which was intended to make it so that we only re-render every 100ms, RIP F
+        // updateTick += lastHaltActivate - haltActivate;
+        // bwprintf(COM2, "update tick? %d \r\n", updateTick);
+        // if (updateTick > 50800) {
+        //     displayIdle((volatile unsigned long long)(lastHaltActivate - haltReturn) * 100000 / (lastHaltActivate - haltActivate));
+        //     updateTick -= 50800;
+        // }
         // The cast here is to prevent overflow during the multiplacation. It might have been possible to avoid this, but we wanted 3 decimal precision.
         displayIdle((unsigned long long)(lastHaltActivate - haltReturn) * 100000 / (lastHaltActivate - haltActivate));
     }
@@ -124,16 +135,16 @@ void Kernel::handle(int* stackPointer)  {
         int vic2Status = *(int *)(VIC1_IRQ_BASE + IRQ_STATUS_OFFSET);
 
         if (vic1Status & TC1UI_MASK) {
-            bwprintf(COM2, "Kernel - The interrupt was a timer 1 underflow interrupt\n\r");
+            // bwprintf(COM2, "Kernel - The interrupt was a timer 1 underflow interrupt\n\r");
             *(int *)(TIMER1_BASE + CLR_OFFSET) = 1; // Clear the interrupt
             handleTimerInterrupt(1);
             // handleTimerUnderflow(1);
         } else if (vic1Status & TC2UI_MASK) {
-            bwprintf(COM2, "Kernel - The interrupt was a timer 2 underflow interrupt\n\r");
+            // bwprintf(COM2, "Kernel - The interrupt was a timer 2 underflow interrupt\n\r");
             *(int *)(TIMER2_BASE + CLR_OFFSET) = 1;
             // handleTimerUnderflow(2);
         } else if (vic2Status & TC3UI_MASK) {
-            bwprintf(COM2, "Kernel - The interrupt was a timer 3 overflow interrupt!\n\r");
+            // bwprintf(COM2, "Kernel - The interrupt was a timer 3 overflow interrupt!\n\r");
             *(int *)(TIMER3_BASE + CLR_OFFSET) = 1;
             // handleTimerUnderflow(3);
         } else {
@@ -142,7 +153,7 @@ void Kernel::handle(int* stackPointer)  {
         }
 
     } else {
-        
+
         int request = *(int*)(stackPointer[1] - 4) & 0xffffff;
         volatile int halt = 0;
         // bwprintf(COM2, "Got SWI: %d\n\r", request);

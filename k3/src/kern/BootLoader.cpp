@@ -25,8 +25,8 @@ void bootLoader() {
     // tid = Create(3, rockPaperScissorClient);
     // tid = Create(3, rockPaperScissorClient);
 
-    // tid = Create(1, receiveTask);
-    // tid = Create(4, sendTask);
+    tid = Create(1, receiveTask);
+    tid = Create(4, sendTask);
 
     // tid = Create(2, nameServer);
     // bwprintf(COM2, "BootLoader - Created Name Server with tid: %d\n\r", tid);

@@ -30,7 +30,7 @@ class Kernel {
         volatile int taskNumber = -1;
 
         TaskDescriptor *haltTD;
-        unsigned int haltActivate, haltReturn, lastHaltActivate;
+        unsigned int haltActivate, haltReturn, lastHaltActivate, updateTick;
 
         void initialize();
 
