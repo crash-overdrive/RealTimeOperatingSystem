@@ -4,6 +4,7 @@
 #include "kern/TaskDescriptor.hpp"
 #include "data-structures/RingBuffer.hpp"
 #include "io/bwio.hpp"
+#include <string.h>
 
 #define FOREVER for(;;)
 
@@ -36,46 +37,65 @@ void clockServer() {
     RegisterAs("rCLOCK SERVER");
 
     DataStructures::RingBuffer<ClockServerEntry,Constants::NUM_TASKS> clockServerEntries;
-    char acknowledge[] = "a";
-    char replyMessage[2] = "A";
-    int numberOfTicks = 0;
+    
+    int numberOfTicksElapsed = 0;
+    char replyMessage[5] = "R";
+    char acknowledge[] = "A";
 
     int sendTid;
-    char sendMessage[2];
+    char sendMessage[5];
+
+    int ticks;
     
     Create(0, clockNotifier); 
 
-    
-
     FOREVER {
-        int sendSize = Receive(&sendTid, sendMessage, 2);
-        if (sendSize == 2) {
-            switch (sendMessage[0])
-            {
-            case 'x':
-                ++numberOfTicks;
-                bwprintf(COM2, "Clock Server - Received from Notifier, Tick Tock: %d\n\r", numberOfTicks);
-                Reply(sendTid, "a", 2);
+        int sendSize = Receive(&sendTid, sendMessage, 5);
+        if (sendSize == 2 || sendSize == 5) {
+            switch (sendMessage[0]) {
+            case 'x': // CLOCK NOTIFIER
+                ++numberOfTicksElapsed;
+                
+                bwprintf(COM2, "Clock Server - Received from Notifier: %d ticks\n\r", numberOfTicksElapsed);
+                
+                Reply(sendTid, acknowledge, 2);
                 break;
 
-            case 't':
-                replyMessage[0] = (char)numberOfTicks;
-                bwprintf(COM2, "Clock Server - Received time Request from: %d %d ticks\n\r", sendTid, numberOfTicks);
-                Reply(sendTid, replyMessage, 2);
+            case 't': // TIME
+                bwprintf(COM2, "Clock Server - Received time Request from: %d at %d ticks\n\r", sendTid, numberOfTicksElapsed);
+                
+                memcpy(replyMessage+1, &numberOfTicksElapsed, sizeof(numberOfTicksElapsed));
+                Reply(sendTid, replyMessage, 5);
+                
                 break;
 
-            case 'u':
-                bwprintf(COM2, "Clock Server - Received delay until request\n\r");
+            case 'd': // DELAY
+                memcpy(&ticks, sendMessage+1, sizeof(ticks));
+                
+                bwprintf(COM2, "Clock Server - Received delay request from %d for ticks: %d at ticks: %d\n\r", sendTid, ticks, numberOfTicksElapsed);
+                
+                memcpy(replyMessage+1, &numberOfTicksElapsed, sizeof(numberOfTicksElapsed));
+                Reply(sendTid, replyMessage, 5);
+
                 break;
 
-            case 'd':
-                bwprintf(COM2, "Clock Server - Received delay request\n\r");
+            case 'u': // DELAY UNTIL
+                memcpy(&ticks, sendMessage+1, sizeof(ticks));
+                
+                bwprintf(COM2, "Clock Server - Received delay until request from %d for ticks: %d at ticks: %d\n\r", sendTid, ticks, numberOfTicksElapsed);
+                
+                memcpy(replyMessage+1, &numberOfTicksElapsed, sizeof(numberOfTicksElapsed));
+                Reply(sendTid, replyMessage, 5);
+
                 break;
 
             default:
                 bwprintf(COM2, "Clock Server - Received invalid SEND: %c\n\r", sendMessage[0]);
+                
                 break;
             }
+        } else {
+            bwprintf(COM2, "Clock Server - Received invalid send, size: %d\n\r", sendSize);
         }
     }
 }

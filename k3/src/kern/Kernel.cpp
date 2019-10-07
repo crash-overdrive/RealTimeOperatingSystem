@@ -149,9 +149,9 @@ void Kernel::handle(int* stackPointer)  {
                 break;
 
             case Constants::SWI::HALT:
-                bwprintf(COM2, "SWI halt executed!\n\r");
+                bwprintf(COM2, "Kernel - SWI halt executed!\n\r");
                 halt = *(int *)0x80930008; // Puts the system into idle mode
-                bwprintf(COM2, "Returned after halt?!\n\r");
+                bwprintf(COM2, "Kernel - Returned after halt?!\n\r");
                 break;
 
             default:
@@ -205,11 +205,6 @@ void Kernel::run() {
     *(int *)(TIMER1_BASE + CRTL_OFFSET) = ENABLE_MASK | MODE_MASK; // | CLKSEL_MASK;
     FOREVER {
         schedule();
-        // Testing interrupts
-        // bwprintf(COM2, "THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG!THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG! THIS MESSAGE IS INTENTIONALLY LONG!\n\r");
-        // bwprintf(COM2, "TIMER CTRL: %d\n\r", *(int *)(TIMER1_BASE + CRTL_OFFSET));
-        // bwprintf(COM2, "TIMER VALUE: %d\n\r", *(int *)(TIMER1_BASE + VAL_OFFSET));
-        // Testing interrupts
         if (activeTask == nullptr) { 
             bwprintf(COM2, "Kernel - No active tasks scheduled!");
             // asm volatile("msr cpsr_c, #0b11010011");
@@ -217,7 +212,5 @@ void Kernel::run() {
         }
         stackPointer = activate();
         handle(stackPointer);
-        // bwprintf(COM2, "Got here\n\r");
     }
 }
-
