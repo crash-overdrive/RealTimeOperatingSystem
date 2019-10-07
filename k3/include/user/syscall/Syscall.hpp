@@ -95,13 +95,4 @@ int sysReply(int tid, const char *reply, int rplen);
 */
 int sysAwaitEvent(int eventId);
 
-/*
- * Triggers a system halt until next interrupt. Can only be executed by tasks with the lowest priority in the system.
- * 
- * Returns:
- *   idle: idle percent ddd.ddd% represented by integer dddddd
- *     -1: calling task does not have lowest priority
- */
-int sysHalt();
-
 #endif

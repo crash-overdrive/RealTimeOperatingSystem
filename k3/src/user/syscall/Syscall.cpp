@@ -67,10 +67,3 @@ int sysAwaitEvent(int eventId) {
     // bwprintf(COM2, "Value 3: %d \n\r", lr);
     return retval;
 }
-
-int sysHalt() {
-    int retval;
-    asm volatile("swi %c0" :: "i"(Constants::SWI::HALT));
-    asm volatile("mov %0, r0" : "=r"(retval));
-    return retval;
-}

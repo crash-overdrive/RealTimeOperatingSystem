@@ -22,7 +22,7 @@ void clockNotifier() {
         
         // Send to time server
         int replySize = Send(clockServerTid, tick, 2, replyMessage, 2);
-        if (!((replySize == 2) && (replyMessage[0] == 'a'))) {
+        if (!((replySize == 2) && (replyMessage[0] == 'A'))) {
             bwprintf(COM2, "Clock Notifier - Got bad reply: %c\n\r", replyMessage[0]);
         }
     }

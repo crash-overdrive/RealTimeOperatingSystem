@@ -88,18 +88,66 @@ int AwaitEvent(int eventId) {
 
 int Time(int tid) {
     int clockServerTid = WhoIs("wCLOCK SERVER");
-    char replyMessage[2];
-    char time[] = "t";
-    int replySize = Send(clockServerTid, time, 2, replyMessage, 2);
-    if(replySize == 2) {
-        bwprintf(COM2, "Syscall Time - Got number of ticks: %d\n\r", replyMessage[0]);
-        return replyMessage[0];
+    if (tid != clockServerTid) {
+        return -1;
+    }
+    char replyMessage[5];
+    char sendMessage[] = "t";
+    int replySize = Send(clockServerTid, sendMessage, 2, replyMessage, 5);
+    if(replySize == 5 && replyMessage[0] == 'R') {
+        int ticks;
+        memcpy(&ticks, replyMessage+1, sizeof(ticks));
+        bwprintf(COM2, "Syscall Time - Got number of ticks: %d\n\r", ticks);
+        return ticks;
     } else {
         bwprintf(COM2, "Syscall Time - Got invalid value from clock server: %c\n\r", replyMessage[0]);
         return -1;
     }
 }
 
-int Halt() {
-    return sysHalt();
+int Delay(int tid, int ticks) {
+    int clockServerTid = WhoIs("wCLOCK SERVER");
+    if (tid != clockServerTid) {
+        return -1;
+    }
+    char replyMessage[5];
+    char sendMessage[5] = "d";
+
+    memcpy(sendMessage+1, &ticks, sizeof(ticks));
+
+    int replySize = Send(clockServerTid, sendMessage, 5, replyMessage, 5);
+
+    if(replySize == 5 && replyMessage[0] == 'R') {
+        int ticksElapsed;
+        memcpy(&ticksElapsed, replyMessage+1, sizeof(ticksElapsed));
+        bwprintf(COM2, "Syscall Delay - Got number of ticks: %d\n\r", ticksElapsed);
+        return ticksElapsed;
+    } else {
+        bwprintf(COM2, "Syscall Delay - Got invalid value from clock server: %c\n\r", replyMessage[0]);
+        return -1;
+    }
+}
+
+int DelayUntil(int tid, int ticks) {
+    int clockServerTid = WhoIs("wCLOCK SERVER");
+    if (tid != clockServerTid) {
+        return -1;
+    }
+
+    char replyMessage[5];
+    char sendMessage[5] = "u";
+
+    memcpy(sendMessage+1, &ticks, sizeof(ticks));
+
+    int replySize = Send(clockServerTid, sendMessage, 5, replyMessage, 5);
+
+    if(replySize == 5 && replyMessage[0] == 'R') {
+        int ticksElapsed;
+        memcpy(&ticksElapsed, replyMessage+1, sizeof(ticksElapsed));
+        bwprintf(COM2, "Syscall Delay Until - Got number of ticks: %d\n\r", ticksElapsed);
+        return ticksElapsed;
+    } else {
+        bwprintf(COM2, "Syscall Delay Until - Got invalid value from clock server: %c\n\r", replyMessage[0]);
+        return -1;
+    }
 }
