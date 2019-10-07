@@ -11,7 +11,7 @@
 #define TIMER3_LOAD 0x80810080
 #define TIMER3_VALUE 0x80810084
 #define TIMER3_CONTROL 0x80810088
-#define NUMBER_OF_TESTS 1
+#define NUMBER_OF_TESTS 1000000
 
 void sendTask() {
     // int receiveServer = WhoIs("ReceiveServer");
@@ -24,7 +24,7 @@ void sendTask() {
         replySize = Send(1, msg, 4, reply, 4);
     }
     
-    bwprintf(COM2, "DEBUG: Size of message returned to SEND is %d with msg %s\n\r", replySize, reply);
+    // bwprintf(COM2, "DEBUG: Size of message returned to SEND is %d with msg %s\n\r", replySize, reply);
     Exit();
 }
 
@@ -40,7 +40,7 @@ void receiveTask() {
 
     unsigned int startTime = READ_REGISTER TIMER3_VALUE;
     
-    for (int i = 0; i < NUMBER_OF_TESTS *2; ++i) {
+    for (int i = 0; i < NUMBER_OF_TESTS ; ++i) {
         msglen = Receive(&tid, msg, 4);
 
         bwprintf(COM2, "DEBUG: RECEIVED a message <%s> with length %d from tid %d\n\r", msg, msglen, tid);
