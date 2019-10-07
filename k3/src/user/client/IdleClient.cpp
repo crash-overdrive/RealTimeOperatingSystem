@@ -27,8 +27,8 @@ void idleClient() {
     struct diagnostics diags;
     bwprintf(COM2, "Created idle client\n\r");
     FOREVER {
-        diagnosis(&diags);
-        bwprintf(COM2, "Idle client halting\n\r");
-        diags.idlePercent = Halt();
+        // diagnosis(&diags);
+        // bwprintf(COM2, "Idle client halting\n\r");
+        // diags.idlePercent = Halt();
     }
 }

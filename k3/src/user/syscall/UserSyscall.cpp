@@ -6,7 +6,6 @@
 #include <string.h>
 
 #define NAME_SERVER_TID 1
-#define CLOCK_SERVER_TID 2
 
 int Create(int priority, void (*function)()) {
     return sysCreate(priority, function);
@@ -97,7 +96,7 @@ int Time(int tid) {
     if(replySize == 5 && replyMessage[0] == 'R') {
         int ticks;
         memcpy(&ticks, replyMessage+1, sizeof(ticks));
-        bwprintf(COM2, "Syscall Time - Got number of ticks: %d\n\r", ticks);
+        // bwprintf(COM2, "Syscall Time - Got number of ticks: %d\n\r", ticks);
         return ticks;
     } else {
         bwprintf(COM2, "Syscall Time - Got invalid value from clock server: %c\n\r", replyMessage[0]);
@@ -110,6 +109,9 @@ int Delay(int tid, int ticks) {
     if (tid != clockServerTid) {
         return -1;
     } 
+    if (ticks < 0) {
+        return -2;
+    }
     char replyMessage[5];
     char sendMessage[5] = "d";
 
@@ -120,7 +122,7 @@ int Delay(int tid, int ticks) {
     if(replySize == 5 && replyMessage[0] == 'R') {
         int ticksElapsed;
         memcpy(&ticksElapsed, replyMessage+1, sizeof(ticksElapsed));
-        bwprintf(COM2, "Syscall Delay - Got number of ticks: %d\n\r", ticksElapsed);
+        // bwprintf(COM2, "Syscall Delay - Got number of ticks: %d\n\r", ticksElapsed);
         return ticksElapsed;
     } else {
         bwprintf(COM2, "Syscall Delay - Got invalid value from clock server: %c\n\r", replyMessage[0]);
@@ -133,6 +135,9 @@ int DelayUntil(int tid, int ticks) {
     if (tid != clockServerTid) {
         return -1;
     } 
+    if (ticks < 0) {
+        return -2;
+    }
 
     char replyMessage[5];
     char sendMessage[5] = "u";
@@ -144,7 +149,7 @@ int DelayUntil(int tid, int ticks) {
     if(replySize == 5 && replyMessage[0] == 'R') {
         int ticksElapsed;
         memcpy(&ticksElapsed, replyMessage+1, sizeof(ticksElapsed));
-        bwprintf(COM2, "Syscall Delay Until - Got number of ticks: %d\n\r", ticksElapsed);
+        // bwprintf(COM2, "Syscall Delay Until - Got number of ticks: %d\n\r", ticksElapsed);
         return ticksElapsed;
     } else {
         bwprintf(COM2, "Syscall Delay Until - Got invalid value from clock server: %c\n\r", replyMessage[0]);

@@ -78,16 +78,16 @@ void Kernel::handle(int* stackPointer)  {
         int vic2Status = *(int *)(VIC1_IRQ_BASE + IRQ_STATUS_OFFSET);
 
         if (vic1Status & TC1UI_MASK) {
-            bwprintf(COM2, "Kernel - The interrupt was a timer 1 underflow interrupt\n\r");
+            // bwprintf(COM2, "Kernel - The interrupt was a timer 1 underflow interrupt\n\r");
             *(int *)(TIMER1_BASE + CLR_OFFSET) = 1; // Clear the interrupt
             handleTimerInterrupt(1);
             // handleTimerUnderflow(1);
         } else if (vic1Status & TC2UI_MASK) {
-            bwprintf(COM2, "Kernel - The interrupt was a timer 2 underflow interrupt\n\r");
+            // bwprintf(COM2, "Kernel - The interrupt was a timer 2 underflow interrupt\n\r");
             *(int *)(TIMER2_BASE + CLR_OFFSET) = 1;
             // handleTimerUnderflow(2);
         } else if (vic2Status & TC3UI_MASK) {
-            bwprintf(COM2, "Kernel - The interrupt was a timer 3 underflow interrupt\n\r");
+            // bwprintf(COM2, "Kernel - The interrupt was a timer 3 underflow interrupt\n\r");
             *(int *)(TIMER3_BASE + CLR_OFFSET) = 1;
             // handleTimerUnderflow(3);
         } else {
@@ -149,9 +149,9 @@ void Kernel::handle(int* stackPointer)  {
                 break;
 
             case Constants::SWI::HALT:
-                bwprintf(COM2, "Kernel - SWI halt executed!\n\r");
+                // bwprintf(COM2, "Kernel - SWI halt executed!\n\r");
                 halt = *(int *)0x80930008; // Puts the system into idle mode
-                bwprintf(COM2, "Kernel - Returned after halt?!\n\r");
+                // bwprintf(COM2, "Kernel - Returned after halt?!\n\r");
                 break;
 
             default:
@@ -186,7 +186,7 @@ void Kernel::handle(int* stackPointer)  {
             break;
 
         case Constants::TIMER_BLOCKED:
-            bwprintf(COM2, "Kernel - Putting %d on timerBlockedQueue\n\r", activeTask->tid);
+            // bwprintf(COM2, "Kernel - Putting %d on timerBlockedQueue\n\r", activeTask->tid);
             timerBlockedQueue.push(activeTask);
             break;
 
@@ -201,8 +201,6 @@ void Kernel::handle(int* stackPointer)  {
 void Kernel::run() {
     int* stackPointer;
     initialize();
-    *(int *)(TIMER1_BASE + LDR_OFFSET) = 2000; // This is just for testing interrupts
-    *(int *)(TIMER1_BASE + CRTL_OFFSET) = ENABLE_MASK | MODE_MASK; // | CLKSEL_MASK;
     FOREVER {
         schedule();
         if (activeTask == nullptr) { 

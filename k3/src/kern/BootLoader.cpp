@@ -11,6 +11,7 @@
 #include "user/server/ClockServer.hpp"
 #include "io/bwio.hpp"
 #include "Constants.hpp"
+#include "string.h"
 
 
 void bootLoader() {
@@ -30,21 +31,57 @@ void bootLoader() {
     // tid = Create(4, sendTask);
 
     tid = Create(2, nameServer);
-    bwprintf(COM2, "BootLoader - Created Name Server with tid: %d\n\r", tid);
+    // bwprintf(COM2, "BootLoader - Created Name Server with tid: %d\n\r", tid);
     tid = Create(1, clockServer);
-    bwprintf(COM2, "BootLoader - Created Clock Server with tid: %d\n\r", tid);
+    // bwprintf(COM2, "BootLoader - Created Clock Server with tid: %d\n\r", tid);
     tid = Create(Constants::NUM_PRIORITIES-1, idleClient);
-    bwprintf(COM2, "BootLoader - Created Idle Task with tid: %d\n\r", tid);
+    // bwprintf(COM2, "BootLoader - Created Idle Task with tid: %d\n\r", tid);
 
     tid = Create(3, clockClient);
+    tid = Create(4, clockClient);
+    tid = Create(5, clockClient);
+    tid = Create(6, clockClient);
     // tid = Create(1, clockClient);
     // tid = Create(1, clockClient);
     // tid = Create(1, clockClient);
 
-    // Receive();
-    // Receive();
-    // Receive();
-    // Receive();
+    int sendSize;
+    int replySize;
+    int sendTid;
+
+    char sendMessage[2];
+    char replyMessage[8];
+
+    int t;
+    int n;
+
+    sendSize = Receive(&sendTid, sendMessage, 2);
+    t = 10;
+    n = 20;
+    memcpy(replyMessage, &t, sizeof(t));
+    memcpy(replyMessage+4, &n, sizeof(n));
+    Reply(sendTid, replyMessage, 8);
+
+    sendSize = Receive(&sendTid, sendMessage, 2);
+    t = 23;
+    n = 9;
+    memcpy(replyMessage, &t, sizeof(t));
+    memcpy(replyMessage+4, &n, sizeof(n));
+    Reply(sendTid, replyMessage, 8);
+
+    sendSize = Receive(&sendTid, sendMessage, 2);
+    t = 33;
+    n = 6;
+    memcpy(replyMessage, &t, sizeof(t));
+    memcpy(replyMessage+4, &n, sizeof(n));
+    Reply(sendTid, replyMessage, 8);
+
+    sendSize = Receive(&sendTid, sendMessage, 2);
+    t = 71;
+    n = 3;
+    memcpy(replyMessage, &t, sizeof(t));
+    memcpy(replyMessage+4, &n, sizeof(n));
+    Reply(sendTid, replyMessage, 8);
     
     Exit();
 }

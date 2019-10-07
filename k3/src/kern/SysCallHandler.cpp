@@ -194,7 +194,7 @@ int Kernel::handleAwaitEvent(int eventId) {
 void Kernel::handleTimerInterrupt(int timerValue) {
     while(!timerBlockedQueue.empty()) {
         TaskDescriptor* task = timerBlockedQueue.pop();
-        bwprintf(COM2, "Kernel Handler - Popping TaskId: %d off the timer blocked queue\n\r", task->tid);
+        // bwprintf(COM2, "Kernel Handler - Popping TaskId: %d off the timer blocked queue\n\r", task->tid);
         task->taskState = Constants::READY;
         // bwprintf(COM2, "Pushing %d to ready queue\n\r", task->tid);
         ready_queue.push(task, task->priority);
