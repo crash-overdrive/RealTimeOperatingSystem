@@ -32,7 +32,7 @@ class ClockServerEntry {
 // OUTPUTS
 // "a" for acknowledge to clockNotifier
 void clockServer() {
-    bwprintf(COM2, "Clock Server - Created Clock server\n\r");
+    // bwprintf(COM2, "Clock Server - Created Clock server\n\r");
 
     RegisterAs("rCLOCK SERVER");
 

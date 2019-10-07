@@ -14,7 +14,7 @@ class nameServerEntry {
 
 void nameServer() {
     // initiliaze
-    bwprintf(COM2, "Name Server - Created Name server\n\r");
+    // bwprintf(COM2, "Name Server - Created Name server\n\r");
     nameServerEntry nameServerEntries[Constants::NUM_TASKS];
     int numberOfEntries = -1;
     

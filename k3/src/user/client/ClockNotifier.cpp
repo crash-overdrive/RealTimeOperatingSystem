@@ -8,7 +8,7 @@
 #define FOREVER for(;;)
 
 void clockNotifier() {
-    bwprintf(COM2, "Clock Notifier - Created Clock notifier\n\r");
+    // bwprintf(COM2, "Clock Notifier - Created Clock notifier\n\r");
     int clockServerTid = WhoIs("wCLOCK SERVER");
 
     *(int *)(TIMER1_BASE + LDR_OFFSET) = 20; // This is just for testing interrupts

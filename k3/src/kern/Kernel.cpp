@@ -63,9 +63,9 @@ void Kernel::drawGUI() {
     // bwprintf(COM2, "\033[4;40f║ \033[4mIdle Time:\033[24m   \033[41m0.000%\033[47m ║");
     // bwprintf(COM2, "\033[5;40f╚═════════════════════╝\0338");
 
-    bwprintf(COM2, "\0337\033[2J\033[3;3f\033[37m╔═════════════════════╗");
-    bwprintf(COM2, "\033[4;3f║ \033[4mIdle Time:\033[24m   \033[31m0.000%%\033[37m ║");
-    bwprintf(COM2, "\033[5;3f╚═════════════════════╝\0338");
+    bwprintf(COM2, "\0337\033[2J\033[3;47f\033[37m╔═════════════════════╗");
+    bwprintf(COM2, "\033[4;47f║ \033[4mIdle Time:\033[24m   \033[31m0.000%%\033[37m ║");
+    bwprintf(COM2, "\033[5;47f╚═════════════════════╝\0338");
 }
 
 void Kernel::displayIdle(unsigned int idlePercent) {
@@ -73,13 +73,28 @@ void Kernel::displayIdle(unsigned int idlePercent) {
     // -> ddd.ddd
     if (idlePercent < 50000) {
         // The column is +14 from the location we use in the gui
-        bwprintf(COM2, "\0337\033[4;17f\033[31m%d.%d%%\0338", idlePercent/1000, idlePercent%1000);
+        bwprintf(COM2, "\0337\033[1;47f\033[K");
+        bwprintf(COM2, "\033[2;47f\033[K");
+        bwprintf(COM2, "\033[3;47f\033[37m╔═════════════════════╗");
+        bwprintf(COM2, "\033[4;47f║ \033[4mIdle Time:\033[24m  \033[31m%d.%d%%\033[37m ║\033[K", idlePercent/1000, idlePercent%1000);
+        bwprintf(COM2, "\033[5;47f╚═════════════════════╝\0338");
+        // bwprintf(COM2, "\0337\033[4;17f\033[31m%d.%d%%\0338", idlePercent/1000, idlePercent%1000);
         // bwprintf(COM2, "   RED: Idle percent %d\n\r", idlePercent);
     } else if (idlePercent < 80000) {
-        bwprintf(COM2, "\0337\033[4;17f\033[33m%d.%d%%\0338", idlePercent/1000, idlePercent%1000);
+        bwprintf(COM2, "\0337\033[1;47f\033[K");
+        bwprintf(COM2, "\033[2;47f\033[K");
+        bwprintf(COM2, "\033[3;47f\033[37m╔═════════════════════╗");
+        bwprintf(COM2, "\033[4;47f║ \033[4mIdle Time:\033[24m  \033[33m%d.%d%%\033[37m ║\033[K", idlePercent/1000, idlePercent%1000);
+        bwprintf(COM2, "\033[5;47f╚═════════════════════╝\0338");
+        // bwprintf(COM2, "\0337\033[4;17f\033[33m%d.%d%%\0338", idlePercent/1000, idlePercent%1000);
         // bwprintf(COM2, "YELLOW: Idle percent %d\n\r", idlePercent);
     } else {
-        bwprintf(COM2, "\0337\033[4;17f\033[32m%d.%d%%\0338", idlePercent/1000, idlePercent%1000);
+        bwprintf(COM2, "\0337\033[1;47f\033[K");
+        bwprintf(COM2, "\033[2;47f\033[K");
+        bwprintf(COM2, "\033[3;47f\033[37m╔═════════════════════╗");
+        bwprintf(COM2, "\033[4;47f║ \033[4mIdle Time:\033[24m  \033[32m%d.%d%%\033[37m ║\033[K", idlePercent/1000, idlePercent%1000);
+        bwprintf(COM2, "\033[5;47f╚═════════════════════╝\0338");
+        // bwprintf(COM2, "\0337\033[4;17f\033[32m%d.%d%%\0338", idlePercent/1000, idlePercent%1000);
         // bwprintf(COM2, " GREEN: Idle percent %d\n\r", idlePercent);
     }
 }
@@ -104,7 +119,7 @@ int* Kernel::activate() {
         haltActivate = *(unsigned int *)(TIMER3_BASE + VAL_OFFSET);
         // Sadly, GCC clobbers the shit out of this update loop which was intended to make it so that we only re-render every 100ms, RIP F
         // updateTick += lastHaltActivate - haltActivate;
-        // bwprintf(COM2, "update tick? %d \r\n", updateTick);
+        // // bwprintf(COM2, "update tick? %d \r\n", updateTick);
         // if (updateTick > 50800) {
         //     displayIdle((volatile unsigned long long)(lastHaltActivate - haltReturn) * 100000 / (lastHaltActivate - haltActivate));
         //     updateTick -= 50800;

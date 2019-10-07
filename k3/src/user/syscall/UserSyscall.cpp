@@ -5,7 +5,7 @@
 #include "user/syscall/Syscall.hpp"
 #include <string.h>
 
-#define NAME_SERVER_TID 1
+#define NAME_SERVER_TID 2
 
 int Create(int priority, void (*function)()) {
     return sysCreate(priority, function);
