@@ -52,7 +52,7 @@ void clockServer() {
 
     ClockServerEntry* clockServerEntry;
     
-    Create(0, clockNotifier); 
+    Create(0, clockNotifier);
 
     FOREVER {
         int sendSize = Receive(&sendTid, sendMessage, 5);

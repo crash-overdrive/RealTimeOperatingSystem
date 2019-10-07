@@ -89,7 +89,7 @@ int Time(int tid) {
     int clockServerTid = WhoIs("wCLOCK SERVER");
     if (tid != clockServerTid) {
         return -1;
-    } 
+    }
     char replyMessage[5];
     char sendMessage[] = "t";
     int replySize = Send(clockServerTid, sendMessage, 2, replyMessage, 5);
@@ -155,8 +155,4 @@ int DelayUntil(int tid, int ticks) {
         bwprintf(COM2, "Syscall Delay Until - Got invalid value from clock server: %c\n\r", replyMessage[0]);
         return -1;
     }
-}
-
-int Halt() {
-    return sysHalt();
 }

@@ -145,12 +145,18 @@ int Delay(int tid, int ticks);
 int DelayUntil(int tid, int ticks);
 
 /*
- * Triggers a system halt until next interrupt. Can only be executed by tasks with the lowest priority in the system.
  * 
- * Returns:
- *   idle: idle percent ddd.ddd% represented by integer dddddd
- *     -1: calling task does not have lowest priority
  */
-int Halt();
+int MyLastUptime();
+
+/*
+ *
+ */
+int MyUpime();
+
+/*
+ *
+ */
+int KernelUptime();
 
 #endif

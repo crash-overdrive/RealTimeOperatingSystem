@@ -29,7 +29,14 @@ class Kernel {
 
         volatile int taskNumber = -1;
 
+        TaskDescriptor *haltTD;
+        unsigned int haltActivate, haltReturn, lastHaltActivate, updateTick;
+
         void initialize();
+
+        // Draws the kernel's graphical user interface
+        void drawGUI();
+        void displayIdle(unsigned int idlePercent);
 
         // Sets the active task to the task descriptor of the next scheduled task.
         void schedule();
@@ -37,7 +44,7 @@ class Kernel {
         // Activates the current active task.
         int* activate();
 
-        // TODO: determine if this should return anything.
+        // Handles SWIs and IRQs
         void handle(int* stackPointer);
 
         int handleCreate(int priority, void (*function)());

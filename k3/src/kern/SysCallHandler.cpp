@@ -90,8 +90,8 @@ int Kernel::handleSend(SendRequest *sendRequest) {
         }
 
         // Transition the receiver to be ready and puts them on the ready queue
-        ready_queue.push(receiver, receiver->priority);
         receiver->taskState = Constants::READY;
+        ready_queue.push(receiver, receiver->priority);
         // Transition the sender to be reply blocked
         replyQueue.push(&activeTask->kSendRequest);
         activeTask->taskState = Constants::REPLY_BLOCKED;

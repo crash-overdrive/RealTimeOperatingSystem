@@ -20,11 +20,11 @@ void sendTask() {
     int replySize = 4;
     // replySize = Send(receiveServer, msg, 14, &reply, 32);
     for (int i = 0; i < NUMBER_OF_TESTS; ++i) {
-        bwprintf(COM2, "DEBUG: Size of message sending from SEND is %d with msg %s\n\r", 4, msg);
-        replySize = Send(1, msg, 4, reply, 4);
+        // bwprintf(COM2, "DEBUG: Size of message sending from SEND is %d with msg %s\n\r", 4, msg);
+        replySize = Send(2, msg, 4, reply, 4);
     }
     
-    bwprintf(COM2, "DEBUG: Size of message returned to SEND is %d with msg %s\n\r", replySize, reply);
+    // bwprintf(COM2, "DEBUG: Size of message returned to SEND is %d with msg %s\n\r", replySize, reply);
     Exit();
 }
 
@@ -43,14 +43,15 @@ void receiveTask() {
     for (int i = 0; i < NUMBER_OF_TESTS; ++i) {
         msglen = Receive(&tid, msg, 4);
 
-        bwprintf(COM2, "DEBUG: RECEIVED a message <%s> with length %d from tid %d\n\r", msg, msglen, tid);
+        // bwprintf(COM2, "DEBUG: RECEIVED a message <%s> with length %d from tid %d\n\r", msg, msglen, tid);
         repret = Reply(tid, reply, 4);
-        bwprintf(COM2, "DEBUG: Our REPLY returned the code %d and msg %s\n\r", repret, reply);
+        // bwprintf(COM2, "DEBUG: Our REPLY returned the code %d and msg %s\n\r", repret, reply);
     }
     // unsigned int endTime = READ_REGISTER TIMER3_VALUE;
     // int timeTaken = (startTime - endTime) / 508 * 1000;
     // bwprintf(COM2, "Start Time: %d\n\r", startTime);
     // bwprintf(COM2, "End Time: %d\n\r", endTime);
-    // bwprintf(COM2, "Time taken for 1 SRR: %d\n\r", timeTaken); 
+    // bwprintf(COM2, "Time taken for 1 SRR: %d\n\r", timeTaken);
+
     Exit();
 }
