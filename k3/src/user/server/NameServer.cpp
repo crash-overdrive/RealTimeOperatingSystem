@@ -78,7 +78,7 @@ void nameServer() {
                         if (strcmp((nameServerEntries[i].taskName), sendMessage) == 0) {
                             matchFound = true;
                             // bwprintf(COM2, "Name Server - Found name server entry at index - %d - %s - %d\n\r", i, nameServerEntries[i].taskName, nameServerEntries[i].tid);
-                            memcpy(replyMessage, &i, sizeof(i));
+                            memcpy(replyMessage, &nameServerEntries[i].tid, sizeof(nameServerEntries[i].tid));
                             Reply(sendProcessTid, replyMessage, sizeof(i));
                             break;
                         }
