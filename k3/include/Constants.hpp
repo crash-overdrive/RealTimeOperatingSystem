@@ -19,7 +19,6 @@ namespace Constants {
         const char FAILURE_REPLY = 'f';
         const int SUCCESS_REPLY_SIZE = 1;
         const int FAILURE_REPLY_SIZE = 1;
-        const int REPLY_SIZE = 4;
         const int SEND_MESSAGE_MAX_SIZE = 16;
         const int REPLY_MESSAGE_MAX_SIZE = sizeof(int);
     }
