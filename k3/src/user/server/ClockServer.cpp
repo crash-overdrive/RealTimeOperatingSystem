@@ -36,9 +36,11 @@ void clockServer() {
 
     RegisterAs("rCLOCK SERVER");
 
+    // TODO: use a priority queue for this
     DataStructures::RingBuffer<ClockServerEntry,Constants::NUM_TASKS> clockServerEntries;
-    ClockServerEntry tempMemory[Constants::NUM_TASKS];
 
+    // TODO: fix this..
+    ClockServerEntry tempMemory[Constants::NUM_TASKS];
     int tempCounter = -1;
     
     int numberOfTicksElapsed = 0;

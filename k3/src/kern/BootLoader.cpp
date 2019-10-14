@@ -1,8 +1,8 @@
 #include "kern/BootLoader.hpp"
 #include "user/syscall/UserSyscall.hpp"
-#include "user/client/TimingTasks.hpp"
+#include "user/client/TimingClient.hpp"
 #include "user/client/RockPaperScissorClient.hpp"
-#include "user/client/TestClient.hpp"
+#include "user/client/ForkClient.hpp"
 #include "user/client/ClockClient.hpp"
 #include "user/client/ClockNotifier.hpp"
 #include "user/server/RockPaperScissorServer.hpp"
@@ -12,10 +12,13 @@
 #include "Constants.hpp"
 #include "string.h"
 
-
+namespace Constants {
+    int NAME_SERVER_TID = -1;
+    int CLOCK_SERVER_TID = -1;
+}
 void bootLoader() {
     int tid;
-    // Create(2, mainClient);
+    // tid = Create(2, daughterClient);
 
     // tid = Create(1, nameServer);
     // tid = Create(2, rockPaperScissorServer);
@@ -26,21 +29,21 @@ void bootLoader() {
     // tid = Create(3, rockPaperScissorClient);
     // tid = Create(3, rockPaperScissorClient);
 
-    // tid = Create(1, receiveTask);
-    // tid = Create(4, sendTask);
+    // tid = Create(1, receiveClient);
+    // tid = Create(4, sendClient);
 
     tid = Create(2, nameServer);
+    Constants::NAME_SERVER_TID = tid;
     // bwprintf(COM2, "BootLoader - Created Name Server with tid: %d\n\r", tid);
+
     tid = Create(1, clockServer);
     // bwprintf(COM2, "BootLoader - Created Clock Server with tid: %d\n\r", tid);
+    Constants::CLOCK_SERVER_TID = tid;
 
     tid = Create(3, clockClient);
     tid = Create(4, clockClient);
     tid = Create(5, clockClient);
     tid = Create(6, clockClient);
-    // tid = Create(1, clockClient);
-    // tid = Create(1, clockClient);
-    // tid = Create(1, clockClient);
 
     int sendSize;
     int replySize;

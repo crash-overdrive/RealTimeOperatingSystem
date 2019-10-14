@@ -10,7 +10,9 @@ namespace Constants {
     const int REPLY_QUEUE_LENGTH = NUM_TASKS;
     const int TD_STACK_SIZE = 32768;
     const int TASK_NAME_SIZE = 16;
-    const int clockTick = 5080;
+    const int CLOCK_TICK = 5080;
+    extern int NAME_SERVER_TID;
+    extern int CLOCK_SERVER_TID;
     enum STATE {
         ACTIVE,
         READY,

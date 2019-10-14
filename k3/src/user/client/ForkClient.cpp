@@ -1,8 +1,8 @@
-#include "user/client/TestClient.hpp"
+#include "user/client/ForkClient.hpp"
 #include "user/syscall/UserSyscall.hpp"
 #include "io/bwio.hpp"
 
-void testClient() {
+void daughterClient() {
     int tid, ptid;
     tid = MyTid();
     ptid = MyParentTid();
@@ -12,15 +12,15 @@ void testClient() {
     Exit();
 }
 
-void mainClient() {
+void parentClient() {
     int tid;
-    tid = Create(3, testClient);
+    tid = Create(3, daughterClient);
     bwprintf(COM2, "MainTask: Created Task: %d\n\r", tid);
-    tid = Create(3, testClient);
+    tid = Create(3, daughterClient);
     bwprintf(COM2, "MainTask: Created Task: %d\n\r", tid);
-    tid = Create(1, testClient);
+    tid = Create(1, daughterClient);
     bwprintf(COM2, "MainTask: Created Task: %d\n\r", tid);
-    tid = Create(1, testClient);
+    tid = Create(1, daughterClient);
     bwprintf(COM2, "MainTask: Created Task: %d\n\r", tid);
     bwprintf(COM2, "MainTask: exiting\n\r");
     Exit();

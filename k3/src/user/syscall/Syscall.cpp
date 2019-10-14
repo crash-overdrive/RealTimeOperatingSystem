@@ -6,7 +6,6 @@
 int sysCreate(int priority, void (*function)()) {
     int retval;
     asm volatile("swi %c0" :: "i"(Constants::SWI::CREATE));
-    // TODO: Determine if we can force this to use a specific register
     asm volatile("mov %0, r0" : "=r"(retval));
     return retval;
 }
@@ -51,19 +50,5 @@ int sysReply(int tid, const char *reply, int rplen) {
     int retval;
     asm volatile("swi %c0" :: "i"(Constants::SWI::REPLY));
     asm volatile("mov %0, r0" : "=r"(retval));
-    return retval;
-}
-
-
-int sysAwaitEvent(int eventId) {
-    int retval;
-    // int lr;
-    // asm volatile("mov %0, lr" :: "r"(lr));
-    // bwprintf(COM2, "Value 2: %d \n\r", lr);
-    asm volatile("swi %c0" :: "i"(Constants::SWI::AWAIT_EVENT));
-    // bwprintf(COM2, "returned from swi 10 \n\r");
-    asm volatile("mov %0, r0" : "=r"(retval));
-    // asm volatile("mov %0, lr" :: "r"(lr));
-    // bwprintf(COM2, "Value 3: %d \n\r", lr);
     return retval;
 }

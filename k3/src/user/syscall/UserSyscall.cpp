@@ -5,8 +5,6 @@
 #include "user/syscall/Syscall.hpp"
 #include <string.h>
 
-#define NAME_SERVER_TID 2
-
 int Create(int priority, void (*function)()) {
     return sysCreate(priority, function);
 }
@@ -48,7 +46,7 @@ int Reply(int tid, const char *reply, int rplen) {
 //TODO: find a way to encode the request
 int RegisterAs(const char* name) {
     char reply[2];
-    int response = Send(NAME_SERVER_TID, name, strlen(name) + 1, reply, 2);
+    int response = Send(Constants::NAME_SERVER_TID, name, strlen(name) + 1, reply, 2);
     
     if (response > 0 && reply[0] == 's') {
                     
@@ -60,7 +58,7 @@ int RegisterAs(const char* name) {
 
 int WhoIs(const char* name) {
     char reply[2];
-    int response = Send(NAME_SERVER_TID, name, strlen(name) + 1, reply, 2);
+    int response = Send(Constants::NAME_SERVER_TID, name, strlen(name) + 1, reply, 2);
     
     if (response > 0 && reply[0] != 'w') {
 
@@ -72,27 +70,18 @@ int WhoIs(const char* name) {
 
 int AwaitEvent(int eventId) {
     int retval;
-    // asm volatile("mov %0, lr" :: "r"(lr));
-    // bwprintf(COM2, "Value 1: %d \n\r", lr);
-    // bwprintf(COM2, "Calling sysAwaitEvent\n\r");
-    // int response = sysAwaitEvent(eventId);
-    // bwprintf(COM2, "Returned from sysAwaitEvent\n\r");
-    // asm volatile("mov %0, lr" :: "r"(lr));    
-    // bwprintf(COM2, "Value 4: %d \n\r", lr);
     asm volatile("swi %c0" :: "i"(Constants::SWI::AWAIT_EVENT));
-    // asm volatile("swi 10");
     asm volatile("mov %0, r0" : "=r"(retval));
     return retval;
 }
 
 int Time(int tid) {
-    int clockServerTid = WhoIs("wCLOCK SERVER");
-    if (tid != clockServerTid) {
+    if (tid != Constants::CLOCK_SERVER_TID) {
         return -1;
     }
     char replyMessage[5];
     char sendMessage[] = "t";
-    int replySize = Send(clockServerTid, sendMessage, 2, replyMessage, 5);
+    int replySize = Send(tid, sendMessage, 2, replyMessage, 5);
     if(replySize == 5 && replyMessage[0] == 'R') {
         int ticks;
         memcpy(&ticks, replyMessage+1, sizeof(ticks));
@@ -105,8 +94,7 @@ int Time(int tid) {
 }
 
 int Delay(int tid, int ticks) {
-    int clockServerTid = WhoIs("wCLOCK SERVER");
-    if (tid != clockServerTid) {
+    if (tid != Constants::CLOCK_SERVER_TID) {
         return -1;
     } 
     if (ticks < 0) {
@@ -117,7 +105,7 @@ int Delay(int tid, int ticks) {
 
     memcpy(sendMessage+1, &ticks, sizeof(ticks));
 
-    int replySize = Send(clockServerTid, sendMessage, 5, replyMessage, 5);
+    int replySize = Send(tid, sendMessage, 5, replyMessage, 5);
 
     if(replySize == 5 && replyMessage[0] == 'R') {
         int ticksElapsed;
@@ -131,8 +119,7 @@ int Delay(int tid, int ticks) {
 }
 
 int DelayUntil(int tid, int ticks) {
-    int clockServerTid = WhoIs("wCLOCK SERVER");
-    if (tid != clockServerTid) {
+    if (tid != Constants::CLOCK_SERVER_TID) {
         return -1;
     } 
     if (ticks < 0) {
@@ -144,7 +131,7 @@ int DelayUntil(int tid, int ticks) {
 
     memcpy(sendMessage+1, &ticks, sizeof(ticks));
 
-    int replySize = Send(clockServerTid, sendMessage, 5, replyMessage, 5);
+    int replySize = Send(tid, sendMessage, 5, replyMessage, 5);
 
     if(replySize == 5 && replyMessage[0] == 'R') {
         int ticksElapsed;

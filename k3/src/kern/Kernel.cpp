@@ -6,7 +6,6 @@
 #include "kern/IdleTask.hpp"
 #include "kern/Kernel.hpp"
 #include "kern/Message.hpp"
-#include "user/client/TimingTasks.hpp"
 #include "user/syscall/UserSyscall.hpp"
 
 extern "C" int* kernelExit(int stackPointer);

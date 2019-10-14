@@ -1,5 +1,5 @@
 #include "Util.hpp"
-#include "user/client/TimingTasks.hpp"
+#include "user/client/TimingClient.hpp"
 #include "user/syscall/UserSyscall.hpp"
 #include "io/bwio.hpp"
 
@@ -13,7 +13,7 @@
 #define TIMER3_CONTROL 0x80810088
 #define NUMBER_OF_TESTS 1000000
 
-void sendTask() {
+void sendClient() {
     // int receiveServer = WhoIs("ReceiveServer");
     char msg[4] = "HeH";
     char reply[4];
@@ -28,7 +28,7 @@ void sendTask() {
     Exit();
 }
 
-void receiveTask() {
+void receiveClient() {
     // WRITE_REGISTER TIMER3_LOAD = 0xFFFFFFFF;
 	// WRITE_REGISTER TIMER3_CONTROL = 0x88; // set with free running mode at 508 KHz
     

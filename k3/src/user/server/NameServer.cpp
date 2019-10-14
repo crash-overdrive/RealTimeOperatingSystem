@@ -1,8 +1,9 @@
+#include <string.h>
+
+#include "Constants.hpp"
+#include "io/bwio.hpp"
 #include "user/server/NameServer.hpp"
 #include "user/syscall/UserSyscall.hpp"
-#include "Constants.hpp"
-#include <string.h>
-#include "io/bwio.hpp"
 
 #define FOREVER for(;;)
 
