@@ -43,12 +43,25 @@ int Reply(int tid, const char *reply, int rplen) {
     return sysReply(tid, reply, rplen);
 }
 
+int AwaitEvent(int eventId) {
+    int retval;
+    asm volatile("swi %c0" :: "i"(Constants::SWI::AWAIT_EVENT));
+    asm volatile("mov %0, r0" : "=r"(retval));
+    return retval;
+}
+
 //TODO: find a way to encode the request
 int RegisterAs(const char* name) {
-    char reply[2];
-    int response = Send(Constants::NAME_SERVER_TID, name, strlen(name) + 1, reply, 2);
+    char replyMessage[Constants::NameServer::REPLY_MESSAGE_MAX_SIZE];
+
+    int sendMessageSize = strlen(name) + 1;
+    char sendMessage[sendMessageSize];
+    memcpy(sendMessage, name, sendMessageSize);
+    sendMessage[sendMessageSize - 1] = Constants::NameServer::REGISTER_AS;
+
+    int replyMessageSize = Send(Constants::NameServer::TID, sendMessage, sendMessageSize, replyMessage, Constants::NameServer::REPLY_MESSAGE_MAX_SIZE);
     
-    if (response > 0 && reply[0] == 's') {
+    if (replyMessageSize == 1 && replyMessage[0] == Constants::NameServer::SUCCESS_REPLY) {
                     
         return 0;
         
@@ -57,26 +70,27 @@ int RegisterAs(const char* name) {
 }
 
 int WhoIs(const char* name) {
-    char reply[2];
-    int response = Send(Constants::NAME_SERVER_TID, name, strlen(name) + 1, reply, 2);
-    
-    if (response > 0 && reply[0] != 'w') {
+    char replyMessage[Constants::NameServer::REPLY_MESSAGE_MAX_SIZE];
 
-        return (int)reply[0];
+    int sendMessageSize = strlen(name) + 1;
+    char sendMessage[sendMessageSize];
+    memcpy(sendMessage, name, sendMessageSize);
+    sendMessage[sendMessageSize - 1] = Constants::NameServer::WHO_IS;
+
+
+    int replyMessageSize = Send(Constants::NameServer::TID, sendMessage, sendMessageSize, replyMessage, Constants::NameServer::REPLY_MESSAGE_MAX_SIZE);
+    
+    if (replyMessageSize == sizeof(int)) {
+        int tid;
+        memcpy(&tid, replyMessage, replyMessageSize);
+        return tid;
 
     }
     return -1;
 }
 
-int AwaitEvent(int eventId) {
-    int retval;
-    asm volatile("swi %c0" :: "i"(Constants::SWI::AWAIT_EVENT));
-    asm volatile("mov %0, r0" : "=r"(retval));
-    return retval;
-}
-
 int Time(int tid) {
-    if (tid != Constants::CLOCK_SERVER_TID) {
+    if (tid != Constants::ClockServer::TID) {
         return -1;
     }
     char replyMessage[5];
@@ -94,7 +108,7 @@ int Time(int tid) {
 }
 
 int Delay(int tid, int ticks) {
-    if (tid != Constants::CLOCK_SERVER_TID) {
+    if (tid != Constants::ClockServer::TID) {
         return -1;
     } 
     if (ticks < 0) {
@@ -119,7 +133,7 @@ int Delay(int tid, int ticks) {
 }
 
 int DelayUntil(int tid, int ticks) {
-    if (tid != Constants::CLOCK_SERVER_TID) {
+    if (tid != Constants::ClockServer::TID) {
         return -1;
     } 
     if (ticks < 0) {

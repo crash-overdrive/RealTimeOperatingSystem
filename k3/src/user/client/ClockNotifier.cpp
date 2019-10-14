@@ -21,7 +21,7 @@ void clockNotifier() {
         // bwprintf(COM2, "Clock Notifier - Woke up from Await Event Queue\n\r");
         
         // Send to time server
-        int replySize = Send(Constants::CLOCK_SERVER_TID, tick, 2, replyMessage, 2);
+        int replySize = Send(Constants::ClockServer::TID, tick, 2, replyMessage, 2);
         if (!((replySize == 2) && (replyMessage[0] == 'A'))) {
             bwprintf(COM2, "Clock Notifier - Got bad reply: %c\n\r", replyMessage[0]);
         }

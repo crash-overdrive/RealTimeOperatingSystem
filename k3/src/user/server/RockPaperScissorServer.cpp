@@ -28,10 +28,9 @@ void rockPaperScissorServer() {
     char* loss = "l";
     char* draw = "d";
     bool gameOver = true;
-    char name[] = "rRPS SERVER";
 
-    RegisterAs(name);
-
+    int x = RegisterAs("RPS SERVER");
+    
     FOREVER {
         
         responseSize = Receive(&sendProcessTid, msg, msglen);

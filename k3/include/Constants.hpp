@@ -9,10 +9,26 @@ namespace Constants {
     const int RECEIVE_QUEUE_LENGTH = 32;
     const int REPLY_QUEUE_LENGTH = NUM_TASKS;
     const int TD_STACK_SIZE = 32768;
-    const int TASK_NAME_SIZE = 16;
     const int CLOCK_TICK = 5080;
-    extern int NAME_SERVER_TID;
-    extern int CLOCK_SERVER_TID;
+    
+    namespace NameServer {
+        extern int TID;
+        const char REGISTER_AS = 'r';
+        const char WHO_IS = 'w';
+        const char SUCCESS_REPLY = 's';
+        const char FAILURE_REPLY = 'f';
+        const int SUCCESS_REPLY_SIZE = 1;
+        const int FAILURE_REPLY_SIZE = 1;
+        const int REPLY_SIZE = 4;
+        const int SEND_MESSAGE_MAX_SIZE = 16;
+        const int REPLY_MESSAGE_MAX_SIZE = sizeof(int);
+    }
+
+    namespace ClockServer {
+        extern int TID;
+    }
+    
+
     enum STATE {
         ACTIVE,
         READY,

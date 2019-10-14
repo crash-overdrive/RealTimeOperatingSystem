@@ -20,7 +20,7 @@ void clockClient() {
     memcpy(&n, replyMessage + 4, sizeof(n));
 
     // bwprintf(COM2, "t: %d  n: %d\n\r", t, n);
-    int clockServerTid = WhoIs("wCLOCK SERVER");
+    int clockServerTid = WhoIs("CLOCK SERVER");
 
     for (int i = 1; i <= n; ++i) {
         int time = Delay(clockServerTid, t);

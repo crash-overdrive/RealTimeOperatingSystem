@@ -9,7 +9,7 @@
 
 class nameServerEntry {
     public:
-        char taskName[Constants::TASK_NAME_SIZE];
+        char taskName[Constants::NameServer::SEND_MESSAGE_MAX_SIZE];
         int tid;
 };
 
@@ -20,84 +20,90 @@ void nameServer() {
     int numberOfEntries = -1;
     
     int sendProcessTid;
+    int sendMessageSize;
+    char sendMessage[Constants::NameServer::SEND_MESSAGE_MAX_SIZE];
     
-    int nameLength = Constants::TASK_NAME_SIZE;
-    int messageSize;
-
-    char* success = "s";
-    char* failure = "w";
-
+    char replyMessage[Constants::NameServer::REPLY_SIZE];
     
-
     // start of server
     FOREVER {
-        char name[nameLength];
-        char requestResponse[2];
-
-        messageSize = Receive(&sendProcessTid, name, nameLength);
-
-        // bwprintf(COM2, "Name Server - Received from %d - %s - %d - %c\n\r", sendProcessTid, name, messageSize, name[0]);
         
-        if (messageSize > 0) {
+        sendMessageSize = Receive(&sendProcessTid, sendMessage, Constants::NameServer::SEND_MESSAGE_MAX_SIZE);
+        
+        if (sendMessageSize > 0 && sendMessageSize < Constants::NameServer::SEND_MESSAGE_MAX_SIZE) {
             // process the input
-            // do appropriate stuff and reply
-            bool matchFound = false;
-            if (name[0] == 'r' && messageSize < Constants::TASK_NAME_SIZE) { // REGISTER-AS
-                
-                for (int i = 0; i <= numberOfEntries; ++i) {
+            char requestType = sendMessage[sendMessageSize - 1];
+            sendMessage[sendMessageSize - 1] = '\0';
+            // bwprintf(COM2, "Name Server - Received from %d - %s - %d\n\r", sendProcessTid, sendMessage, sendMessageSize);
 
-                    int x = strcmp((nameServerEntries[i].taskName), name+1);
-                    // bwprintf(COM2, "Value of registering comparison is: %d\n\r", x);
-                    
-                    if (strcmp((nameServerEntries[i].taskName), name+1) == 0) {
+            switch (requestType) {
+
+                case Constants::NameServer::REGISTER_AS: {
+                    bool matchFound = false;
+
+                    for (int i = 0; i <= numberOfEntries; ++i) {
+
+                        // int x = strcmp((nameServerEntries[i].taskName), sendMessage);
+                        // bwprintf(COM2, "Value of registering comparison is: %d\n\r", x);
                         
-                        nameServerEntries[i].tid = sendProcessTid;
-                        // bwprintf(COM2, "Name Server - MATCH found Created name server entry at index: %d %d - %s\n\r", i, sendProcessTid, nameServerEntries[i].taskName);
-                        Reply(sendProcessTid, success, 2);
-                        matchFound = true;
-                        break;
+                        if (strcmp((nameServerEntries[i].taskName), sendMessage) == 0) {
+                            
+                            nameServerEntries[i].tid = sendProcessTid;
+                            // bwprintf(COM2, "Name Server - MATCH found Replaced name server entry at index: %d %d - %s\n\r", i, sendProcessTid, nameServerEntries[i].taskName);
+                            memcpy(replyMessage, &Constants::NameServer::SUCCESS_REPLY, sizeof(Constants::NameServer::SUCCESS_REPLY_SIZE));
+                            Reply(sendProcessTid, replyMessage, Constants::NameServer::SUCCESS_REPLY_SIZE);
+                            matchFound = true;
+                            break;
 
+                        }
                     }
+                    if(!matchFound) {
+                        // if we reach here then that means that we didnt find a match
+                        // time to make a new entry
+                        ++numberOfEntries;
+                        memcpy(nameServerEntries[numberOfEntries].taskName, sendMessage, sendMessageSize);
+                        nameServerEntries[numberOfEntries].tid = sendProcessTid;
+                        // bwprintf(COM2, "Name Server - MATCH not found - Created name server entry: %d - %s - %d\n\r", sendProcessTid, nameServerEntries[numberOfEntries].taskName, numberOfEntries);
+                        memcpy(replyMessage, &Constants::NameServer::SUCCESS_REPLY, sizeof(Constants::NameServer::SUCCESS_REPLY_SIZE));
+                        Reply(sendProcessTid, replyMessage, Constants::NameServer::SUCCESS_REPLY_SIZE);
+                    }     
+                    break;
                 }
-                if(!matchFound) {
-                    // if we reach here then that means that we didnt find a match
-                    // time to make a new entry
-                    ++numberOfEntries;
-                    memcpy(nameServerEntries[numberOfEntries].taskName, name+1, messageSize-1);
-                    nameServerEntries[numberOfEntries].tid = sendProcessTid;
-                    // bwprintf(COM2, "Name Server - MATCH not found - Created name server entry: %d - %s - %d\n\r", sendProcessTid, nameServerEntries[numberOfEntries].taskName, numberOfEntries);
-                    Reply(sendProcessTid, success, 2);
-                }                    
 
-            } else if (name[0] == 'w') { // WHO-IS
-                bool matchFound = false;
-                for (int i = 0; i <= numberOfEntries; ++i) {
 
-                    if (strcmp((nameServerEntries[i].taskName), name+1) == 0) {
+                case Constants::NameServer::WHO_IS: {
+                    bool matchFound = false;
+                    for (int i = 0; i <= numberOfEntries; ++i) {
 
-                        matchFound = true;
-                        // bwprintf(COM2, "Name Server - Found name server entry at index - %d - %s - %d\n\r", i, name+1, nameServerEntries[i].tid);
-                        requestResponse[0] = (char) nameServerEntries[i].tid;
-                        requestResponse[1] = '\0';
-                        Reply(sendProcessTid, requestResponse, 2);
-                        break;
-
+                        if (strcmp((nameServerEntries[i].taskName), sendMessage) == 0) {
+                            matchFound = true;
+                            // bwprintf(COM2, "Name Server - Found name server entry at index - %d - %s - %d\n\r", i, nameServerEntries[i].taskName, nameServerEntries[i].tid);
+                            memcpy(replyMessage, &i, sizeof(i));
+                            Reply(sendProcessTid, replyMessage, sizeof(i));
+                            break;
+                        }
                     }
+                    if(!matchFound) {
+                        // if we reached here then that means we didnt find a match
+                        // time to return an error
+                        memcpy(replyMessage, &Constants::NameServer::FAILURE_REPLY, sizeof(Constants::NameServer::FAILURE_REPLY_SIZE));
+                        Reply(sendProcessTid, replyMessage, Constants::NameServer::FAILURE_REPLY_SIZE);
+                    }
+                    break;
                 }
-                if(!matchFound) {
-                    // if we reached here then that means we didnt find a match
-                    // time to return an error
-                    Reply(sendProcessTid, failure, 2);
+
+
+                default: {
+                    memcpy(replyMessage, &Constants::NameServer::FAILURE_REPLY, sizeof(Constants::NameServer::FAILURE_REPLY_SIZE));
+                    Reply(sendProcessTid, replyMessage, Constants::NameServer::FAILURE_REPLY_SIZE);
+                    break;
                 }
-            } else { // INVALID Request to Name-Server
-
-                Reply(sendProcessTid, failure, 2);
-
             }
 
         } else { // INVALID Request to Name-Server
 
-            Reply(sendProcessTid, failure, 2);
+            memcpy(replyMessage, &Constants::NameServer::FAILURE_REPLY, sizeof(Constants::NameServer::FAILURE_REPLY_SIZE));
+            Reply(sendProcessTid, replyMessage, Constants::NameServer::FAILURE_REPLY_SIZE);
 
         }
     }

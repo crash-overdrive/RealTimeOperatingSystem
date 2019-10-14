@@ -13,8 +13,12 @@
 #include "string.h"
 
 namespace Constants {
-    int NAME_SERVER_TID = -1;
-    int CLOCK_SERVER_TID = -1;
+    namespace NameServer {
+        int TID = -1;
+    }
+    namespace ClockServer {
+        int TID = -1;
+    }
 }
 void bootLoader() {
     int tid;
@@ -33,12 +37,12 @@ void bootLoader() {
     // tid = Create(4, sendClient);
 
     tid = Create(2, nameServer);
-    Constants::NAME_SERVER_TID = tid;
+    Constants::NameServer::TID = tid;
     // bwprintf(COM2, "BootLoader - Created Name Server with tid: %d\n\r", tid);
 
     tid = Create(1, clockServer);
     // bwprintf(COM2, "BootLoader - Created Clock Server with tid: %d\n\r", tid);
-    Constants::CLOCK_SERVER_TID = tid;
+    Constants::ClockServer::TID = tid;
 
     tid = Create(3, clockClient);
     tid = Create(4, clockClient);

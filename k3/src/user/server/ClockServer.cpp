@@ -34,7 +34,7 @@ class ClockServerEntry {
 void clockServer() {
     // bwprintf(COM2, "Clock Server - Created Clock server\n\r");
 
-    RegisterAs("rCLOCK SERVER");
+    int x = RegisterAs("CLOCK SERVER");
 
     // TODO: use a priority queue for this
     DataStructures::RingBuffer<ClockServerEntry,Constants::NUM_TASKS> clockServerEntries;
