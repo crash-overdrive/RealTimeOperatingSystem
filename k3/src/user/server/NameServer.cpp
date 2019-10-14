@@ -50,8 +50,7 @@ void nameServer() {
                             
                             nameServerEntries[i].tid = sendProcessTid;
                             // bwprintf(COM2, "Name Server - MATCH found Replaced name server entry at index: %d %d - %s\n\r", i, sendProcessTid, nameServerEntries[i].taskName);
-                            memcpy(replyMessage, &Constants::NameServer::SUCCESS_REPLY, sizeof(Constants::NameServer::SUCCESS_REPLY));
-                            Reply(sendProcessTid, replyMessage, Constants::NameServer::SUCCESS_REPLY_SIZE);
+                            Reply(sendProcessTid, Constants::NameServer::SUCCESS_REPLY, Constants::NameServer::SUCCESS_REPLY_SIZE);
                             matchFound = true;
                             break;
 
@@ -64,8 +63,7 @@ void nameServer() {
                         memcpy(nameServerEntries[numberOfEntries].taskName, sendMessage, sendMessageSize);
                         nameServerEntries[numberOfEntries].tid = sendProcessTid;
                         // bwprintf(COM2, "Name Server - MATCH not found - Created name server entry: %d - %s - %d\n\r", sendProcessTid, nameServerEntries[numberOfEntries].taskName, numberOfEntries);
-                        memcpy(replyMessage, &Constants::NameServer::SUCCESS_REPLY, sizeof(Constants::NameServer::SUCCESS_REPLY));
-                        Reply(sendProcessTid, replyMessage, Constants::NameServer::SUCCESS_REPLY_SIZE);
+                        Reply(sendProcessTid, Constants::NameServer::SUCCESS_REPLY, Constants::NameServer::SUCCESS_REPLY_SIZE);
                     }     
                     break;
                 }
@@ -86,24 +84,21 @@ void nameServer() {
                     if(!matchFound) {
                         // if we reached here then that means we didnt find a match
                         // time to return an error
-                        memcpy(replyMessage, &Constants::NameServer::FAILURE_REPLY, sizeof(Constants::NameServer::FAILURE_REPLY));
-                        Reply(sendProcessTid, replyMessage, Constants::NameServer::FAILURE_REPLY_SIZE);
+                        Reply(sendProcessTid, Constants::NameServer::FAILURE_REPLY, Constants::NameServer::FAILURE_REPLY_SIZE);
                     }
                     break;
                 }
 
 
                 default: {
-                    memcpy(replyMessage, &Constants::NameServer::FAILURE_REPLY, sizeof(Constants::NameServer::FAILURE_REPLY));
-                    Reply(sendProcessTid, replyMessage, Constants::NameServer::FAILURE_REPLY_SIZE);
+                    Reply(sendProcessTid, Constants::NameServer::FAILURE_REPLY, Constants::NameServer::FAILURE_REPLY_SIZE);
                     break;
                 }
             }
 
         } else { // INVALID Request to Name-Server
 
-            memcpy(replyMessage, &Constants::NameServer::FAILURE_REPLY, sizeof(Constants::NameServer::FAILURE_REPLY));
-            Reply(sendProcessTid, replyMessage, Constants::NameServer::FAILURE_REPLY_SIZE);
+            Reply(sendProcessTid, Constants::NameServer::FAILURE_REPLY, Constants::NameServer::FAILURE_REPLY_SIZE);
 
         }
     }

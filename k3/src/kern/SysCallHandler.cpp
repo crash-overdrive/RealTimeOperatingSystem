@@ -143,7 +143,7 @@ int Kernel::handleReply(int tid, const char *reply, int rplen) {
     KernelSendRequest *kSendRequest;
 
     // Check if the task is reply-blocked
-    for (int i = 0; i < replyQueue.size(); ++i) {
+    for (unsigned int i = 0; i < replyQueue.size(); ++i) {
         kSendRequest = replyQueue.pop();
         if (kSendRequest->senderTD->tid == tid) {
             // if reply is truncated return -1 but copy what you can

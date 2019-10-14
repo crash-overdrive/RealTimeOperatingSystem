@@ -2,6 +2,7 @@
 #include "user/syscall/UserSyscall.hpp"
 #include "io/bwio.hpp"
 
+// TODO: refactor this
 void rockPaperScissorClient() {
     char* signup = "s";
     char* quit = "q";
@@ -9,11 +10,11 @@ void rockPaperScissorClient() {
     char response[5];
 
     // int rpsServer = 2;
-    int rpsServer = WhoIs("wRPS SERVER");
+    int rpsServer = WhoIs("RPS SERVER");
     // bwprintf(COM2, "RPS Server TID: %d\n\r", rpsServer);
-    bwprintf(COM2, "Sending sign up request\n\r");
+    // bwprintf(COM2, "Sending sign up request\n\r");
     int reply = Send(rpsServer, signup, 2, response, 5);
-    bwprintf(COM2, "Sent sign up request\n\r");
+    // bwprintf(COM2, "Sent sign up request\n\r");
 
     if (reply == 2 && response[0] == 'r') {
         for (int i = 1; i <= 3; ++i) {

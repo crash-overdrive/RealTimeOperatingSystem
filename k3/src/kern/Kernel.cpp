@@ -15,11 +15,6 @@ void Kernel::initialize() {
     uart.setConfig(COM1, BPF8, OFF, ON, OFF);
 	uart.setConfig(COM2, BPF8, OFF, OFF, OFF);
 
-    // Start kernel clock (Timer3 is reserved by the kernel for idle task reporting)
-    *(int *)(TIMER3_BASE + LDR_OFFSET) = 0xFFFFFFFF;
-    *(int *)(TIMER3_BASE + CRTL_OFFSET) |= ENABLE_MASK | CLKSEL_MASK;
-    *(int *)(TIMER3_BASE + CRTL_OFFSET) &= ~MODE_MASK;
-
     // Draw GUI
     // drawGUI();
 
@@ -41,7 +36,6 @@ void Kernel::initialize() {
     asm volatile("str r12, [r3]");
 
     // Setup 0x18, 0x38
-    // asm volatile("TEST: ");
     // *(volatile int*)0x18 = 0xe59ff018; // e59ff018 = ldr pc, [pc, #24] TODO: Why doesn't this work???
     asm volatile("ldr r12, =handle_interrupt");
     asm volatile("ldr r3, =0x38");
@@ -112,9 +106,7 @@ int* Kernel::activate() {
 
     //handle idle task start timing
     if (activeTask == haltTD) {
-
         startIdleTaskTimeStamp = *(int *)(TIMER3_BASE + VAL_OFFSET);
-    
     } 
 
     // Exit Kernel
@@ -123,10 +115,8 @@ int* Kernel::activate() {
 
     //handle idle task stop timing
     if (activeTask == haltTD) {
-
         stopIdleTaskTimeStamp = *(int *)(TIMER3_BASE + VAL_OFFSET);
         timeSpentInIdle = (startIdleTaskTimeStamp - stopIdleTaskTimeStamp + timeSpentInIdle);
-
     }
 
     return stackPointer;
@@ -140,7 +130,7 @@ void Kernel::handle(int* stackPointer)  {
     // Handle Hardware Interrupts
     if (stackPointer[0]) {
         int vic1Status = *(int *)(VIC1_IRQ_BASE + IRQ_STATUS_OFFSET);
-        int vic2Status = *(int *)(VIC1_IRQ_BASE + IRQ_STATUS_OFFSET);
+        int vic2Status = *(int *)(VIC2_IRQ_BASE + IRQ_STATUS_OFFSET);
 
         if (vic1Status & TC1UI_MASK) {
 
@@ -175,7 +165,6 @@ void Kernel::handle(int* stackPointer)  {
         void* arg1 = (void*)stackPointer[3];
         void* arg2 = (void*)stackPointer[4];
         void* arg3 = (void*)stackPointer[5];
-        void* arg4 = (void*)stackPointer[6];
 
         switch(request) {
             case Constants::SWI::CREATE:

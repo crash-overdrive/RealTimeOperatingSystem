@@ -1,6 +1,8 @@
 #ifndef CONSTANTS_HPP
 #define CONSTANTS_HPP
 
+#include <string.h>
+
 namespace Constants {
     const int NUM_PRIORITIES = 8;
     const int Q_LENGTH = 10;
@@ -15,15 +17,24 @@ namespace Constants {
         extern int TID;
         const char REGISTER_AS = 'r';
         const char WHO_IS = 'w';
-        const char SUCCESS_REPLY = 's';
-        const char FAILURE_REPLY = 'f';
-        const int SUCCESS_REPLY_SIZE = 1;
-        const int FAILURE_REPLY_SIZE = 1;
+        const char SUCCESS_REPLY[] = "s";
+        const char FAILURE_REPLY[] = "f";
+        const int SUCCESS_REPLY_SIZE = strlen(SUCCESS_REPLY) + 1;
+        const int FAILURE_REPLY_SIZE = strlen(FAILURE_REPLY) + 1;
         const int SEND_MESSAGE_MAX_SIZE = 16;
         const int REPLY_MESSAGE_MAX_SIZE = sizeof(int);
     }
 
     namespace ClockServer {
+        extern int TID;
+        const char TIME = 't';
+        const char DELAY = 'd';
+        const char DELAY_UNTIL = 'u';
+        const char TICK = 'x';
+        const char ACKNOWLEDGE[] = "a";
+    }
+
+    namespace RockPaperScissorServer {
         extern int TID;
     }
     

@@ -50,7 +50,6 @@ int AwaitEvent(int eventId) {
     return retval;
 }
 
-//TODO: find a way to encode the request
 int RegisterAs(const char* name) {
     char replyMessage[Constants::NameServer::REPLY_MESSAGE_MAX_SIZE];
 
@@ -61,11 +60,10 @@ int RegisterAs(const char* name) {
 
     int replyMessageSize = Send(Constants::NameServer::TID, sendMessage, sendMessageSize, replyMessage, Constants::NameServer::REPLY_MESSAGE_MAX_SIZE);
     
-    if (replyMessageSize == 1 && replyMessage[0] == Constants::NameServer::SUCCESS_REPLY) {
-                    
+    if (!strcmp(replyMessage, Constants::NameServer::SUCCESS_REPLY)) {         
         return 0;
-        
     }
+    bwprintf(COM2, "RegisterAs Failure\n\r");
     return -1;
 }
 
@@ -84,8 +82,8 @@ int WhoIs(const char* name) {
         int tid;
         memcpy(&tid, replyMessage, replyMessageSize);
         return tid;
-
     }
+    bwprintf(COM2, "WhoIs Failure\n\r");
     return -1;
 }
 

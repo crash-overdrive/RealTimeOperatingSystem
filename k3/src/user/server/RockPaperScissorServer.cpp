@@ -6,6 +6,7 @@
 
 #define FOREVER for(;;)
 
+// TODO: refactor this
 void rockPaperScissorServer() {
     // TODO: evaluate the size, put it in constants file as well
     DataStructures::RingBuffer<int, 10> registrationList;
@@ -30,6 +31,19 @@ void rockPaperScissorServer() {
     bool gameOver = true;
 
     int x = RegisterAs("RPS SERVER");
+    // bwprintf(COM2, "%d\n\r", x);
+    // x = RegisterAs("RPS SERVER");
+    // bwprintf(COM2, "%d\n\r", x);
+    // x = WhoIs("RPS SERVER");
+    // bwprintf(COM2, "%d\n\r", x);
+    // x = RegisterAs("RPS SERVER 2");
+    // bwprintf(COM2, "%d\n\r", x);
+    // x = WhoIs("RPS SERVER 2");
+    // bwprintf(COM2, "%d\n\r", x);
+    // x = WhoIs("RPS SERVER");
+    // bwprintf(COM2, "%d\n\r", x);
+    // x = WhoIs("RPS SERVER 3");
+    // bwprintf(COM2, "%d\n\r", x);
     
     FOREVER {
         

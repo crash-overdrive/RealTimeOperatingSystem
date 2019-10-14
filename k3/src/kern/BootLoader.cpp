@@ -49,8 +49,6 @@ void bootLoader() {
     tid = Create(5, clockClient);
     tid = Create(6, clockClient);
 
-    int sendSize;
-    int replySize;
     int sendTid;
 
     char sendMessage[2];
@@ -59,28 +57,28 @@ void bootLoader() {
     int t;
     int n;
 
-    sendSize = Receive(&sendTid, sendMessage, 2);
+    Receive(&sendTid, sendMessage, 2);
     t = 10;
     n = 20;
     memcpy(replyMessage, &t, sizeof(t));
     memcpy(replyMessage+4, &n, sizeof(n));
     Reply(sendTid, replyMessage, 8);
 
-    sendSize = Receive(&sendTid, sendMessage, 2);
+    Receive(&sendTid, sendMessage, 2);
     t = 23;
     n = 9;
     memcpy(replyMessage, &t, sizeof(t));
     memcpy(replyMessage+4, &n, sizeof(n));
     Reply(sendTid, replyMessage, 8);
 
-    sendSize = Receive(&sendTid, sendMessage, 2);
+    Receive(&sendTid, sendMessage, 2);
     t = 33;
     n = 6;
     memcpy(replyMessage, &t, sizeof(t));
     memcpy(replyMessage+4, &n, sizeof(n));
     Reply(sendTid, replyMessage, 8);
 
-    sendSize = Receive(&sendTid, sendMessage, 2);
+    Receive(&sendTid, sendMessage, 2);
     t = 71;
     n = 3;
     memcpy(replyMessage, &t, sizeof(t));
