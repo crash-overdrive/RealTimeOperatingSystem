@@ -30,13 +30,13 @@ class Kernel {
         volatile int taskNumber = -1;
 
         TaskDescriptor *haltTD;
-        unsigned int haltActivate, haltReturn, lastHaltActivate, updateTick;
+        unsigned int timeSpentInIdle = 0;
 
         void initialize();
 
         // Draws the kernel's graphical user interface
         void drawGUI();
-        void displayIdle(unsigned int idlePercent);
+        void displayIdle(unsigned int idleTime);
 
         // Sets the active task to the task descriptor of the next scheduled task.
         void schedule();

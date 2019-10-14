@@ -24,7 +24,7 @@ void clockClient() {
 
     for (int i = 1; i <= n; ++i) {
         int time = Delay(clockServerTid, t);
-        bwprintf(COM2, "TID: %d  DELAY INTERVAL: %d  #delays: %d\n\r", myTid, t, i);
+        bwprintf(COM2, "tid: %d  Delay Interval: %d  #delays: %d #ticks: %d\n\r", myTid, t, i, time);
     }
     Exit();
 }

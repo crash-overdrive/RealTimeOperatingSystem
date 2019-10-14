@@ -3,7 +3,7 @@
 #include "io/ep9302.h"
 #include "io/ts7200.h"
 #include "kern/BootLoader.hpp"
-#include "kern/Halt.hpp"
+#include "kern/IdleTask.hpp"
 #include "kern/Kernel.hpp"
 #include "kern/Message.hpp"
 #include "user/client/TimingTasks.hpp"
@@ -16,13 +16,13 @@ void Kernel::initialize() {
     uart.setConfig(COM1, BPF8, OFF, ON, OFF);
 	uart.setConfig(COM2, BPF8, OFF, OFF, OFF);
 
-    // Start kernel clock (Timer3 is reserved by the kernel)
+    // Start kernel clock (Timer3 is reserved by the kernel for idle task reporting)
     *(int *)(TIMER3_BASE + LDR_OFFSET) = 0xFFFFFFFF;
     *(int *)(TIMER3_BASE + CRTL_OFFSET) |= ENABLE_MASK | CLKSEL_MASK;
     *(int *)(TIMER3_BASE + CRTL_OFFSET) &= ~MODE_MASK;
 
     // Draw GUI
-    drawGUI();
+    // drawGUI();
 
     // Setup TaskDescriptors
     for (int i = 0; i < Constants::NUM_TASKS; ++i) {
@@ -51,89 +51,83 @@ void Kernel::initialize() {
     // Create the system's first task
     handleCreate(0, bootLoader);
 
-    // Create the system's idle task and intialize timing
-    haltTD = lookupTD(handleCreate(Constants::NUM_PRIORITIES-1, halt));
-    haltActivate = haltReturn = lastHaltActivate = *(int *)(TIMER3_BASE + VAL_OFFSET);
-    updateTick = 0;
+    // Create the system's idle task
+    haltTD = lookupTD(handleCreate(Constants::NUM_PRIORITIES-1, idleTask));
 }
 
-void Kernel::drawGUI() {
-    // TODO: refactor this into a graphics context maybe?
-    // bwprintf(COM2, "\0337\033[3;40f╔═════════════════════╗");
-    // bwprintf(COM2, "\033[4;40f║ \033[4mIdle Time:\033[24m   \033[41m0.000%\033[47m ║");
-    // bwprintf(COM2, "\033[5;40f╚═════════════════════╝\0338");
+// void Kernel::drawGUI() {
+//     // TODO: refactor this into a graphics context maybe?
+//     bwprintf(COM2, "\0337\033[3;40f╔═════════════════════╗");
+//     bwprintf(COM2, "\033[4;40f║ \033[4mIdle Time:\033[24m   \033[41m0.000%\033[47m ║");
+//     bwprintf(COM2, "\033[5;40f╚═════════════════════╝\0338");
 
-    bwprintf(COM2, "\0337\033[2J\033[3;47f\033[37m╔═════════════════════╗");
-    bwprintf(COM2, "\033[4;47f║ \033[4mIdle Time:\033[24m   \033[31m0.000%%\033[37m ║");
-    bwprintf(COM2, "\033[5;47f╚═════════════════════╝\0338");
-}
+//     bwprintf(COM2, "\0337\033[2J\033[3;47f\033[37m╔═════════════════════╗");
+//     bwprintf(COM2, "\033[4;47f║ \033[4mIdle Time:\033[24m   \033[31m0.000%%\033[37m ║");
+//     bwprintf(COM2, "\033[5;47f╚═════════════════════╝\0338");
+// }
 
-void Kernel::displayIdle(unsigned int idlePercent) {
+void Kernel::displayIdle(unsigned int idleTime) {
     // -> dddddd
     // -> ddd.ddd
-    if (idlePercent < 50000) {
-        // The column is +14 from the location we use in the gui
-        bwprintf(COM2, "\0337\033[1;47f\033[K");
-        bwprintf(COM2, "\033[2;47f\033[K");
-        bwprintf(COM2, "\033[3;47f\033[37m╔═════════════════════╗");
-        bwprintf(COM2, "\033[4;47f║ \033[4mIdle Time:\033[24m  \033[31m%d.%d%%\033[37m ║\033[K", idlePercent/1000, idlePercent%1000);
-        bwprintf(COM2, "\033[5;47f╚═════════════════════╝\0338");
-        // bwprintf(COM2, "\0337\033[4;17f\033[31m%d.%d%%\0338", idlePercent/1000, idlePercent%1000);
-        // bwprintf(COM2, "   RED: Idle percent %d\n\r", idlePercent);
-    } else if (idlePercent < 80000) {
-        bwprintf(COM2, "\0337\033[1;47f\033[K");
-        bwprintf(COM2, "\033[2;47f\033[K");
-        bwprintf(COM2, "\033[3;47f\033[37m╔═════════════════════╗");
-        bwprintf(COM2, "\033[4;47f║ \033[4mIdle Time:\033[24m  \033[33m%d.%d%%\033[37m ║\033[K", idlePercent/1000, idlePercent%1000);
-        bwprintf(COM2, "\033[5;47f╚═════════════════════╝\0338");
-        // bwprintf(COM2, "\0337\033[4;17f\033[33m%d.%d%%\0338", idlePercent/1000, idlePercent%1000);
-        // bwprintf(COM2, "YELLOW: Idle percent %d\n\r", idlePercent);
-    } else {
-        bwprintf(COM2, "\0337\033[1;47f\033[K");
-        bwprintf(COM2, "\033[2;47f\033[K");
-        bwprintf(COM2, "\033[3;47f\033[37m╔═════════════════════╗");
-        bwprintf(COM2, "\033[4;47f║ \033[4mIdle Time:\033[24m  \033[32m%d.%d%%\033[37m ║\033[K", idlePercent/1000, idlePercent%1000);
-        bwprintf(COM2, "\033[5;47f╚═════════════════════╝\0338");
-        // bwprintf(COM2, "\0337\033[4;17f\033[32m%d.%d%%\0338", idlePercent/1000, idlePercent%1000);
-        // bwprintf(COM2, " GREEN: Idle percent %d\n\r", idlePercent);
-    }
+    // if (idlePercent < 50000) {
+    //     // The column is +14 from the location we use in the gui
+    //     bwprintf(COM2, "\0337\033[1;47f\033[K");
+    //     bwprintf(COM2, "\033[2;47f\033[K");
+    //     bwprintf(COM2, "\033[3;47f\033[37m╔═════════════════════╗");
+    //     bwprintf(COM2, "\033[4;47f║ \033[4mIdle Time:\033[24m  \033[31m%d.%d%%\033[37m ║\033[K", idlePercent/1000, idlePercent%1000);
+    //     bwprintf(COM2, "\033[5;47f╚═════════════════════╝\0338");
+    //     // bwprintf(COM2, "\0337\033[4;17f\033[31m%d.%d%%\0338", idlePercent/1000, idlePercent%1000);
+    //     // bwprintf(COM2, "   RED: Idle percent %d\n\r", idlePercent);
+    // } else if (idlePercent < 80000) {
+    //     bwprintf(COM2, "\0337\033[1;47f\033[K");
+    //     bwprintf(COM2, "\033[2;47f\033[K");
+    //     bwprintf(COM2, "\033[3;47f\033[37m╔═════════════════════╗");
+    //     bwprintf(COM2, "\033[4;47f║ \033[4mIdle Time:\033[24m  \033[33m%d.%d%%\033[37m ║\033[K", idlePercent/1000, idlePercent%1000);
+    //     bwprintf(COM2, "\033[5;47f╚═════════════════════╝\0338");
+    //     // bwprintf(COM2, "\0337\033[4;17f\033[33m%d.%d%%\0338", idlePercent/1000, idlePercent%1000);
+    //     // bwprintf(COM2, "YELLOW: Idle percent %d\n\r", idlePercent);
+    // } else {
+    //     bwprintf(COM2, "\0337\033[1;47f\033[K");
+    //     bwprintf(COM2, "\033[2;47f\033[K");
+    //     bwprintf(COM2, "\033[3;47f\033[37m╔═════════════════════╗");
+    //     bwprintf(COM2, "\033[4;47f║ \033[4mIdle Time:\033[24m  \033[32m%d.%d%%\033[37m ║\033[K", idlePercent/1000, idlePercent%1000);
+    //     bwprintf(COM2, "\033[5;47f╚═════════════════════╝\0338");
+    //     // bwprintf(COM2, "\0337\033[4;17f\033[32m%d.%d%%\0338", idlePercent/1000, idlePercent%1000);
+    //     // bwprintf(COM2, " GREEN: Idle percent %d\n\r", idlePercent);
+    // }
+    bwprintf(COM2, "%d.%d\r", idleTime * 10 / 508, idleTime * 10 % 508);
+    // bwprintf(COM2, "%d\n\r", idleTime);
 }
 
 void Kernel::schedule() {
-    // TODO: what happens when ready_queue is empty?
     activeTask = ready_queue.pop();
     // bwprintf(COM2, "Schedulding tid: %d to run with priority %d\n\r", activeTask->tid, activeTask->priority);
 }
 
-
-void printStack(int* stackPointer) {
-    for (int i = 0; i < 45; ++i) {
-        bwprintf(COM2, "%d - %d\n\r", i, stackPointer[i]);
-    }
-}
-
 int* Kernel::activate() {
+    
+    unsigned volatile int startIdleTaskTimeStamp;
+    unsigned volatile int stopIdleTaskTimeStamp;
+    
     activeTask->sp[3] = activeTask->returnValue;
+
+    //handle idle task start timing
     if (activeTask == haltTD) {
-        lastHaltActivate = haltActivate;
-        haltActivate = *(unsigned int *)(TIMER3_BASE + VAL_OFFSET);
-        // Sadly, GCC clobbers the shit out of this update loop which was intended to make it so that we only re-render every 100ms, RIP F
-        // updateTick += lastHaltActivate - haltActivate;
-        // // bwprintf(COM2, "update tick? %d \r\n", updateTick);
-        // if (updateTick > 50800) {
-        //     displayIdle((volatile unsigned long long)(lastHaltActivate - haltReturn) * 100000 / (lastHaltActivate - haltActivate));
-        //     updateTick -= 50800;
-        // }
-        // The cast here is to prevent overflow during the multiplacation. It might have been possible to avoid this, but we wanted 3 decimal precision.
-        displayIdle((unsigned long long)(lastHaltActivate - haltReturn) * 100000 / (lastHaltActivate - haltActivate));
-    }
+
+        startIdleTaskTimeStamp = *(int *)(TIMER3_BASE + VAL_OFFSET);
+    
+    } 
 
     // Exit Kernel
     int* stackPointer = kernelExit((int) activeTask->sp);
     activeTask->sp = stackPointer;
 
+    //handle idle task stop timing
     if (activeTask == haltTD) {
-        haltReturn = *(int *)(TIMER3_BASE + VAL_OFFSET);
+
+        stopIdleTaskTimeStamp = *(int *)(TIMER3_BASE + VAL_OFFSET);
+        timeSpentInIdle = (startIdleTaskTimeStamp - stopIdleTaskTimeStamp + timeSpentInIdle);
+
     }
 
     return stackPointer;
@@ -142,37 +136,42 @@ int* Kernel::activate() {
 void Kernel::handle(int* stackPointer)  {
     // Set the state of the activeTask to be READY
     // If it needs to be changed then the appropriate handler will do it
-    activeTask->taskState = Constants::READY;
+    activeTask->taskState = Constants::STATE::READY;
     
-
+    // Handle Hardware Interrupts
     if (stackPointer[0]) {
         int vic1Status = *(int *)(VIC1_IRQ_BASE + IRQ_STATUS_OFFSET);
         int vic2Status = *(int *)(VIC1_IRQ_BASE + IRQ_STATUS_OFFSET);
 
         if (vic1Status & TC1UI_MASK) {
+
             // bwprintf(COM2, "Kernel - The interrupt was a timer 1 underflow interrupt\n\r");
             *(int *)(TIMER1_BASE + CLR_OFFSET) = 1; // Clear the interrupt
+
+            // handle idle task reporting
+            displayIdle(timeSpentInIdle);
+            timeSpentInIdle = 0;
+
             handleTimerInterrupt(1);
-            // handleTimerUnderflow(1);
+
         } else if (vic1Status & TC2UI_MASK) {
+
             // bwprintf(COM2, "Kernel - The interrupt was a timer 2 underflow interrupt\n\r");
             *(int *)(TIMER2_BASE + CLR_OFFSET) = 1;
-            // handleTimerUnderflow(2);
+
         } else if (vic2Status & TC3UI_MASK) {
+
             // bwprintf(COM2, "Kernel - The interrupt was a timer 3 overflow interrupt!\n\r");
             *(int *)(TIMER3_BASE + CLR_OFFSET) = 1;
-            // handleTimerUnderflow(3);
+
         } else {
             bwprintf(COM2, "Kernel - ERROR: Kernel interrupted with unknown interrupt\n\r");
             TRAP
         }
 
-    } else {
+    } else { // Handle Software Interrupts
 
         int request = *(int*)(stackPointer[1] - 4) & 0xffffff;
-        volatile int halt = 0;
-        // bwprintf(COM2, "Got SWI: %d\n\r", request);
-        // bwprintf(COM2, "Software Interrupt: %d\n\r", request);
 
         void* arg1 = (void*)stackPointer[3];
         void* arg2 = (void*)stackPointer[4];
@@ -200,20 +199,15 @@ void Kernel::handle(int* stackPointer)  {
                 break;
 
             case Constants::SWI::SEND:
-                // bwprintf(COM2, "Active Task Tid before handleSend: %d\n\r", activeTask->tid);
                 activeTask->returnValue = handleSend((SendRequest *) arg1);
-                // bwprintf(COM2, "Active Task Tid after handleSend: %d\n\r", activeTask->tid);
-                // bwprintf(COM2, "Came out from handlesend\n\r");
                 break;
 
             case Constants::SWI::RECIEVE:
                 activeTask->returnValue = handleReceive((int *) arg1, (int *) arg2, (int) arg3);
-                // bwprintf(COM2, "Came out from handleReceive\n\r");
                 break;
 
             case Constants::SWI::REPLY:
                 activeTask->returnValue = handleReply((int) arg1, (const char *)arg2, (int) arg3);
-                // bwprintf(COM2, "Came out from handleReply\n\r");
                 break;
 
             case Constants::SWI::AWAIT_EVENT:

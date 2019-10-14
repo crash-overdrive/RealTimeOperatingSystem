@@ -11,8 +11,8 @@ void clockNotifier() {
     // bwprintf(COM2, "Clock Notifier - Created Clock notifier\n\r");
     int clockServerTid = WhoIs("wCLOCK SERVER");
 
-    *(int *)(TIMER1_BASE + LDR_OFFSET) = 20; // This is just for testing interrupts
-    *(int *)(TIMER1_BASE + CRTL_OFFSET) = ENABLE_MASK | MODE_MASK; // | CLKSEL_MASK;
+    *(int *)(TIMER1_BASE + LDR_OFFSET) = Constants::clockTick; 
+    *(int *)(TIMER1_BASE + CRTL_OFFSET) = ENABLE_MASK | MODE_MASK | CLKSEL_MASK;
 
     // TODO: as part of the the initilization clock notifier should set up the timer interrupts
     char tick[] = "x";
