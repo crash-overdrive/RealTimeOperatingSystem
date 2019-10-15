@@ -91,10 +91,15 @@ int Time(int tid) {
     if (tid != Constants::ClockServer::TID) {
         return -1;
     }
-    char replyMessage[5];
-    char sendMessage[] = "t";
-    int replySize = Send(tid, sendMessage, 2, replyMessage, 5);
-    if(replySize == 5 && replyMessage[0] == 'R') {
+
+    char replyMessage[Constants::ClockServer::REPLY_MESSAGE_MAX_SIZE];
+
+    char sendMessage[1];
+    sendMessage[0] = Constants::ClockServer::TIME;
+
+    int replySize = Send(tid, sendMessage, 1, replyMessage, Constants::ClockServer::REPLY_MESSAGE_MAX_SIZE);
+    
+    if(replySize == 5 && replyMessage[0] == Constants::ClockServer::ACKNOWLEDGE) {
         int ticks;
         memcpy(&ticks, replyMessage+1, sizeof(ticks));
         // bwprintf(COM2, "Syscall Time - Got number of ticks: %d\n\r", ticks);
@@ -112,14 +117,16 @@ int Delay(int tid, int ticks) {
     if (ticks < 0) {
         return -2;
     }
-    char replyMessage[5];
-    char sendMessage[5] = "d";
+    
+    char replyMessage[Constants::ClockServer::REPLY_MESSAGE_MAX_SIZE];
 
+    char sendMessage[Constants::ClockServer::SEND_MESSAGE_MAX_SIZE];
+    sendMessage[0] = Constants::ClockServer::DELAY;
     memcpy(sendMessage+1, &ticks, sizeof(ticks));
 
-    int replySize = Send(tid, sendMessage, 5, replyMessage, 5);
+    int replySize = Send(tid, sendMessage, 5, replyMessage, Constants::ClockServer::REPLY_MESSAGE_MAX_SIZE);
 
-    if(replySize == 5 && replyMessage[0] == 'R') {
+    if(replySize == 5 && replyMessage[0] == Constants::ClockServer::ACKNOWLEDGE) {
         int ticksElapsed;
         memcpy(&ticksElapsed, replyMessage+1, sizeof(ticksElapsed));
         // bwprintf(COM2, "Syscall Delay - Got number of ticks: %d\n\r", ticksElapsed);
@@ -138,14 +145,15 @@ int DelayUntil(int tid, int ticks) {
         return -2;
     }
 
-    char replyMessage[5];
-    char sendMessage[5] = "u";
+    char replyMessage[Constants::ClockServer::REPLY_MESSAGE_MAX_SIZE];
 
+    char sendMessage[Constants::ClockServer::SEND_MESSAGE_MAX_SIZE];
+    sendMessage[0] = Constants::ClockServer::DELAY_UNTIL;
     memcpy(sendMessage+1, &ticks, sizeof(ticks));
 
-    int replySize = Send(tid, sendMessage, 5, replyMessage, 5);
+    int replySize = Send(tid, sendMessage, 5, replyMessage, Constants::ClockServer::REPLY_MESSAGE_MAX_SIZE);
 
-    if(replySize == 5 && replyMessage[0] == 'R') {
+    if(replySize == 5 && replyMessage[0] == Constants::ClockServer::ACKNOWLEDGE) {
         int ticksElapsed;
         memcpy(&ticksElapsed, replyMessage+1, sizeof(ticksElapsed));
         // bwprintf(COM2, "Syscall Delay Until - Got number of ticks: %d\n\r", ticksElapsed);

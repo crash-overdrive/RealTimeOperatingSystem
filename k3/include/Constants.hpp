@@ -11,7 +11,6 @@ namespace Constants {
     const int RECEIVE_QUEUE_LENGTH = 32;
     const int REPLY_QUEUE_LENGTH = NUM_TASKS;
     const int TD_STACK_SIZE = 32768;
-    const int CLOCK_TICK = 5080;
     
     namespace NameServer {
         extern int TID;
@@ -31,7 +30,10 @@ namespace Constants {
         const char DELAY = 'd';
         const char DELAY_UNTIL = 'u';
         const char TICK = 'x';
-        const char ACKNOWLEDGE[] = "a";
+        const char ACKNOWLEDGE = 'a';
+        const int SEND_MESSAGE_MAX_SIZE = sizeof(int) + 1;
+        const int REPLY_MESSAGE_MAX_SIZE = sizeof(int) + 1;
+        const int CLOCK_TICK = 5080;
     }
 
     namespace RockPaperScissorServer {

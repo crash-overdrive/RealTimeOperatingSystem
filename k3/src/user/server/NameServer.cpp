@@ -18,16 +18,13 @@ void nameServer() {
     // bwprintf(COM2, "Name Server - Created Name server\n\r");
     nameServerEntry nameServerEntries[Constants::NUM_TASKS];
     int numberOfEntries = -1;
-    
-    int sendProcessTid;
-    int sendMessageSize;
-    char sendMessage[Constants::NameServer::SEND_MESSAGE_MAX_SIZE];
-    
-    char replyMessage[Constants::NameServer::REPLY_MESSAGE_MAX_SIZE];
-    
+        
     // start of server
     FOREVER {
-        
+        int sendProcessTid;
+        int sendMessageSize;
+        char sendMessage[Constants::NameServer::SEND_MESSAGE_MAX_SIZE];
+                
         sendMessageSize = Receive(&sendProcessTid, sendMessage, Constants::NameServer::SEND_MESSAGE_MAX_SIZE);
         
         if (sendMessageSize > 0 && sendMessageSize < Constants::NameServer::SEND_MESSAGE_MAX_SIZE) {
@@ -75,6 +72,7 @@ void nameServer() {
 
                         if (strcmp((nameServerEntries[i].taskName), sendMessage) == 0) {
                             matchFound = true;
+                            char replyMessage[sizeof(i)];
                             // bwprintf(COM2, "Name Server - Found name server entry at index - %d - %s - %d\n\r", i, nameServerEntries[i].taskName, nameServerEntries[i].tid);
                             memcpy(replyMessage, &nameServerEntries[i].tid, sizeof(nameServerEntries[i].tid));
                             Reply(sendProcessTid, replyMessage, sizeof(i));
