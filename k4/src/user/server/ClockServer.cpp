@@ -38,10 +38,6 @@ void clockServer() {
 
     // TODO: use a priority queue for this
     DataStructures::RingBuffer<ClockServerEntry,Constants::NUM_TASKS> clockServerEntries;
-
-    // TODO: come up with a better solution for this
-    ClockServerEntry tempMemory[Constants::NUM_TASKS];
-    int tempCounter = -1;
     
     int numberOfTicksElapsed = 0;
     
@@ -101,9 +97,7 @@ void clockServer() {
 
                     // bwprintf(COM2, "Clock Server - Received delay request from %d for ticks: %d at ticks: %d, pushed to cses\n\r", sendTid, ticks, numberOfTicksElapsed);
 
-                    ++tempCounter;
-                    tempMemory[tempCounter] = ClockServerEntry(sendTid, ticks + numberOfTicksElapsed);
-                    clockServerEntries.push(tempMemory[tempCounter]);
+                    clockServerEntries.push(ClockServerEntry(sendTid, ticks + numberOfTicksElapsed));
 
                     break;
                 }
@@ -116,9 +110,7 @@ void clockServer() {
                     
                     // bwprintf(COM2, "Clock Server - Received delay until request from %d for ticks: %d at ticks: %d, pushed to cses\n\r", sendTid, ticks, numberOfTicksElapsed);
                     
-                    ++tempCounter;
-                    tempMemory[tempCounter] = ClockServerEntry(sendTid, ticks);
-                    clockServerEntries.push(tempMemory[tempCounter]);
+                    clockServerEntries.push(ClockServerEntry(sendTid, ticks));
 
                     break;
                 }

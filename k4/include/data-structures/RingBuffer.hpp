@@ -1,6 +1,7 @@
 #ifndef RING_BUFFER_HPP
 #define RING_BUFFER_HPP
 
+#include "io/bwio.hpp"
 
 namespace DataStructures {
 
@@ -24,25 +25,27 @@ class RingBuffer {
 
         }
 
-        // NOTE: if buffer is full, then put will overwrite the oldest value
-        void push(T item) {
-
-            buffer[head] = item;
+        // NOTE: if buffer is full, then will ignore the push
+        // Returns 0 if successful push, 1 otherwise
+        int push(T item) {
 
             if(isFull) {
-
-                tail = (tail + 1) % maxSize;
-            
+                bwprintf(COM2, "Ring Buffer - Tried to push to a full RingBuffer\n\r");
+                return 1;            
             }
+
+            buffer[head] = item;
 
             head = (head + 1) % maxSize;
 
             isFull = (head == tail);
+            
+            return 0;
 
         }
 
-        // NOTE: if buffer was full and values were overwritten, then will return the oldest value in the buffer
-        // NOTE: if buffer is empty then will return nullptr
+
+        // NOTE: if buffer is empty then will return T()
         T pop() {
 
             if(empty()) {

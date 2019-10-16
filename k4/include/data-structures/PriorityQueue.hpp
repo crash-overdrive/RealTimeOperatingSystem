@@ -21,15 +21,17 @@ class PriorityQueue {
 
         }
 
-        // NOTE: if ring buffer of priority is full, then put will overwrite the oldest value
+        // NOTE: if ring buffer of priority is full, then will ignore the push
         // NOTE: if priority is not in the range then its ignored
         void push(T item, int priority) {
 
             if (priority >= 0 && priority < maxNumberOfPriorities) {
-
-                // bwprintf(COM2, "Priority Queue - Pushed %d with priority: %d \n\r", item, priority);
-                queue[priority].push(item);
-
+                int status = queue[priority].push(item);
+                if(status == 1) {
+                    bwprintf(COM2, "Ring Buffer - Tried to push to a full queue: %d\n\r", priority);
+                }
+            } else {
+                bwprintf(COM2, "Priority Queue - Invalid Priority\n\r");
             }
 
         }
