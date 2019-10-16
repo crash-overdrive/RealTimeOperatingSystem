@@ -144,19 +144,4 @@ int Delay(int tid, int ticks);
  */
 int DelayUntil(int tid, int ticks);
 
-/*
- * 
- */
-int MyLastUptime();
-
-/*
- *
- */
-int MyUpime();
-
-/*
- *
- */
-int KernelUptime();
-
 #endif
