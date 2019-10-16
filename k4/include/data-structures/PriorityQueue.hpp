@@ -28,7 +28,7 @@ class PriorityQueue {
             if (priority >= 0 && priority < maxNumberOfPriorities) {
                 int status = queue[priority].push(item);
                 if(status == 1) {
-                    bwprintf(COM2, "Ring Buffer - Tried to push to a full queue: %d\n\r", priority);
+                    bwprintf(COM2, "Priority Queue - Tried to push to a full queue: %d\n\r", priority);
                 }
             } else {
                 bwprintf(COM2, "Priority Queue - Invalid Priority\n\r");

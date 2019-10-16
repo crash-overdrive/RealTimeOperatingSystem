@@ -24,13 +24,6 @@ class ClockServerEntry {
         }
 };
 
-// INPUTS
-// "d" for delay
-// "u" for delay-until
-// "t" for time
-// "x" for tick
-// OUTPUTS
-// "a" for acknowledge to clockNotifier
 void clockServer() {
     // bwprintf(COM2, "Clock Server - Created Clock server\n\r");
 
