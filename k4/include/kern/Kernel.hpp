@@ -14,14 +14,15 @@
 class Kernel {
 
     private:
-        DataStructures::PriorityQueue<TaskDescriptor, Constants::NUM_PRIORITIES, Constants::Q_LENGTH> ready_queue;
-        DataStructures::RingBuffer<TaskDescriptor, Constants::Q_LENGTH> blocked_queue;
+        DataStructures::PriorityQueue<TaskDescriptor*, Constants::NUM_PRIORITIES, Constants::Q_LENGTH> ready_queue;
+        DataStructures::RingBuffer<TaskDescriptor*, Constants::Q_LENGTH> blocked_queue;
 
-        DataStructures::RingBuffer<TaskDescriptor, Constants::EXIT_Q_LENGTH> exit_queue;
-        DataStructures::RingBuffer<KernelSendRequest, Constants::REPLY_QUEUE_LENGTH> replyQueue;
-        DataStructures::RingBuffer<TaskDescriptor, Constants::NUM_TASKS> timerBlockedQueue;
+        DataStructures::RingBuffer<TaskDescriptor*, Constants::EXIT_Q_LENGTH> exit_queue;
+        DataStructures::RingBuffer<KernelSendRequest*, Constants::REPLY_QUEUE_LENGTH> replyQueue;
+        DataStructures::RingBuffer<TaskDescriptor*, Constants::NUM_TASKS> timerBlockedQueue;
         
         TaskDescriptor tasks[Constants::NUM_TASKS];
+        // DataStructures::RingBuffer<TaskDescriptor, Constants::NUM_TASKS> tasks2;
 
         UART uart;
 

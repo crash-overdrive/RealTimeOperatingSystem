@@ -13,7 +13,7 @@ class RingBuffer {
         unsigned int tail;
         const unsigned int maxSize = length;
         bool isFull;
-        T* buffer[length];
+        T buffer[length];
 
     public:
         RingBuffer<T, length>() {
@@ -25,7 +25,7 @@ class RingBuffer {
         }
 
         // NOTE: if buffer is full, then put will overwrite the oldest value
-        void push(T* item) {
+        void push(T item) {
 
             buffer[head] = item;
 
@@ -43,16 +43,16 @@ class RingBuffer {
 
         // NOTE: if buffer was full and values were overwritten, then will return the oldest value in the buffer
         // NOTE: if buffer is empty then will return nullptr
-        T* pop() {
+        T pop() {
 
             if(empty()) {
 
-                return nullptr;
+                return T();
                 
             }
 
             //Read data and advance the tail, there is now a space in the RingBuffer
-            T* val = buffer[tail];
+            T val = buffer[tail];
             isFull = false;
             tail = (tail + 1) % maxSize;
 

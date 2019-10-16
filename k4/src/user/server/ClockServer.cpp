@@ -1,10 +1,10 @@
 #include "user/server/ClockServer.hpp"
 #include "user/client/ClockNotifier.hpp"
 #include "user/syscall/UserSyscall.hpp"
-#include "kern/TaskDescriptor.hpp"
 #include "data-structures/RingBuffer.hpp"
 #include "io/bwio.hpp"
-#include <string.h>
+#include "Constants.hpp"
+#include <cstring>
 
 #define FOREVER for(;;)
 
@@ -69,12 +69,12 @@ void clockServer() {
                     int length = clockServerEntries.size();
                     // bwprintf(COM2, "Clock Server - Length of clockServerEntries is %d\n\r", length);
                     for (int i=0; i < length; ++i) {
-                        ClockServerEntry* clockServerEntry = clockServerEntries.pop();
+                        ClockServerEntry clockServerEntry = clockServerEntries.pop();
                         // bwprintf(COM2, "Clock Server - Popped off entry %d %d\n\r", clockServerEntry->tid, clockServerEntry->ticksToReleaseAt);
-                        if (clockServerEntry->ticksToReleaseAt <= numberOfTicksElapsed) {
+                        if (clockServerEntry.ticksToReleaseAt <= numberOfTicksElapsed) {
                             // bwprintf(COM2, "Clock Server - Releasing %d from sleep at ticks: %d\n\r", clockServerEntry->tid, numberOfTicksElapsed);
                             memcpy(replyMessage+1, &numberOfTicksElapsed, sizeof(numberOfTicksElapsed));
-                            Reply(clockServerEntry->tid, replyMessage, 5);
+                            Reply(clockServerEntry.tid, replyMessage, 5);
                         } else {
                             clockServerEntries.push(clockServerEntry);
                         }
@@ -103,7 +103,7 @@ void clockServer() {
 
                     ++tempCounter;
                     tempMemory[tempCounter] = ClockServerEntry(sendTid, ticks + numberOfTicksElapsed);
-                    clockServerEntries.push(&tempMemory[tempCounter]);
+                    clockServerEntries.push(tempMemory[tempCounter]);
 
                     break;
                 }
@@ -118,7 +118,7 @@ void clockServer() {
                     
                     ++tempCounter;
                     tempMemory[tempCounter] = ClockServerEntry(sendTid, ticks);
-                    clockServerEntries.push(&tempMemory[tempCounter]);
+                    clockServerEntries.push(tempMemory[tempCounter]);
 
                     break;
                 }

@@ -34,7 +34,7 @@ ASMFILES := $(patsubst %.cpp,%.s,$(CPPFILES))
 
 OBJECTS := $(patsubst %.s, %.o, $(ASMFILES))
 
-ELF := k3.elf
+ELF := k4.elf
 
 all : $(ELF)
 	cp build/$(ELF) /u/cs452/tftp/ARM/$(USER)

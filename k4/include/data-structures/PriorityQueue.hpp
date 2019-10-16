@@ -1,6 +1,7 @@
 #ifndef PRIORITY_QUEUE_HPP
 #define PRIORITY_QUEUE_HPP
 
+#include "io/bwio.hpp"
 #include "RingBuffer.hpp"
 
 namespace DataStructures {
@@ -22,11 +23,11 @@ class PriorityQueue {
 
         // NOTE: if ring buffer of priority is full, then put will overwrite the oldest value
         // NOTE: if priority is not in the range then its ignored
-        void push(T* item, int priority) {
+        void push(T item, int priority) {
 
             if (priority >= 0 && priority < maxNumberOfPriorities) {
 
-                // bwprintf(COM2, "Pushed with priority: %d \n", priority);
+                // bwprintf(COM2, "Priority Queue - Pushed %d with priority: %d \n\r", item, priority);
                 queue[priority].push(item);
 
             }
@@ -34,20 +35,21 @@ class PriorityQueue {
         }
 
         // NOTE: if all RingBuffers were empty then will return nullptr
-        T* pop() {
+        T pop() {
 
             for(int i = 0; i < maxNumberOfPriorities; ++i) {
-
+                // bwprintf(COM2, "Priority Queue - Queue %d size: %d\n\r", i, queue[i].size());
                 if (!(queue[i].empty())) {
 
-                    T* val = queue[i].pop();
+                    T val = queue[i].pop();
+                    // bwprintf(COM2, "Priority Queue - Popped %d\n\r", val);
                     return val;
 
                 }
 
             }
 
-            return nullptr;
+            return T();
 
         }
 

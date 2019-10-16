@@ -19,7 +19,7 @@ class TaskDescriptor {
         int returnValue;
         int stack[Constants::TD_STACK_SIZE];
 
-        DataStructures::RingBuffer<KernelSendRequest, Constants::RECEIVE_QUEUE_LENGTH> receiveQueue;
+        DataStructures::RingBuffer<KernelSendRequest*, Constants::RECEIVE_QUEUE_LENGTH> receiveQueue;
         KernelSendRequest kSendRequest;
         KernelRecieveRequest kReceiveRequest;
 };
