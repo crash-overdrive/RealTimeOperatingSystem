@@ -117,6 +117,7 @@ int* Kernel::activate() {
     if (activeTask == haltTD) {
         stopIdleTaskTimeStamp = *(int *)(TIMER3_BASE + VAL_OFFSET);
         timeSpentInIdle = (startIdleTaskTimeStamp - stopIdleTaskTimeStamp + timeSpentInIdle);
+        activeTask->returnValue = timeSpentInIdle;
     }
 
     return stackPointer;
@@ -137,8 +138,6 @@ void Kernel::handle(int* stackPointer)  {
             // bwprintf(COM2, "Kernel - The interrupt was a timer 1 underflow interrupt\n\r");
             *(int *)(TIMER1_BASE + CLR_OFFSET) = 1; // Clear the interrupt
 
-            // handle idle task reporting
-            displayIdle(timeSpentInIdle);
             timeSpentInIdle = 0;
 
             handleTimerInterrupt(1);

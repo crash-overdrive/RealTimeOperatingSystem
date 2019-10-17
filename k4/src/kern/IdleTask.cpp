@@ -8,12 +8,14 @@
 
 #define FOREVER for(;;)
 
+extern "C" int Halt();
+
 void idleTask() {
     *(int *)(TIMER3_BASE + LDR_OFFSET) = 0xFFFFFFFF;
     *(int *)(TIMER3_BASE + CRTL_OFFSET) = ENABLE_MASK | MODE_MASK | CLKSEL_MASK;
 
-    volatile int halt;
     FOREVER {
-        halt = *(int *)0x80930008; // Puts the system into idle mode
+        int idleTime = Halt();
+        bwprintf(COM2, "Idle Time: %d.%d\n\r", idleTime * 10 / 508, idleTime * 10 % 508);
     }
 }
