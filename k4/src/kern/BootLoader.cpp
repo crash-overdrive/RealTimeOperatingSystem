@@ -8,6 +8,8 @@
 #include "user/server/RockPaperScissorServer.hpp"
 #include "user/server/NameServer.hpp"
 #include "user/server/ClockServer.hpp"
+#include "user/server/UART1RXServer.hpp"
+#include "user/server/UART2RXServer.hpp"
 #include "io/bwio.hpp"
 #include "Constants.hpp"
 #include "string.h"
@@ -36,7 +38,7 @@ void bootLoader() {
     // tid = Create(1, receiveClient);
     // tid = Create(4, sendClient);
 
-    tid = Create(2, nameServer);
+    tid = Create(3, nameServer);
     Constants::NameServer::TID = tid;
     // bwprintf(COM2, "BootLoader - Created Name Server with tid: %d\n\r", tid);
 
@@ -44,10 +46,14 @@ void bootLoader() {
     // bwprintf(COM2, "BootLoader - Created Clock Server with tid: %d\n\r", tid);
     Constants::ClockServer::TID = tid;
 
-    tid = Create(3, clockClient);
-    tid = Create(4, clockClient);
-    tid = Create(5, clockClient);
-    tid = Create(6, clockClient);
+    tid = Create(2, uart2rxServer);
+    // bwprintf(COM2, "BootLoader - Created Clock Server with tid: %d\n\r", tid);
+    Constants::UART2RXServer::TID = tid;
+
+    // tid = Create(3, clockClient);
+    // tid = Create(4, clockClient);
+    // tid = Create(5, clockClient);
+    // tid = Create(6, clockClient);
 
     int sendTid;
 

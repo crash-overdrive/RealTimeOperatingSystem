@@ -20,6 +20,13 @@ class Kernel {
         DataStructures::RingBuffer<TaskDescriptor, Constants::EXIT_Q_LENGTH> exit_queue;
         DataStructures::RingBuffer<KernelSendRequest, Constants::REPLY_QUEUE_LENGTH> replyQueue;
         DataStructures::RingBuffer<TaskDescriptor, Constants::NUM_TASKS> timerBlockedQueue;
+
+        // These are queues to support the potential for multiple programs being concerned with when uart interrupts have occurred, although in our system only
+        // the UART servers are responsible for reading the data
+        DataStructures::RingBuffer<TaskDescriptor, Constants::NUM_TASKS> uart1RXBlockedQueue;
+        // DataStructures::RingBuffer<TaskDescriptor, Constants::NUM_TASKS> uart1TXBlocked;
+        DataStructures::RingBuffer<TaskDescriptor, Constants::NUM_TASKS> uart2RXBlockedQueue;
+        // DataStructures::RingBuffer<TaskDescriptor, Constants::NUM_TASKS> uart2TXBlocked;
         
         TaskDescriptor tasks[Constants::NUM_TASKS];
 
@@ -57,6 +64,10 @@ class Kernel {
         int handleAwaitEvent(int eventId);
 
         void handleTimerInterrupt(int timerValue);
+        void handleUART1RXInterrupt(int data);
+        void handleUART2RXInterrupt(int data);
+        // void handleInterrupt(int data, DataStructures::RingBuffer<TaskDescriptor, Constants::NUM_TASKS> &blockQueue);
+        void handleInterrupt(DataStructures::RingBuffer<TaskDescriptor, Constants::NUM_TASKS> &blockQueue);
 
         /*
          * Lookup TD by tid

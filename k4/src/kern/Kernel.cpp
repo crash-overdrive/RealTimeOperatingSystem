@@ -131,6 +131,7 @@ void Kernel::handle(int* stackPointer)  {
     if (stackPointer[0]) {
         int vic1Status = *(int *)(VIC1_IRQ_BASE + IRQ_STATUS_OFFSET);
         int vic2Status = *(int *)(VIC2_IRQ_BASE + IRQ_STATUS_OFFSET);
+        int data;
 
         if (vic1Status & TC1UI_MASK) {
 
@@ -148,7 +149,21 @@ void Kernel::handle(int* stackPointer)  {
             // bwprintf(COM2, "Kernel - The interrupt was a timer 2 underflow interrupt\n\r");
             *(int *)(TIMER2_BASE + CLR_OFFSET) = 1;
 
-        } else if (vic2Status & TC3UI_MASK) {
+        } else if (vic1Status & UART1_RX_INTR1_MASK) {
+
+            // data = *(int *)(UART1_BASE + UART_DATA_OFFSET);
+            // handleInterrupt(data, uart1RXBlockedQueue);
+            handleInterrupt(uart1RXBlockedQueue);
+
+        } else if (vic1Status & UART2_RX_INTR2_MASK) {
+
+            // data = *(int *)(UART2_BASE + UART_DATA_OFFSET);
+            // handleInterrupt(data, uart2RXBlockedQueue);
+            handleInterrupt(uart2RXBlockedQueue);
+
+        }
+
+        else if (vic2Status & TC3UI_MASK) {
 
             // bwprintf(COM2, "Kernel - The interrupt was a timer 3 overflow interrupt!\n\r");
             *(int *)(TIMER3_BASE + CLR_OFFSET) = 1;
@@ -236,6 +251,14 @@ void Kernel::handle(int* stackPointer)  {
         case Constants::TIMER_BLOCKED:
             // bwprintf(COM2, "Kernel - Putting %d on timerBlockedQueue\n\r", activeTask->tid);
             timerBlockedQueue.push(activeTask);
+            break;
+
+        case Constants::UART1RX_BLOCKED:
+            uart1RXBlockedQueue.push(activeTask);
+            break;
+
+        case Constants::UART2RX_BLOCKED:
+            uart2RXBlockedQueue.push(activeTask);
             break;
 
         default:
