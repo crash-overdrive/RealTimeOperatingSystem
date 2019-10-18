@@ -11,14 +11,14 @@ extern int Putc(int tid, int uart, char ch);
 
 void manualTrainControl() {
     
-    int UART1_SERVER = WhoIs("UART1RX SERVER");
+    // int UART1_SERVER = WhoIs("UART1RX SERVER");
     int UART2_SERVER = WhoIs("UART2RX");
 
     int trainSpeeds[Constants::ManualTrainControl::NUM_TRAINS] = {0};
     char switchOrientations[Constants::ManualTrainControl::NUM_SENSORS];
 
     FOREVER {
-        char ch;
+        int ch;
         char input[Constants::ManualTrainControl::MAX_COMMAND_SIZE] = {0};
         int inputSize = 0;
 
@@ -28,6 +28,7 @@ void manualTrainControl() {
         do {
             
             ch = Getc(UART2_SERVER, COM2);
+            bwprintf(COM2, "Got some input: %d\n\r", ch);
             // int x = Putc(UART2_SERVER, COM2, ch);
             bwprintf(COM2, "%c", ch);
             input[inputSize] = ch;
@@ -40,7 +41,8 @@ void manualTrainControl() {
             }
             // TODO: support for backspace?
 
-        } while(ch != Constants::ManualTrainControl::ENTER);
+        } while(ch != Constants::ManualTrainControl::ENTER && inputSize < Constants::ManualTrainControl::MAX_COMMAND_SIZE);
+        bwprintf(COM2, "\n\r");
         input[inputSize - 1] = '\0';
 
         char* commandToken = strtok(input, Constants::ManualTrainControl::DELIMITER);
