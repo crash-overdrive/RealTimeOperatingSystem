@@ -37,6 +37,11 @@ namespace Constants {
         const char SET_RESET_ON_FOR_SENSORS = (char)192;
     }
     
+    namespace Server {
+        const char ACK = 'A';
+        const char ERR = 'E';
+    }
+    
     namespace NameServer {
         extern int TID;
         const char REGISTER_AS = 'r';
@@ -61,10 +66,24 @@ namespace Constants {
         const int CLOCK_TICK = 5080;
     }
 
+    namespace UART1RXServer {
+        extern int TID;
+        const int BUFFER_SIZE = 16;
+        const int MSG_SIZE = 1;
+        const int RP_SIZE = 1;
+    }
+
+    namespace UART2RXServer {
+        extern int TID;
+        const int BUFFER_SIZE = 1024;
+        const int MSG_SIZE = 1;
+        const int RP_SIZE = 1;
+    }
+
+
     namespace RockPaperScissorServer {
         extern int TID;
     }
-    
 
     enum STATE {
         ACTIVE,
@@ -74,7 +93,9 @@ namespace Constants {
         REPLY_BLOCKED,
         BLOCKED,
         ZOMBIE,
-        TIMER_BLOCKED
+        TIMER_BLOCKED,
+        UART1RX_BLOCKED,
+        UART2RX_BLOCKED
     };
     enum SWI {
         CREATE = 2,
@@ -89,7 +110,11 @@ namespace Constants {
         HALT
     };
     enum EVENTS {
-        TIMER_INTERRUPT
+        TIMER_INTERRUPT,
+        UART1RX_IRQ,
+        UART1TX_IRQ,
+        UART2RX_IRQ,
+        UART2TX_IRQ,
     };
 };
 

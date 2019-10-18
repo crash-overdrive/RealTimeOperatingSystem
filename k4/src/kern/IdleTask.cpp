@@ -16,6 +16,6 @@ void idleTask() {
 
     FOREVER {
         int idleTime = Halt();
-        bwprintf(COM2, "Idle Time: %d.%d\n\r", idleTime * 10 / 508, idleTime * 10 % 508);
+        // bwprintf(COM2, "Idle Time: %d.%d\n\r", idleTime * 10 / 508, idleTime * 10 % 508);
     }
 }

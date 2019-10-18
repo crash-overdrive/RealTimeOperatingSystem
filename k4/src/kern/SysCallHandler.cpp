@@ -178,16 +178,24 @@ int Kernel::handleReply(int tid, const char *reply, int rplen) {
 }
 
 int Kernel::handleAwaitEvent(int eventId) {
-    // for now its only even gonna be timer Interrupts
     switch (eventId) {
-    case Constants::TIMER_INTERRUPT:
-        activeTask->taskState = Constants::TIMER_BLOCKED;
-        break;
-    
-    default:
-        bwprintf(COM2, "Kernel Handler - Unknown Await Event encountered: %d\n\r", eventId);
-        break;
-    }
+        case Constants::TIMER_INTERRUPT:
+            activeTask->taskState = Constants::TIMER_BLOCKED;
+            break;
+
+        case Constants::UART1RX_IRQ:
+            activeTask->taskState = Constants::UART1RX_BLOCKED;
+            break;
+
+        case Constants::UART2RX_IRQ:
+            bwprintf(COM2, "Kernel Handler - Awaiting 2RX: %d\n\r", eventId);
+            activeTask->taskState = Constants::UART2RX_BLOCKED;
+            break;
+
+        default:
+            bwprintf(COM2, "Kernel Handler - Unknown Await Event encountered: %d\n\r", eventId);
+            return -1; // Invalid event should be returned from AwaitEvent
+        }
     return 1;
 }
 
@@ -201,11 +209,72 @@ void Kernel::handleTimerInterrupt(int timerValue) {
     }
 }
 
+// void Kernel::handleInterrupt(int data, DataStructures::RingBuffer<TaskDescriptor, Constants::NUM_TASKS> &blockedQueue) {
+void Kernel::handleInterrupt(DataStructures::RingBuffer<TaskDescriptor *, Constants::NUM_TASKS> &blockedQueue) {
+    while(!blockedQueue.empty()) {
+        TaskDescriptor* task = blockedQueue.pop();
+        task->taskState = Constants::READY;
+        // task->returnValue = data;
+        ready_queue.push(task, task->priority);
+    }
+}
+
+void Kernel::handleUART1RXInterrupt(int data) {
+    while(!uart1RXBlockedQueue.empty()) {
+        TaskDescriptor* task = uart1RXBlockedQueue.pop();
+        task->taskState = Constants::READY;
+        ready_queue.push(task, task->priority);
+    }
+    // Puts a character on the provided channel, returning -2 if buffer is full
+    // int plputc(int channel, char c) {
+    //     int *flags, *data;
+    //     switch(channel) {
+    //     case COM1:
+    //         flags = (int *)(UART1_BASE + UART_FLAG_OFFSET);
+    //         data = (int *)(UART1_BASE + UART_DATA_OFFSET);
+    //         break;
+    //     case COM2:
+    //         flags = (int *)(UART2_BASE + UART_FLAG_OFFSET);
+    //         data = (int *)(UART2_BASE + UART_DATA_OFFSET);
+    //         break;
+    //     default:
+    //         return -1;
+    //         break;
+    //     }
+    //     if (*flags & TXFF_MASK) { return -2; }
+    //     *data = c;
+    //     return 0;
+    // }
+
+    // // Gets a character from the provided channel, returning -2 if buffer is empty
+    // int plgetc(int channel) {
+    //     int *flags, *data;
+    //     unsigned char c;
+
+    //     switch( channel ) {
+    //     case COM1:
+    //         flags = (int *)( UART1_BASE + UART_FLAG_OFFSET );
+    //         data = (int *)( UART1_BASE + UART_DATA_OFFSET );
+    //         break;
+    //     case COM2:
+    //         flags = (int *)( UART2_BASE + UART_FLAG_OFFSET );
+    //         data = (int *)( UART2_BASE + UART_DATA_OFFSET );
+    //         break;
+    //     default:
+    //         return -1;
+    //         break;
+    //     }
+    //     if (*flags & RXFE_MASK) { return -2; }
+    //     c = *data;
+    //     return c;
+    // }
+}
+
 TaskDescriptor* Kernel::lookupTD(int tid) {
     if (tid < 0 || tid >= Constants::NUM_TASKS || tasks[tid].taskState == Constants::ZOMBIE) {
         return nullptr;
     }
-    
+
     return &tasks[tid];
 }
 

@@ -31,7 +31,7 @@ class RingBuffer {
 
             if(isFull) {
                 bwprintf(COM2, "Ring Buffer - Tried to push to a full RingBuffer\n\r");
-                return 1;            
+                return 1;
             }
 
             buffer[head] = item;
@@ -39,7 +39,7 @@ class RingBuffer {
             head = (head + 1) % maxSize;
 
             isFull = (head == tail);
-            
+
             return 0;
 
         }

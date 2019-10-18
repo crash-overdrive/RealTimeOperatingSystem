@@ -163,3 +163,11 @@ int DelayUntil(int tid, int ticks) {
         return -1;
     }
 }
+
+int Getc(int tid, int uart) {
+    // TODO: implement me
+}
+
+int Putc(int tid, int uart, char ch) {
+    // TODO: implement me
+}

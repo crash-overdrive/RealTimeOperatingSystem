@@ -21,8 +21,13 @@ int main () {
     *(int *)0x80930080 |= 0x1; // Writes SHena bit of DeviceCfg Syscon register
 
     // Turn interrupts on
-    *(int *)(VIC1_IRQ_BASE + IRQ_ENABLE_OFFSET) = TC1UI_MASK | TC2UI_MASK;
+    *(int *)(VIC1_IRQ_BASE + IRQ_ENABLE_OFFSET) = TC2UI_MASK | UART2_RX_INTR2_MASK | UART2_TX_INTR2_MASK;
+    // *(int *)(VIC1_IRQ_BASE + IRQ_ENABLE_OFFSET) = TC1UI_MASK | TC2UI_MASK;
     *(int *)(VIC2_IRQ_BASE + IRQ_ENABLE_OFFSET) = TC3UI_MASK;
+
+    // Set all interrupts to IRQ
+    *(int *)(VIC1_IRQ_BASE + IRQ_SELECT_OFFSET) = 0;
+    *(int *)(VIC2_IRQ_BASE + IRQ_SELECT_OFFSET) = 0;
 
     kern.run();
 }

@@ -84,8 +84,9 @@ int Receive(int *tid, char *msg, int msglen);
 int Reply(int tid, const char *reply, int rplen);
 
 /*
- * Registers the task id of the caller under the given name. On return without error it is guaranteed that all WhoIs() calls by any task will return the task id 
- * of the caller until the registration is overwritten. If another task has already registered with the given name, its registration is overwritten. 
+ * Registers the task id of the caller under the given name. On return without error it is guaranteed that all WhoIs() calls by any task will return the task
+ * id of the caller until the registration is overwritten. If another task has already registered with the given name, its registration is overwritten.
+ * 
  * RegisterAs() is actually a wrapper covering a send to the name server.
  * 
  * Returns:
@@ -97,7 +98,9 @@ int RegisterAs(const char* name);
 /*
  * asks the name server for the task id of the task that is registered under the given name. Whether WhoIs() blocks waiting for a registration or returns 
  * with an error, if no task is registered under the given name, is implementation-dependent. There is guaranteed to be a unique task id associated with 
- * each registered name, but the registered task may change at any time after a call to WhoIs(). WhoIs() is actually a wrapper covering a send to the name server.
+ * each registered name, but the registered task may change at any time after a call to WhoIs().
+ * 
+ * WhoIs() is actually a wrapper covering a send to the name server.
  *
  * Returns:
  *   tid: task id of the registered task.
@@ -116,7 +119,9 @@ int WhoIs(const char* name);
 int AwaitEvent(int eventId);
 
 /*
- * returns the number of ticks since the clock server was created and initialized. With a 10 millisecond tick and a 32-bit unsigned int for the time wraparound is almost 12,000 hours, plenty of time for your demo. Time is actually a wrapper for a send to the clock server. The argument is the tid of the clock server.
+ * returns the number of ticks since the clock server was created and initialized. With a 10 millisecond tick and a 32-bit unsigned int for the time wraparound
+ * is almost 12,000 hours, plenty of time for your demo.
+ * Time is actually a wrapper for a send to the clock server. The argument is the tid of the clock server.
  * 
  * Returns:
  *   >-1: time in ticks since the clock server initialized.
@@ -125,7 +130,10 @@ int AwaitEvent(int eventId);
 int Time(int tid);
 
 /*
- * returns after the given number of ticks has elapsed. How long after is not guaranteed because the caller may have to wait on higher priority tasks. Delay() is (almost) identical to Yield() if ticks is zero. Delay() is actually a wrapper for a send to the clock server.
+ * returns after the given number of ticks has elapsed. How long after is not guaranteed because the caller may have to wait on higher priority tasks. Delay()
+ * is (almost) identical to Yield() if ticks is zero.
+ * 
+ * Delay() is actually a wrapper for a send to the clock server.
  * 
  * Returns:
  *   >-1: success. The current time returned (as in Time())
@@ -135,7 +143,10 @@ int Time(int tid);
 int Delay(int tid, int ticks);
 
 /*
- * returns when the time since clock server initialization is greater or equal than the given number of ticks. How long after is not guaranteed because the caller may have to wait on higher priority tasks. Also, DelayUntil(tid, Time(tid) + ticks) may differ from Delay(tid, ticks) by a small amount. DelayUntil is actually a wrapper for a send to the clock server.
+ * returns when the time since clock server initialization is greater or equal than the given number of ticks. How long after is not guaranteed because the
+ * caller may have to wait on higher priority tasks. Also, DelayUntil(tid, Time(tid) + ticks) may differ from Delay(tid, ticks) by a small amount.
+ * 
+ * DelayUntil is actually a wrapper for a send to the clock server.
  * 
  * Returns:
  *   >-1: success. The current time returned (as in Time())
@@ -145,18 +156,28 @@ int Delay(int tid, int ticks);
 int DelayUntil(int tid, int ticks);
 
 /*
+ * returns next unreturned character from the given UART. The first argument is the task id of the appropriate server. How communication errors are handled is
+ * implementation-dependent.
  * 
+ * Getc() is actually a wrapper for a send to the appropriate server.
+ * 
+ * Returns:
+ *   >-1: new character from the given UART.
+ *    -1: tid is not a valid uart server task.
  */
-int MyLastUptime();
+int Getc(int tid, int uart);
 
 /*
- *
+ * queues the given character for transmission by the given UART. On return the only guarantee is that the character has been queued. Whether it has been
+ * transmitted or received is not guaranteed. How communication errors are handled is implementation-dependent.
+ * 
+ * Putc() is actually a wrapper for a send to the appropriate server.
+ * 
+ * Returns:
+ *   0: success.
+ *  -1: tid is not a valid uart server task.
  */
-int MyUpime();
 
-/*
- *
- */
-int KernelUptime();
+int Putc(int tid, int uart, char ch);
 
 #endif

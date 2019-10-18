@@ -14,6 +14,7 @@ void Kernel::initialize() {
     // Setup comm
     uart.setConfig(COM1, BPF8, OFF, ON, OFF);
 	uart.setConfig(COM2, BPF8, OFF, OFF, OFF);
+    uart.enableRXInterrupt(COM2);
 
     // Draw GUI
     // drawGUI();
@@ -99,6 +100,7 @@ void Kernel::handle(int* stackPointer)  {
     if (stackPointer[0]) {
         int vic1Status = *(int *)(VIC1_IRQ_BASE + IRQ_STATUS_OFFSET);
         int vic2Status = *(int *)(VIC2_IRQ_BASE + IRQ_STATUS_OFFSET);
+        // bwprintf(COM2, "Kernel - Hardware interrupt vic1Status %d vic2Status %d \n\r", vic1Status, vic2Status);
 
         if (vic1Status & TC1UI_MASK) {
 
@@ -114,7 +116,22 @@ void Kernel::handle(int* stackPointer)  {
             // bwprintf(COM2, "Kernel - The interrupt was a timer 2 underflow interrupt\n\r");
             *(int *)(TIMER2_BASE + CLR_OFFSET) = 1;
 
-        } else if (vic2Status & TC3UI_MASK) {
+        } else if (vic1Status & UART1_RX_INTR1_MASK) {
+
+            // bwprintf(COM2, "Kernel - UART 1 receive interrupt\n\r");
+
+            handleInterrupt(uart1RXBlockedQueue);
+
+        } else if (vic1Status & UART2_RX_INTR2_MASK) {
+
+            // bwprintf(COM2, "Kernel - UART 2 receive interrupt\n\r");
+            uart.disableRXInterrupt(COM2);
+
+            handleInterrupt(uart2RXBlockedQueue);
+
+        }
+
+        else if (vic2Status & TC3UI_MASK) {
 
             // bwprintf(COM2, "Kernel - The interrupt was a timer 3 overflow interrupt!\n\r");
             *(int *)(TIMER3_BASE + CLR_OFFSET) = 1;
@@ -202,6 +219,15 @@ void Kernel::handle(int* stackPointer)  {
         case Constants::TIMER_BLOCKED:
             // bwprintf(COM2, "Kernel - Putting %d on timerBlockedQueue\n\r", activeTask->tid);
             timerBlockedQueue.push(activeTask);
+            break;
+
+        case Constants::UART1RX_BLOCKED:
+            uart1RXBlockedQueue.push(activeTask);
+            break;
+
+        case Constants::UART2RX_BLOCKED:
+            // bwprintf(COM2, "Kernel - Putting %d on UART2RXBlockedQueue\n\r", activeTask->tid);
+            uart2RXBlockedQueue.push(activeTask);
             break;
 
         default:
