@@ -36,7 +36,7 @@ OBJECTS := $(patsubst %.s, %.o, $(ASMFILES))
 
 ELF := k4.elf
 
-all : $(ELF)
+all : clean dirs $(ELF)
 	cp build/$(ELF) /u/cs452/tftp/ARM/$(USER)
 	chmod 777 /u/cs452/tftp/ARM/$(USER)/$(ELF)
 
@@ -52,6 +52,10 @@ $(SFILES): %.o : %.s
 $(ASMFILES): %.s : %.cpp
 	$(CPP) $(CPPFLAGS) $< -o $(addprefix build/, $(notdir $@))
 
+dirs:
+	mkdir build
+
 clean:
-	cd build && rm -f *.s *.o *.elf
+	rm -rf build
+
 	

@@ -59,39 +59,6 @@ void Kernel::initialize() {
 //     bwprintf(COM2, "\033[5;47f╚═════════════════════╝\0338");
 // }
 
-void Kernel::displayIdle(unsigned int idleTime) {
-    // -> dddddd
-    // -> ddd.ddd
-    // if (idlePercent < 50000) {
-    //     // The column is +14 from the location we use in the gui
-    //     bwprintf(COM2, "\0337\033[1;47f\033[K");
-    //     bwprintf(COM2, "\033[2;47f\033[K");
-    //     bwprintf(COM2, "\033[3;47f\033[37m╔═════════════════════╗");
-    //     bwprintf(COM2, "\033[4;47f║ \033[4mIdle Time:\033[24m  \033[31m%d.%d%%\033[37m ║\033[K", idlePercent/1000, idlePercent%1000);
-    //     bwprintf(COM2, "\033[5;47f╚═════════════════════╝\0338");
-    //     // bwprintf(COM2, "\0337\033[4;17f\033[31m%d.%d%%\0338", idlePercent/1000, idlePercent%1000);
-    //     // bwprintf(COM2, "   RED: Idle percent %d\n\r", idlePercent);
-    // } else if (idlePercent < 80000) {
-    //     bwprintf(COM2, "\0337\033[1;47f\033[K");
-    //     bwprintf(COM2, "\033[2;47f\033[K");
-    //     bwprintf(COM2, "\033[3;47f\033[37m╔═════════════════════╗");
-    //     bwprintf(COM2, "\033[4;47f║ \033[4mIdle Time:\033[24m  \033[33m%d.%d%%\033[37m ║\033[K", idlePercent/1000, idlePercent%1000);
-    //     bwprintf(COM2, "\033[5;47f╚═════════════════════╝\0338");
-    //     // bwprintf(COM2, "\0337\033[4;17f\033[33m%d.%d%%\0338", idlePercent/1000, idlePercent%1000);
-    //     // bwprintf(COM2, "YELLOW: Idle percent %d\n\r", idlePercent);
-    // } else {
-    //     bwprintf(COM2, "\0337\033[1;47f\033[K");
-    //     bwprintf(COM2, "\033[2;47f\033[K");
-    //     bwprintf(COM2, "\033[3;47f\033[37m╔═════════════════════╗");
-    //     bwprintf(COM2, "\033[4;47f║ \033[4mIdle Time:\033[24m  \033[32m%d.%d%%\033[37m ║\033[K", idlePercent/1000, idlePercent%1000);
-    //     bwprintf(COM2, "\033[5;47f╚═════════════════════╝\0338");
-    //     // bwprintf(COM2, "\0337\033[4;17f\033[32m%d.%d%%\0338", idlePercent/1000, idlePercent%1000);
-    //     // bwprintf(COM2, " GREEN: Idle percent %d\n\r", idlePercent);
-    // }
-    bwprintf(COM2, "%d.%d\r", idleTime * 10 / 508, idleTime * 10 % 508);
-    // bwprintf(COM2, "%d\n\r", idleTime);
-}
-
 void Kernel::schedule() {
     activeTask = ready_queue.pop();
     // bwprintf(COM2, "Schedulding tid: %d to run with priority %d\n\r", activeTask->tid, activeTask->priority);

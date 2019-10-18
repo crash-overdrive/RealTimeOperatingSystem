@@ -37,7 +37,6 @@ class Kernel {
 
         // Draws the kernel's graphical user interface
         void drawGUI();
-        void displayIdle(unsigned int idleTime);
 
         // Sets the active task to the task descriptor of the next scheduled task.
         void schedule();

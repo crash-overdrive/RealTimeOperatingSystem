@@ -63,7 +63,7 @@ int RegisterAs(const char* name) {
     if (!strcmp(replyMessage, Constants::NameServer::SUCCESS_REPLY)) {         
         return 0;
     }
-    bwprintf(COM2, "RegisterAs Failure\n\r");
+    bwprintf(COM2, "RegisterAs Failure: %d\n\r", name);
     return -1;
 }
 
@@ -83,7 +83,7 @@ int WhoIs(const char* name) {
         memcpy(&tid, replyMessage, replyMessageSize);
         return tid;
     }
-    bwprintf(COM2, "WhoIs Failure\n\r");
+    bwprintf(COM2, "WhoIs Failure: %s\n\r", name);
     return -1;
 }
 

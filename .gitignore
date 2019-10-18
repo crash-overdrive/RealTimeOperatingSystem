@@ -5,5 +5,5 @@
 .nfs*
 .vscode
 *.out
-*/build/*.s
+*/build
 *.gdbinit

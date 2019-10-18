@@ -1,2 +1,0 @@
-README file for build folder. This is placed here because we need build folder to not be empty so that it is tracked by git. 
-Build folder is essential for running make.
