@@ -23,17 +23,20 @@ void manualTrainControl() {
         int inputSize = 0;
 
         // TODO: print "Enter a command: "
+        bwprintf(COM2, "Enter a command: ");
 
         do {
             
             ch = Getc(UART2_SERVER, COM2);
-            int x = Putc(UART2_SERVER, COM2, ch);
+            // int x = Putc(UART2_SERVER, COM2, ch);
+            bwprintf(COM2, "%c", ch);
             input[inputSize] = ch;
             ++inputSize;
 
             if (ch == Constants::ManualTrainControl::BACKSPACE && inputSize > 0) {
                 --inputSize;
-                Putc(UART2_SERVER, COM2, ch);
+                // Putc(UART2_SERVER, COM2, ch);
+                bwprintf(COM2, "%c", ch);
             }
             // TODO: support for backspace?
 
@@ -79,8 +82,10 @@ void manualTrainControl() {
                 ++temp;
             }
 
-            Putc(UART1_SERVER, COM1, trainSpeed);
-            Putc(UART1_SERVER, COM1, trainNumber);
+            bwprintf(COM2, "Setting train: %d to speed: %d\n\r", trainNumber, trainSpeed);
+
+            // Putc(uart1SendTid, uabwprintfrt1, trainSpeed);
+            // Putc(uart1SendTid, uart1, trainNumber);
             trainSpeeds[trainNumber] = trainSpeed;
 
         } 
@@ -105,14 +110,15 @@ void manualTrainControl() {
             }
 
             int trainSpeed = trainSpeeds[trainNumber];
-            Putc(UART1_SERVER, COM1, Constants::MarklinConsole::STOP_TRAIN);
-            Putc(UART1_SERVER, COM1, trainNumber);
+            // Putc(uart1SendTid, uart1, Constants::MarklinConsole::STOP_TRAIN);
+            // Putc(uart1SendTid, uart1, trainNumber);
             
-            Putc(UART1_SERVER, COM1, Constants::MarklinConsole::REVERSE_TRAIN);
-            Putc(UART1_SERVER, COM1, trainNumber);
+            // Putc(uart1SendTid, uart1, Constants::MarklinConsole::REVERSE_TRAIN);
+            // Putc(uart1SendTid, uart1, trainNumber);
 
-            Putc(UART1_SERVER, COM1, trainSpeed);
-            Putc(UART1_SERVER, COM1, trainNumber);
+            // Putc(uart1SendTid, uart1, trainSpeed);
+            // Putc(uart1SendTid, uart1, trainNumber);
+            bwprintf(COM2, "Reversing train: %d to speed: %d\n\r", trainNumber, trainSpeed);
 
         } 
         
@@ -144,13 +150,15 @@ void manualTrainControl() {
             switchDirection = switchDirectionToken[0];
 
             if (switchDirection == Constants::ManualTrainControl::STRAIGHT_SWITCH_INPUT) {
-                Putc(UART1_SERVER, COM1, Constants::MarklinConsole::STRAIGHT_SWITCH);
-                Putc(UART1_SERVER, COM1, switchNumber);
-                Putc(UART1_SERVER, COM1, Constants::MarklinConsole::SWITCH_OFF_TURNOUT);
+                // Putc(uart1SendTid, uart1, Constants::MarklinConsole::STRAIGHT_SWITCH);
+                // Putc(uart1SendTid, uart1, switchNumber);
+                // Putc(uart1SendTid, uart1, Constants::MarklinConsole::SWITCH_OFF_TURNOUT);
+                bwprintf(COM2, "Switching %d to %c\n\r", switchNumber, Constants::ManualTrainControl::STRAIGHT_SWITCH_INPUT);
             } else if (switchDirection == Constants::ManualTrainControl::CURVED_SWITCH_INPUT) {
-                Putc(UART1_SERVER, COM1, Constants::MarklinConsole::CURVED_SWITCH);
-                Putc(UART1_SERVER, COM1, switchNumber);
-                Putc(UART1_SERVER, COM1, Constants::MarklinConsole::SWITCH_OFF_TURNOUT);
+                // Putc(uart1SendTid, uart1, Constants::MarklinConsole::CURVED_SWITCH);
+                // Putc(uart1SendTid, uart1, switchNumber);
+                // Putc(uart1SendTid, uart1, Constants::MarklinConsole::SWITCH_OFF_TURNOUT);
+                bwprintf(COM2, "Switching %d to %c\n\r", switchNumber, Constants::ManualTrainControl::CURVED_SWITCH_INPUT);
             } else {
                 // TODO: Error out
             }
@@ -164,6 +172,7 @@ void manualTrainControl() {
         
         else {
             // TODO: Error
+            bwprintf(COM2, "Invalid Command\n\r");
         }
 
     }
