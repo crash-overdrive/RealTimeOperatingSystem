@@ -1,10 +1,10 @@
 #include "user/server/ClockServer.hpp"
 #include "user/client/ClockNotifier.hpp"
 #include "user/syscall/UserSyscall.hpp"
-#include "kern/TaskDescriptor.hpp"
 #include "data-structures/RingBuffer.hpp"
 #include "io/bwio.hpp"
-#include <string.h>
+#include "Constants.hpp"
+#include <cstring>
 
 #define FOREVER for(;;)
 
@@ -24,13 +24,6 @@ class ClockServerEntry {
         }
 };
 
-// INPUTS
-// "d" for delay
-// "u" for delay-until
-// "t" for time
-// "x" for tick
-// OUTPUTS
-// "a" for acknowledge to clockNotifier
 void clockServer() {
     // bwprintf(COM2, "Clock Server - Created Clock server\n\r");
 
@@ -38,10 +31,6 @@ void clockServer() {
 
     // TODO: use a priority queue for this
     DataStructures::RingBuffer<ClockServerEntry,Constants::NUM_TASKS> clockServerEntries;
-
-    // TODO: come up with a better solution for this
-    ClockServerEntry tempMemory[Constants::NUM_TASKS];
-    int tempCounter = -1;
     
     int numberOfTicksElapsed = 0;
     
@@ -69,12 +58,12 @@ void clockServer() {
                     int length = clockServerEntries.size();
                     // bwprintf(COM2, "Clock Server - Length of clockServerEntries is %d\n\r", length);
                     for (int i=0; i < length; ++i) {
-                        ClockServerEntry* clockServerEntry = clockServerEntries.pop();
+                        ClockServerEntry clockServerEntry = clockServerEntries.pop();
                         // bwprintf(COM2, "Clock Server - Popped off entry %d %d\n\r", clockServerEntry->tid, clockServerEntry->ticksToReleaseAt);
-                        if (clockServerEntry->ticksToReleaseAt <= numberOfTicksElapsed) {
+                        if (clockServerEntry.ticksToReleaseAt <= numberOfTicksElapsed) {
                             // bwprintf(COM2, "Clock Server - Releasing %d from sleep at ticks: %d\n\r", clockServerEntry->tid, numberOfTicksElapsed);
                             memcpy(replyMessage+1, &numberOfTicksElapsed, sizeof(numberOfTicksElapsed));
-                            Reply(clockServerEntry->tid, replyMessage, 5);
+                            Reply(clockServerEntry.tid, replyMessage, 5);
                         } else {
                             clockServerEntries.push(clockServerEntry);
                         }
@@ -101,9 +90,7 @@ void clockServer() {
 
                     // bwprintf(COM2, "Clock Server - Received delay request from %d for ticks: %d at ticks: %d, pushed to cses\n\r", sendTid, ticks, numberOfTicksElapsed);
 
-                    ++tempCounter;
-                    tempMemory[tempCounter] = ClockServerEntry(sendTid, ticks + numberOfTicksElapsed);
-                    clockServerEntries.push(&tempMemory[tempCounter]);
+                    clockServerEntries.push(ClockServerEntry(sendTid, ticks + numberOfTicksElapsed));
 
                     break;
                 }
@@ -116,9 +103,7 @@ void clockServer() {
                     
                     // bwprintf(COM2, "Clock Server - Received delay until request from %d for ticks: %d at ticks: %d, pushed to cses\n\r", sendTid, ticks, numberOfTicksElapsed);
                     
-                    ++tempCounter;
-                    tempMemory[tempCounter] = ClockServerEntry(sendTid, ticks);
-                    clockServerEntries.push(&tempMemory[tempCounter]);
+                    clockServerEntries.push(ClockServerEntry(sendTid, ticks));
 
                     break;
                 }

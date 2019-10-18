@@ -11,6 +11,7 @@ namespace Constants {
     const int RECEIVE_QUEUE_LENGTH = 32;
     const int REPLY_QUEUE_LENGTH = NUM_TASKS;
     const int TD_STACK_SIZE = 32768;
+
     namespace Server {
         const char ACK = 'A';
         const char ERR = 'E';
@@ -49,7 +50,7 @@ namespace Constants {
 
     namespace UART2RXServer {
         extern int TID;
-        const int BUFFER_SIZE = 16;
+        const int BUFFER_SIZE = 1024;
         const int MSG_SIZE = 1;
         const int RP_SIZE = 1;
     }

@@ -14,6 +14,7 @@ void Kernel::initialize() {
     // Setup comm
     uart.setConfig(COM1, BPF8, OFF, ON, OFF);
 	uart.setConfig(COM2, BPF8, OFF, OFF, OFF);
+    uart.enableRXInterrupt(COM2);
 
     // Draw GUI
     // drawGUI();
@@ -117,6 +118,7 @@ int* Kernel::activate() {
     if (activeTask == haltTD) {
         stopIdleTaskTimeStamp = *(int *)(TIMER3_BASE + VAL_OFFSET);
         timeSpentInIdle = (startIdleTaskTimeStamp - stopIdleTaskTimeStamp + timeSpentInIdle);
+        activeTask->returnValue = timeSpentInIdle;
     }
 
     return stackPointer;
@@ -131,15 +133,13 @@ void Kernel::handle(int* stackPointer)  {
     if (stackPointer[0]) {
         int vic1Status = *(int *)(VIC1_IRQ_BASE + IRQ_STATUS_OFFSET);
         int vic2Status = *(int *)(VIC2_IRQ_BASE + IRQ_STATUS_OFFSET);
-        int data;
+        // bwprintf(COM2, "Kernel - Hardware interrupt vic1Status %d vic2Status %d \n\r", vic1Status, vic2Status);
 
         if (vic1Status & TC1UI_MASK) {
 
             // bwprintf(COM2, "Kernel - The interrupt was a timer 1 underflow interrupt\n\r");
             *(int *)(TIMER1_BASE + CLR_OFFSET) = 1; // Clear the interrupt
 
-            // handle idle task reporting
-            displayIdle(timeSpentInIdle);
             timeSpentInIdle = 0;
 
             handleTimerInterrupt(1);
@@ -151,14 +151,15 @@ void Kernel::handle(int* stackPointer)  {
 
         } else if (vic1Status & UART1_RX_INTR1_MASK) {
 
-            // data = *(int *)(UART1_BASE + UART_DATA_OFFSET);
-            // handleInterrupt(data, uart1RXBlockedQueue);
+            // bwprintf(COM2, "Kernel - UART 1 receive interrupt\n\r");
+
             handleInterrupt(uart1RXBlockedQueue);
 
         } else if (vic1Status & UART2_RX_INTR2_MASK) {
 
-            // data = *(int *)(UART2_BASE + UART_DATA_OFFSET);
-            // handleInterrupt(data, uart2RXBlockedQueue);
+            // bwprintf(COM2, "Kernel - UART 2 receive interrupt\n\r");
+            uart.disableRXInterrupt(COM2);
+
             handleInterrupt(uart2RXBlockedQueue);
 
         }
@@ -258,6 +259,7 @@ void Kernel::handle(int* stackPointer)  {
             break;
 
         case Constants::UART2RX_BLOCKED:
+            // bwprintf(COM2, "Kernel - Putting %d on UART2RXBlockedQueue\n\r", activeTask->tid);
             uart2RXBlockedQueue.push(activeTask);
             break;
 

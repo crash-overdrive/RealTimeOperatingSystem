@@ -19,7 +19,7 @@ void uart1rxServer() {
 
     DataStructures::RingBuffer<char, Constants::UART1RXServer::BUFFER_SIZE> rbuf;
 
-    RegisterAs("UART1R SERVER");
+    RegisterAs("UART1RX SERVER");
 
     FOREVER {
         msglen = Receive(&tid, msg, Constants::UART1RXServer::MSG_SIZE);

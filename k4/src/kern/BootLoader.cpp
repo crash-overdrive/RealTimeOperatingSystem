@@ -21,6 +21,12 @@ namespace Constants {
     namespace ClockServer {
         int TID = -1;
     }
+    namespace UART1RXServer {
+        int TID = -1;
+    }
+    namespace UART2RXServer {
+        int TID = -1;
+    }
 }
 void bootLoader() {
     int tid;
@@ -47,7 +53,7 @@ void bootLoader() {
     Constants::ClockServer::TID = tid;
 
     tid = Create(2, uart2rxServer);
-    // bwprintf(COM2, "BootLoader - Created Clock Server with tid: %d\n\r", tid);
+    // bwprintf(COM2, "BootLoader - Created UART2RX Server with tid: %d\n\r", tid);
     Constants::UART2RXServer::TID = tid;
 
     // tid = Create(3, clockClient);

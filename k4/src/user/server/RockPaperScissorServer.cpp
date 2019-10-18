@@ -55,7 +55,7 @@ void rockPaperScissorServer() {
             Util::assert(false);
         }
         else if (msg[0] == 's') { //SIGN UP       
-            registrationList.push((int *)sendProcessTid);
+            registrationList.push(sendProcessTid);
             bwprintf(COM2, "Got sign up request from %d %d\n\r", sendProcessTid, registrationList.size());
 
             if (registrationList.size() >= 2 && gameOver) {
@@ -101,8 +101,8 @@ void rockPaperScissorServer() {
                 // handle popping off next elements which are ready and then get out of this loop
                 if (registrationList.size() >= 2) {
                     // release the next 2 if available
-                    tidPlayer1 = *registrationList.pop();
-                    tidPlayer2 = *registrationList.pop();
+                    tidPlayer1 = registrationList.pop();
+                    tidPlayer2 = registrationList.pop();
 
                     gameOver = false;
 

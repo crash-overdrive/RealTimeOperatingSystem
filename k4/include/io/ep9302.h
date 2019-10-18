@@ -32,5 +32,5 @@
 #define UART3_TX_INTR3_MASK 0x1<<28
 
 #define INT_UART1_MASK 0x1<<20 // 53
-#define INT_UART2_MASK 0x1<<21
-#define INT_UART3_MASK 0x1<<22
+#define INT_UART2_MASK 0x1<<22
+#define INT_UART3_MASK 0x1<<23

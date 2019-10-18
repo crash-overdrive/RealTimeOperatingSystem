@@ -188,6 +188,7 @@ int Kernel::handleAwaitEvent(int eventId) {
             break;
 
         case Constants::UART2RX_IRQ:
+            bwprintf(COM2, "Kernel Handler - Awaiting 2RX: %d\n\r", eventId);
             activeTask->taskState = Constants::UART2RX_BLOCKED;
             break;
 
@@ -209,7 +210,7 @@ void Kernel::handleTimerInterrupt(int timerValue) {
 }
 
 // void Kernel::handleInterrupt(int data, DataStructures::RingBuffer<TaskDescriptor, Constants::NUM_TASKS> &blockedQueue) {
-void Kernel::handleInterrupt(DataStructures::RingBuffer<TaskDescriptor, Constants::NUM_TASKS> &blockedQueue) {
+void Kernel::handleInterrupt(DataStructures::RingBuffer<TaskDescriptor *, Constants::NUM_TASKS> &blockedQueue) {
     while(!blockedQueue.empty()) {
         TaskDescriptor* task = blockedQueue.pop();
         task->taskState = Constants::READY;
@@ -269,13 +270,11 @@ void Kernel::handleUART1RXInterrupt(int data) {
     // }
 }
 
-TaskDescriptor *Kernel::lookupTD(int tid) {
-    for (int i = 0; i < Constants::NUM_TASKS; ++i) {
-        if (tasks[i].tid == tid) {
-            if (tasks[i].taskState == Constants::ZOMBIE) { return nullptr; }
-            return &tasks[i];
-        }
+TaskDescriptor* Kernel::lookupTD(int tid) {
+    if (tid < 0 || tid >= Constants::NUM_TASKS || tasks[tid].taskState == Constants::ZOMBIE) {
+        return nullptr;
     }
-    return nullptr;
+
+    return &tasks[tid];
 }
 
