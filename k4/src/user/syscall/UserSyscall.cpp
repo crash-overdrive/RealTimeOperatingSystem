@@ -140,7 +140,7 @@ int Delay(int tid, int ticks) {
 int DelayUntil(int tid, int ticks) {
     if (tid != Constants::ClockServer::TID) {
         return -1;
-    } 
+    }
     if (ticks < 0) {
         return -2;
     }
@@ -165,7 +165,14 @@ int DelayUntil(int tid, int ticks) {
 }
 
 int Getc(int tid, int uart) {
-    // TODO: implement me
+    char c;
+    int rplen;
+    if (tid != Constants::UART2RXServer::TID) {
+        return -1;
+    }
+
+    rplen = Send(tid, "", 1, &c, 1);
+    return c;
 }
 
 int Putc(int tid, int uart, char ch) {
