@@ -44,8 +44,13 @@ void uart2rxServer() {
             // bwprintf(COM2, "UART2RX Server - re-enabling interrupts\n\r");
         } else {
             // Request is coming from the kernel, so return a character from the read buffer
-            reply[0] = rbuf.pop();
-            Reply(tid, reply, 1);
+            if (rbuf.empty()) {
+                reply[0] = 0; // If you get 0 just try again Shash, in order for this to be properly blocking, we need a queue of people to repond to and I'm not sure we need it
+                Reply(tid, reply, 1);
+            } else {
+                reply[0] = rbuf.pop();
+                Reply(tid, reply, 1);
+            }
         }
     }
 }
