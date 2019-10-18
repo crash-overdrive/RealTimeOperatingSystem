@@ -1,4 +1,5 @@
 #include "Constants.hpp"
+#include "io/bwio.hpp"
 #include "user/client/ManualTrainControl.hpp"
 #include "user/syscall/UserSyscall.hpp"
 
@@ -7,15 +8,11 @@
 // TODO: take these out
 extern int Getc(int tid, int uart);
 extern int Putc(int tid, int uart, char ch);
-int uart1 = 0;
-int uart2 = 1;
 
 void manualTrainControl() {
     
-    int uart2SendTid = WhoIs("UART2 SEND");
-    int uart2GetTid = WhoIs("UART2 GET");
-    int uart1SendTid = WhoIs("UART1 SEND");
-    int uart1GetTid = WhoIs("UART1 GET");
+    int UART1_SERVER = WhoIs("UART1RX SERVER");
+    int UART2_SERVER = WhoIs("UART2RX");
 
     int trainSpeeds[Constants::ManualTrainControl::NUM_TRAINS] = {0};
     char switchOrientations[Constants::ManualTrainControl::NUM_SENSORS];
@@ -29,11 +26,15 @@ void manualTrainControl() {
 
         do {
             
-            ch = Getc(uart2GetTid, uart2);
-            int x = Putc(uart2SendTid, uart2, ch);
+            ch = Getc(UART2_SERVER, COM2);
+            int x = Putc(UART2_SERVER, COM2, ch);
             input[inputSize] = ch;
             ++inputSize;
 
+            if (ch == Constants::ManualTrainControl::BACKSPACE && inputSize > 0) {
+                --inputSize;
+                Putc(UART2_SERVER, COM2, ch);
+            }
             // TODO: support for backspace?
 
         } while(ch != Constants::ManualTrainControl::ENTER);
@@ -46,9 +47,15 @@ void manualTrainControl() {
             int trainSpeed = 0;
 
             char* trainNumberToken = strtok(nullptr, Constants::ManualTrainControl::DELIMITER);
-            // TODO: check if above is nullptr then error
+            if (trainNumberToken == nullptr) {
+                continue;
+            }
+
             int numberOfDigitsInTrainNumber = strspn(trainNumberToken, Constants::ManualTrainControl::DIGITS);
-            // TODO: check if above is 0 or > 2 then error
+            if (numberOfDigitsInTrainNumber == 0 || numberOfDigitsInTrainNumber > 2) {
+                continue;
+            }
+
             int temp = 0;
             while (temp < numberOfDigitsInTrainNumber) {
                 trainNumber = trainNumber*10 + trainNumberToken[temp] - '0';
@@ -57,17 +64,23 @@ void manualTrainControl() {
 
 
             char* trainSpeedToken = strtok(nullptr, Constants::ManualTrainControl::DELIMITER);
-            // TODO: check if above is nullptr then error
+            if (trainSpeedToken == nullptr) {
+                continue;
+            }
+            
             int numberOfDigitsInTrainSpeed = strspn(trainSpeedToken, Constants::ManualTrainControl::DIGITS);
-            // TODO: check if above is 0 or > 2 then error
+            if (numberOfDigitsInTrainSpeed == 0 || numberOfDigitsInTrainSpeed > 2) {
+                continue;
+            }
+
             temp = 0;
             while (temp < numberOfDigitsInTrainSpeed) {
                 trainSpeed = trainSpeed*10 + trainSpeedToken[temp] - '0';
                 ++temp;
             }
 
-            Putc(uart1SendTid, uart1, trainSpeed);
-            Putc(uart1SendTid, uart1, trainNumber);
+            Putc(UART1_SERVER, COM1, trainSpeed);
+            Putc(UART1_SERVER, COM1, trainNumber);
             trainSpeeds[trainNumber] = trainSpeed;
 
         } 
@@ -76,9 +89,15 @@ void manualTrainControl() {
             int trainNumber = 0;
 
             char* trainNumberToken = strtok(nullptr, Constants::ManualTrainControl::DELIMITER);
-            // TODO: check if above is nullptr then error
+            if (trainNumberToken == nullptr) {
+                continue;
+            }
+
             int numberOfDigitsInTrainNumber = strspn(trainNumberToken, Constants::ManualTrainControl::DIGITS);
-            // TODO: check if above is 0 or > 2 then error
+            if (numberOfDigitsInTrainNumber == 0 || numberOfDigitsInTrainNumber > 2) {
+                continue;
+            }
+
             int temp = 0;
             while (temp < numberOfDigitsInTrainNumber) {
                 trainNumber = trainNumber*10 + trainNumberToken[temp] - '0';
@@ -86,14 +105,14 @@ void manualTrainControl() {
             }
 
             int trainSpeed = trainSpeeds[trainNumber];
-            Putc(uart1SendTid, uart1, Constants::MarklinConsole::STOP_TRAIN);
-            Putc(uart1SendTid, uart1, trainNumber);
+            Putc(UART1_SERVER, COM1, Constants::MarklinConsole::STOP_TRAIN);
+            Putc(UART1_SERVER, COM1, trainNumber);
             
-            Putc(uart1SendTid, uart1, Constants::MarklinConsole::REVERSE_TRAIN);
-            Putc(uart1SendTid, uart1, trainNumber);
+            Putc(UART1_SERVER, COM1, Constants::MarklinConsole::REVERSE_TRAIN);
+            Putc(UART1_SERVER, COM1, trainNumber);
 
-            Putc(uart1SendTid, uart1, trainSpeed);
-            Putc(uart1SendTid, uart1, trainNumber);
+            Putc(UART1_SERVER, COM1, trainSpeed);
+            Putc(UART1_SERVER, COM1, trainNumber);
 
         } 
         
@@ -102,9 +121,15 @@ void manualTrainControl() {
             char switchDirection;
 
             char* switchNumberToken = strtok(nullptr, Constants::ManualTrainControl::DELIMITER);
-            // TODO: check if above is nullptr then error
+            if (switchNumberToken == nullptr) {
+                continue;
+            }
+
             int numberOfDigitsInSwitchNumber = strspn(switchNumberToken, Constants::ManualTrainControl::DIGITS);
-            // TODO: check if above is 0 or > 3 then error
+            if (numberOfDigitsInSwitchNumber == 0 || numberOfDigitsInSwitchNumber > 3) {
+                continue;
+            }
+
             int temp = 0;
             while (temp < numberOfDigitsInSwitchNumber) {
                 switchNumber = switchNumber*10 + switchNumberToken[temp] - '0';
@@ -112,17 +137,20 @@ void manualTrainControl() {
             }
 
             char* switchDirectionToken = strtok(nullptr, Constants::ManualTrainControl::DELIMITER);
-            // TODO: check if above is nullptr then error
+            if (switchDirectionToken == nullptr) {
+                continue;
+            }
+            
             switchDirection = switchDirectionToken[0];
 
             if (switchDirection == Constants::ManualTrainControl::STRAIGHT_SWITCH_INPUT) {
-                Putc(uart1SendTid, uart1, Constants::MarklinConsole::STRAIGHT_SWITCH);
-                Putc(uart1SendTid, uart1, switchNumber);
-                Putc(uart1SendTid, uart1, Constants::MarklinConsole::SWITCH_OFF_TURNOUT);
+                Putc(UART1_SERVER, COM1, Constants::MarklinConsole::STRAIGHT_SWITCH);
+                Putc(UART1_SERVER, COM1, switchNumber);
+                Putc(UART1_SERVER, COM1, Constants::MarklinConsole::SWITCH_OFF_TURNOUT);
             } else if (switchDirection == Constants::ManualTrainControl::CURVED_SWITCH_INPUT) {
-                Putc(uart1SendTid, uart1, Constants::MarklinConsole::CURVED_SWITCH);
-                Putc(uart1SendTid, uart1, switchNumber);
-                Putc(uart1SendTid, uart1, Constants::MarklinConsole::SWITCH_OFF_TURNOUT);
+                Putc(UART1_SERVER, COM1, Constants::MarklinConsole::CURVED_SWITCH);
+                Putc(UART1_SERVER, COM1, switchNumber);
+                Putc(UART1_SERVER, COM1, Constants::MarklinConsole::SWITCH_OFF_TURNOUT);
             } else {
                 // TODO: Error out
             }
@@ -130,7 +158,7 @@ void manualTrainControl() {
 
         } 
         
-        else if (!memcmp(commandToken, "q", 1) && inputSize == 1) {
+        else if (!memcmp(commandToken, "q", 1) && inputSize == 2) {
             Exit();
         }
         
