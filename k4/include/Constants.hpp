@@ -22,7 +22,11 @@ namespace Constants {
         const char DIGITS[] = "1234567890";
         const char STRAIGHT_SWITCH_INPUT = 'S';
         const char CURVED_SWITCH_INPUT = 'C';
-        
+    }
+
+    namespace SensorData {
+        const int NUMBER_OF_SENSOR_BANKS = 10;
+        const int SENSOR_HISTORY_SIZE = 10;
     }
 
     namespace MarklinConsole {
@@ -31,7 +35,7 @@ namespace Constants {
         const char SWITCH_OFF_TURNOUT = (char)32;
         const char STRAIGHT_SWITCH = (char)33;
         const char CURVED_SWITCH = (char)34;
-        const char START = (char)96;
+        const char GO = (char)96;
         const char STOP = (char)97;
         const char REQUEST_5_SENSOR_DATA = (char)133;
         const char SET_RESET_ON_FOR_SENSORS = (char)192;
