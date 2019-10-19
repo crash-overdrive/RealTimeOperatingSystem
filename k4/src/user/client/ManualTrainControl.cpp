@@ -28,7 +28,6 @@ void manualTrainControl() {
         do {
             
             ch = Getc(UART2_SERVER, COM2);
-            bwprintf(COM2, "Got some input: %d\n\r", ch);
             // int x = Putc(UART2_SERVER, COM2, ch);
             bwprintf(COM2, "%c", ch);
             input[inputSize] = ch;
