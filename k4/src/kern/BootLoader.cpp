@@ -61,8 +61,8 @@ void bootLoader() {
     Constants::ClockServer::TID = tid;
 
     tid = Create(2, uart1rxServer);
-    // bwprintf(COM2, "BootLoader - Created UART2RX Server with tid: %d\n\r", tid);
-    Constants::UART2RXServer::TID = tid;
+    // bwprintf(COM2, "BootLoader - Created UART1RX Server with tid: %d\n\r", tid);
+    Constants::UART1RXServer::TID = tid;
     
     tid = Create(4, uart2rxServer);
     // bwprintf(COM2, "BootLoader - Created UART2RX Server with tid: %d\n\r", tid);
