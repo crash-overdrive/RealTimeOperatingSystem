@@ -188,7 +188,6 @@ int Kernel::handleAwaitEvent(int eventId) {
             break;
 
         case Constants::UART2RX_IRQ:
-            bwprintf(COM2, "Kernel Handler - Awaiting 2RX: %d\n\r", eventId);
             activeTask->taskState = Constants::UART2RX_BLOCKED;
             break;
 
