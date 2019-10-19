@@ -111,14 +111,14 @@ void clockServer() {
 
             default:
                 {
-                    bwprintf(COM2, "Clock Server - Received invalid SEND: %d, SendMessageSize: %d\n\r", sendMessage[0], sendMessageSize);
+                    bwprintf(COM2, "Clock Server - Received invalid SEND: %d from : %d, SendMessageSize: %d\n\r", sendMessage[0], sendTid, sendMessageSize);
                     
                     break;
                 }
                     
             }
         } else {
-            bwprintf(COM2, "Clock Server - Received invalid send, size: %d\n\r", sendMessageSize);
+            bwprintf(COM2, "Clock Server - Received invalid send from: %d, size: %d\n\r", sendTid, sendMessageSize);
         }
     }
 }
