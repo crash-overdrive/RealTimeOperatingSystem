@@ -187,8 +187,16 @@ int Kernel::handleAwaitEvent(int eventId) {
             activeTask->taskState = Constants::UART1RX_BLOCKED;
             break;
 
+        case Constants::UART1TX_IRQ:
+            activeTask->taskState = Constants::UART1TX_BLOCKED;
+            break;
+
         case Constants::UART2RX_IRQ:
             activeTask->taskState = Constants::UART2RX_BLOCKED;
+            break;
+
+        case Constants::UART2TX_IRQ:
+            activeTask->taskState = Constants::UART2TX_BLOCKED;
             break;
 
         default:

@@ -123,26 +123,25 @@ void Kernel::handle(int* stackPointer)  {
         } else if (vic1Status & UART1_RX_INTR1_MASK) {
 
             // bwprintf(COM2, "Kernel - UART 1 receive interrupt\n\r");
-
+            uart1.disableRXInterrupt();
             handleInterrupt(uart1RXBlockedQueue);
 
         } else if (vic1Status & UART1_TX_INTR1_MASK) {
 
             // bwprintf(COM2, "Kernel - UART 1 transmit interrupt\n\r");
-
+            uart1.disableTXInterrupt();
             handleInterrupt(uart1TXBlockedQueue);
 
         } else if (vic1Status & UART2_RX_INTR2_MASK) {
 
             // bwprintf(COM2, "Kernel - UART 2 receive interrupt\n\r");
             uart2.disableRXInterrupt();
-
             handleInterrupt(uart2RXBlockedQueue);
 
         } else if (vic1Status & UART2_TX_INTR2_MASK) {
 
             // bwprintf(COM2, "Kernel - UART 2 transmit interrupt\n\r");
-
+            uart2.disableTXInterrupt();
             handleInterrupt(uart2TXBlockedQueue);
 
         } else if (vic2Status & TC3UI_MASK) {
