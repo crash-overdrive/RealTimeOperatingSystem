@@ -9,7 +9,7 @@
 #define FOREVER for(;;)
 
 void uart2txNotifier() {
-    // bwprintf(COM2, "UART2TX Notifier - entered server\n\r");
+    bwprintf(COM2, "UART2TX Notifier - entered server\n\r");
 
     char msg[Constants::UART2TXServer::MSG_SIZE];
     char reply[Constants::UART2TXServer::RP_SIZE];
@@ -24,7 +24,7 @@ void uart2txNotifier() {
         result = AwaitEvent(Constants::UART2TX_IRQ);
         // bwprintf(COM2, "UART1R Notifier - exited AwaitEvent\n\r");
 
-        // bwprintf(COM2, "SENDING TO UART2TX SERVER\n\r");
+        bwprintf(COM2, "SENDING TO UART2TX SERVER\n\r");
 
         // This should not be reading this, whois should identify what the correct server is at the top of the notifier
         rplen = Send(uart2tx_tid, msg, 1, reply, 1);

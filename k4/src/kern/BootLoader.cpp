@@ -72,7 +72,7 @@ void bootLoader() {
     // bwprintf(COM2, "BootLoader - Created UART2TX Server with tid: %d\n\r", tid);
     Constants::UART2TXServer::TID = tid;
 
-    tid = Create(3, manualTrainControl);
+    tid = Create(6, manualTrainControl);
 
     // tid = Create(3, clockClient);
     // tid = Create(4, clockClient);
