@@ -2,13 +2,22 @@
 #define UART_HPP
 
 class UART {
-    public:
-        int setConfig(int channel, int wordLength, int fifoEnable, int stop, int parity);
-        void enableRXInterrupt(int channel);
-        void disableRXInterrupt(int channel);
-        void enableTXInterrupt(int channel);
-        void disableTXInterrupt(int channel);
-        char getc();
+    int base;
+
+public:
+    UART(int base);
+
+    int setConfig(int wordLength, int fifoEnable, int stop, int parity);
+    void enableRXInterrupt();
+    void disableRXInterrupt();
+    void enableTXInterrupt();
+    void disableTXInterrupt();
+    bool isRXEmpty();
+    bool isRXFull();
+    bool isTXEmpty();
+    bool isTXFull();
+    char getc();
+    void putc(char c);
 };
 
 #endif
