@@ -55,22 +55,22 @@ void UART::disableTXInterrupt() {
 }
 
 bool UART::isRXEmpty() {
-    volatile bool empty = *(int *)(UART2_BASE + UART_FLAG_OFFSET) & RXFE_MASK;
+    volatile bool empty = *(int *)(base + UART_FLAG_OFFSET) & RXFE_MASK;
     return empty;
 }
 
 bool UART::isRXFull() {
-    volatile bool full = *(int *)(UART2_BASE + UART_FLAG_OFFSET) & RXFF_MASK;
+    volatile bool full = *(int *)(base + UART_FLAG_OFFSET) & RXFF_MASK;
     return full;
 }
 
 bool UART::isTXEmpty() {
-    volatile bool empty = *(int *)(UART2_BASE + UART_FLAG_OFFSET) & TXFE_MASK;
+    volatile bool empty = *(int *)(base + UART_FLAG_OFFSET) & TXFE_MASK;
     return empty;
 }
 
 bool UART::isTXFull() {
-    volatile bool full = *(int *)(UART2_BASE + UART_FLAG_OFFSET) & TXFF_MASK;
+    volatile bool full = *(int *)(base + UART_FLAG_OFFSET) & TXFF_MASK;
     return full;
 }
 

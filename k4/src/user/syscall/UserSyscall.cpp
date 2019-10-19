@@ -1,5 +1,6 @@
 #include "Constants.hpp"
 #include "io/bwio.hpp"
+#include "io/ts7200.h"
 #include "kern/Message.hpp"
 #include "user/syscall/UserSyscall.hpp"
 #include "user/syscall/Syscall.hpp"
@@ -167,14 +168,32 @@ int DelayUntil(int tid, int ticks) {
 int Getc(int tid, int uart) {
     char c;
     int rplen;
-    if (tid != Constants::UART2RXServer::TID) {
+
+    // If we don't get a valid uart or the tid doesn't match a valid server, return error
+    if (uart != UART1 && uart != UART2 ||
+        uart == UART1 && tid != Constants::UART1RXServer::TID ||
+        uart == UART2 && tid != Constants::UART2RXServer::TID) {
         return -1;
     }
 
     rplen = Send(tid, "", 1, &c, 1);
+
     return c;
 }
 
 int Putc(int tid, int uart, char ch) {
-    // TODO: implement me
+    int rplen;
+    char reply;
+
+    // If we don't get a valid uart or the tid doesn't match a valid server, return error
+    if (uart != UART1 && uart != UART2 ||
+        uart == UART1 && tid != Constants::UART1TXServer::TID ||
+        uart == UART2 && tid != Constants::UART2TXServer::TID) {
+        return -1;
+    }
+
+    rplen = Send(tid, &ch, 1, &reply, 1);
+    // TODO: error check with reply?
+
+    return 0;
 }

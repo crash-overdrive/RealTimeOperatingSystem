@@ -19,7 +19,7 @@ void uart2rxServer() {
     char reply[Constants::UART2RXServer::RP_SIZE];
     UART uart2 = UART(UART2_BASE);
     DataStructures::RingBuffer<char, Constants::UART2RXServer::BUFFER_SIZE> rbuf;
-    DataStructures::RingBuffer<int, Constants::UART2RXServer::BUFFER_SIZE> waitbuf;
+    DataStructures::RingBuffer<int, Constants::NUM_TASKS> waitbuf;
 
     RegisterAs("UART2RX");
 
@@ -31,13 +31,14 @@ void uart2rxServer() {
         msglen = Receive(&tid, msg, Constants::UART2RXServer::MSG_SIZE);
 
         if (tid == notifierTid) {
+            // We've been notified that uart2 is ready to be read, so read everything into buffer
             while (!uart2.isRXEmpty()) {
                 rbuf.push(uart2.getc());
             }
-
             reply[0] = Constants::Server::ACK;
             Reply(tid, reply, 1);
-            if (!waitbuf.empty()) {
+
+            while (!waitbuf.empty() && !rbuf.empty()) {
                 tid = waitbuf.pop();
                 reply[0] = rbuf.pop();
                 Reply(tid, reply, 1);
@@ -48,8 +49,6 @@ void uart2rxServer() {
             // Request is coming from the kernel, so return a character from the read buffer
             if (rbuf.empty()) {
                 waitbuf.push(tid);
-                // reply[0] = 0; // If you get 0 just try again Shash, in order for this to be properly blocking, we need a queue of people to repond to and I'm not sure we need it
-                // Reply(tid, reply, 1);
             } else {
                 reply[0] = rbuf.pop();
                 Reply(tid, reply, 1);

@@ -72,12 +72,26 @@ namespace Constants {
 
     namespace UART1RXServer {
         extern int TID;
-        const int BUFFER_SIZE = 16;
+        const int BUFFER_SIZE = 1024;
+        const int MSG_SIZE = 1;
+        const int RP_SIZE = 1;
+    }
+
+    namespace UART1TXServer {
+        extern int TID;
+        const int BUFFER_SIZE = 1024;
         const int MSG_SIZE = 1;
         const int RP_SIZE = 1;
     }
 
     namespace UART2RXServer {
+        extern int TID;
+        const int BUFFER_SIZE = 1024;
+        const int MSG_SIZE = 1;
+        const int RP_SIZE = 1;
+    }
+
+    namespace UART2TXServer {
         extern int TID;
         const int BUFFER_SIZE = 1024;
         const int MSG_SIZE = 1;
@@ -99,8 +113,11 @@ namespace Constants {
         ZOMBIE,
         TIMER_BLOCKED,
         UART1RX_BLOCKED,
-        UART2RX_BLOCKED
+        UART1TX_BLOCKED,
+        UART2RX_BLOCKED,
+        UART2TX_BLOCKED,
     };
+
     enum SWI {
         CREATE = 2,
         MY_TID,
@@ -113,6 +130,7 @@ namespace Constants {
         AWAIT_EVENT,
         HALT
     };
+
     enum EVENTS {
         TIMER_INTERRUPT,
         UART1RX_IRQ,

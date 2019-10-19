@@ -31,13 +31,14 @@ void uart1rxServer() {
         msglen = Receive(&tid, msg, Constants::UART1RXServer::MSG_SIZE);
 
         if (tid == notifierTid) {
+            // We've been notified that uart1 is ready to be read, so read everything into buffer
             while (!uart1.isRXEmpty()) {
                 rbuf.push(uart1.getc());
             }
-
             reply[0] = Constants::Server::ACK;
             Reply(tid, reply, 1);
-            if (!waitbuf.empty()) {
+
+            while (!waitbuf.empty() && !rbuf.empty()) {
                 tid = waitbuf.pop();
                 reply[0] = rbuf.pop();
                 Reply(tid, reply, 1);

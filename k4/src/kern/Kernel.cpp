@@ -16,7 +16,9 @@ void Kernel::initialize() {
     // Setup comm
     uart1.setConfig(BPF8, OFF, ON, OFF);
 	uart2.setConfig(BPF8, OFF, OFF, OFF);
+    uart1.enableRXInterrupt();
     uart2.enableRXInterrupt();
+    uart2.enableTXInterrupt();
 
     // Draw GUI
     // drawGUI();
@@ -124,6 +126,12 @@ void Kernel::handle(int* stackPointer)  {
 
             handleInterrupt(uart1RXBlockedQueue);
 
+        } else if (vic1Status & UART1_TX_INTR1_MASK) {
+
+            // bwprintf(COM2, "Kernel - UART 1 transmit interrupt\n\r");
+
+            handleInterrupt(uart1TXBlockedQueue);
+
         } else if (vic1Status & UART2_RX_INTR2_MASK) {
 
             // bwprintf(COM2, "Kernel - UART 2 receive interrupt\n\r");
@@ -131,9 +139,13 @@ void Kernel::handle(int* stackPointer)  {
 
             handleInterrupt(uart2RXBlockedQueue);
 
-        }
+        } else if (vic1Status & UART2_TX_INTR2_MASK) {
 
-        else if (vic2Status & TC3UI_MASK) {
+            // bwprintf(COM2, "Kernel - UART 2 transmit interrupt\n\r");
+
+            handleInterrupt(uart2TXBlockedQueue);
+
+        } else if (vic2Status & TC3UI_MASK) {
 
             // bwprintf(COM2, "Kernel - The interrupt was a timer 3 overflow interrupt!\n\r");
             *(int *)(TIMER3_BASE + CLR_OFFSET) = 1;
@@ -227,9 +239,17 @@ void Kernel::handle(int* stackPointer)  {
             uart1RXBlockedQueue.push(activeTask);
             break;
 
+        case Constants::UART1TX_BLOCKED:
+            uart1TXBlockedQueue.push(activeTask);
+            break;
+
         case Constants::UART2RX_BLOCKED:
             // bwprintf(COM2, "Kernel - Putting %d on UART2RXBlockedQueue\n\r", activeTask->tid);
             uart2RXBlockedQueue.push(activeTask);
+            break;
+
+        case Constants::UART2TX_BLOCKED:
+            uart2TXBlockedQueue.push(activeTask);
             break;
 
         default:

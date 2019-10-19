@@ -27,6 +27,9 @@
 #define COM1	0
 #define COM2	1
 
+#define UART1	0
+#define UART2	1
+
 #define BPF8	3
 #define BPF7	2
 #define BPF6	1
