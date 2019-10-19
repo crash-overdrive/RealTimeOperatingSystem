@@ -1,21 +1,20 @@
 #include "io/UART.hpp"
 #include "io/ts7200.h"
 
-int UART::setConfig(int channel, int wordLength, int fifoEnable, int stop, int parity) {
+UART::UART(int base) : base{base} {}
+
+int UART::setConfig(int wordLength, int fifoEnable, int stop, int parity) {
     int *high, *mid, *low, hmask;
     hmask = 0;
-    switch(channel) {
-    case COM1:
-        high = (int *)(UART1_BASE + UART_LCRH_OFFSET);
-        mid = (int *)(UART1_BASE + UART_LCRM_OFFSET);
-        low = (int *)(UART1_BASE + UART_LCRL_OFFSET);
+    high = (int *)(base + UART_LCRH_OFFSET);
+    mid = (int *)(base + UART_LCRM_OFFSET);
+    low = (int *)(base + UART_LCRL_OFFSET);
+    switch(base) {
+    case UART1_BASE:
         *mid = 0x0;
         *low = 0xBF;
         break;
-    case COM2:
-        high = (int *)(UART2_BASE + UART_LCRH_OFFSET);
-        mid = (int *)(UART2_BASE + UART_LCRM_OFFSET);
-        low = (int *)(UART2_BASE + UART_LCRL_OFFSET);
+    case UART2_BASE:
         *mid = 0x0;
         *low = 0x3;
         break;
@@ -31,50 +30,56 @@ int UART::setConfig(int channel, int wordLength, int fifoEnable, int stop, int p
     return 0;
 };
 
-void UART::enableRXInterrupt(int channel) {
+void UART::enableRXInterrupt() {
     volatile int flags;
-    switch(channel) {
-        case COM1:
-            flags = *(int *)(UART1_BASE + UART_CTRL_OFFSET);
-            *(int *)(UART1_BASE + UART_CTRL_OFFSET) = flags | RIEN_MASK;
-            break;
-        case COM2:
-            flags = *(int *)(UART2_BASE + UART_CTRL_OFFSET);
-            *(int *)(UART2_BASE + UART_CTRL_OFFSET) = flags | RIEN_MASK;
-            break;
-    }
+    flags = *(int *)(base + UART_CTRL_OFFSET);
+    *(int *)(base + UART_CTRL_OFFSET) = flags | RIEN_MASK;
 }
 
-void UART::disableRXInterrupt(int channel) {
+void UART::disableRXInterrupt() {
     volatile int flags;
-    switch(channel) {
-        case COM1:
-            flags = *(int *)(UART1_BASE + UART_CTRL_OFFSET);
-            *(int *)(UART1_BASE + UART_CTRL_OFFSET) = flags & ~RIEN_MASK;
-            break;
-        case COM2:
-            flags = *(int *)(UART2_BASE + UART_CTRL_OFFSET);
-            *(int *)(UART2_BASE + UART_CTRL_OFFSET) = flags & ~RIEN_MASK;
-            break;
-    }
+    flags = *(int *)(base + UART_CTRL_OFFSET);
+    *(int *)(base + UART_CTRL_OFFSET) = flags & ~RIEN_MASK;
 }
 
-void UART::enableTXInterrupt(int channel) {
+void UART::enableTXInterrupt() {
     volatile int flags;
-    switch(channel) {
-        case COM1:
-            flags = *(int *)(UART1_BASE + UART_CTRL_OFFSET);
-            *(int *)(UART1_BASE + UART_CTRL_OFFSET) = flags | TIEN_MASK;
-            break;
-        case COM2:
-            flags = *(int *)(UART2_BASE + UART_CTRL_OFFSET);
-            *(int *)(UART2_BASE + UART_CTRL_OFFSET) = flags | TIEN_MASK;
-            break;
-    }
+    flags = *(int *)(base + UART_CTRL_OFFSET);
+    *(int *)(base + UART_CTRL_OFFSET) = flags | TIEN_MASK;
+}
+
+void UART::disableTXInterrupt() {
+    volatile int flags;
+    flags = *(int *)(base + UART_CTRL_OFFSET);
+    *(int *)(base + UART_CTRL_OFFSET) = flags & ~TIEN_MASK;
+}
+
+bool UART::isRXEmpty() {
+    volatile bool empty = *(int *)(UART2_BASE + UART_FLAG_OFFSET) & RXFE_MASK;
+    return empty;
+}
+
+bool UART::isRXFull() {
+    volatile bool full = *(int *)(UART2_BASE + UART_FLAG_OFFSET) & RXFF_MASK;
+    return full;
+}
+
+bool UART::isTXEmpty() {
+    volatile bool empty = *(int *)(UART2_BASE + UART_FLAG_OFFSET) & TXFE_MASK;
+    return empty;
+}
+
+bool UART::isTXFull() {
+    volatile bool full = *(int *)(UART2_BASE + UART_FLAG_OFFSET) & TXFF_MASK;
+    return full;
 }
 
 char UART::getc() {
     volatile char c;
-    c = (char)(*(volatile int *)(UART2_BASE + UART_DATA_OFFSET) & DATA_MASK);
+    c = (char)(*(volatile int *)(base + UART_DATA_OFFSET) & DATA_MASK);
     return c;
+}
+
+void UART::putc(char c) {
+    *(volatile int *)(base + UART_DATA_OFFSET) = c;
 }

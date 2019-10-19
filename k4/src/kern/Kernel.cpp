@@ -10,11 +10,13 @@
 
 extern "C" int* kernelExit(int stackPointer);
 
+Kernel::Kernel(): uart1(UART1_BASE), uart2(UART2_BASE) {}
+
 void Kernel::initialize() {
     // Setup comm
-    uart.setConfig(COM1, BPF8, OFF, ON, OFF);
-	uart.setConfig(COM2, BPF8, OFF, OFF, OFF);
-    uart.enableRXInterrupt(COM2);
+    uart1.setConfig(BPF8, OFF, ON, OFF);
+	uart2.setConfig(BPF8, OFF, OFF, OFF);
+    uart2.enableRXInterrupt();
 
     // Draw GUI
     // drawGUI();
@@ -125,7 +127,7 @@ void Kernel::handle(int* stackPointer)  {
         } else if (vic1Status & UART2_RX_INTR2_MASK) {
 
             // bwprintf(COM2, "Kernel - UART 2 receive interrupt\n\r");
-            uart.disableRXInterrupt(COM2);
+            uart2.disableRXInterrupt();
 
             handleInterrupt(uart2RXBlockedQueue);
 

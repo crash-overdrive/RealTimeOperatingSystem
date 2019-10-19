@@ -14,7 +14,8 @@ void uart2rxNotifier() {
     char msg[Constants::UART2RXServer::MSG_SIZE];
     char reply[Constants::UART2RXServer::RP_SIZE];
     int rplen, result, uart2rx_tid;
-    UART uart2;
+    UART uart2 = UART(UART2_BASE);
+    // TODO(sgaweda): add a queue to store queued tasks
 
     uart2rx_tid = WhoIs("UART2RX");
 

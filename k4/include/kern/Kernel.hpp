@@ -31,7 +31,8 @@ class Kernel {
         TaskDescriptor tasks[Constants::NUM_TASKS];
         // DataStructures::RingBuffer<TaskDescriptor, Constants::NUM_TASKS> tasks2;
 
-        UART uart;
+        UART uart1;
+        UART uart2;
 
         TaskDescriptor* activeTask = nullptr;
 
@@ -79,6 +80,7 @@ class Kernel {
         TaskDescriptor* lookupTD(int tid);
 
     public:
+        Kernel();
 
         void run();
 

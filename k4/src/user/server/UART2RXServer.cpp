@@ -17,7 +17,8 @@ void uart2rxServer() {
     char msg[Constants::UART2RXServer::MSG_SIZE];
     int msglen;
     char reply[Constants::UART2RXServer::RP_SIZE];
-    UART uart2;
+    UART uart2 = UART(UART2_BASE);
+    // TODO(sgaweda): Add queue of tasks waiting for characters
 
     RegisterAs("UART2RX");
 
@@ -30,17 +31,13 @@ void uart2rxServer() {
         msglen = Receive(&tid, msg, Constants::UART2RXServer::MSG_SIZE);
 
         if (tid == notifierTid) {
-            // bwprintf(COM2, "UART2RX Server - received a message from notifier\n\r");
-            volatile int rxfe = *(int *)(UART2_BASE + UART_FLAG_OFFSET) & RXFE_MASK;
-
-            while (!rxfe) {
+            while (!uart2.isRXEmpty()) {
                 rbuf.push(uart2.getc());
-                rxfe = *(int *)(UART2_BASE + UART_FLAG_OFFSET) & RXFE_MASK;
             }
 
             reply[0] = Constants::Server::ACK;
             Reply(tid, reply, 1);
-            uart2.enableRXInterrupt(COM2);
+            uart2.enableRXInterrupt();
             // bwprintf(COM2, "UART2RX Server - re-enabling interrupts\n\r");
         } else {
             // Request is coming from the kernel, so return a character from the read buffer
