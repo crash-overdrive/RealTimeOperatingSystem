@@ -218,57 +218,6 @@ void Kernel::handleInterrupt(DataStructures::RingBuffer<TaskDescriptor *, Consta
     }
 }
 
-void Kernel::handleUART1RXInterrupt(int data) {
-    while(!uart1RXBlockedQueue.empty()) {
-        TaskDescriptor* task = uart1RXBlockedQueue.pop();
-        task->taskState = Constants::READY;
-        ready_queue.push(task, task->priority);
-    }
-    // Puts a character on the provided channel, returning -2 if buffer is full
-    // int plputc(int channel, char c) {
-    //     int *flags, *data;
-    //     switch(channel) {
-    //     case COM1:
-    //         flags = (int *)(UART1_BASE + UART_FLAG_OFFSET);
-    //         data = (int *)(UART1_BASE + UART_DATA_OFFSET);
-    //         break;
-    //     case COM2:
-    //         flags = (int *)(UART2_BASE + UART_FLAG_OFFSET);
-    //         data = (int *)(UART2_BASE + UART_DATA_OFFSET);
-    //         break;
-    //     default:
-    //         return -1;
-    //         break;
-    //     }
-    //     if (*flags & TXFF_MASK) { return -2; }
-    //     *data = c;
-    //     return 0;
-    // }
-
-    // // Gets a character from the provided channel, returning -2 if buffer is empty
-    // int plgetc(int channel) {
-    //     int *flags, *data;
-    //     unsigned char c;
-
-    //     switch( channel ) {
-    //     case COM1:
-    //         flags = (int *)( UART1_BASE + UART_FLAG_OFFSET );
-    //         data = (int *)( UART1_BASE + UART_DATA_OFFSET );
-    //         break;
-    //     case COM2:
-    //         flags = (int *)( UART2_BASE + UART_FLAG_OFFSET );
-    //         data = (int *)( UART2_BASE + UART_DATA_OFFSET );
-    //         break;
-    //     default:
-    //         return -1;
-    //         break;
-    //     }
-    //     if (*flags & RXFE_MASK) { return -2; }
-    //     c = *data;
-    //     return c;
-    // }
-}
-
 TaskDescriptor* Kernel::lookupTD(int tid) {
     if (tid < 0 || tid >= Constants::NUM_TASKS || tasks[tid].taskState == Constants::ZOMBIE) {
         return nullptr;

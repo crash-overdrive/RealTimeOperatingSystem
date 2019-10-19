@@ -11,6 +11,7 @@
 #include "user/server/ClockServer.hpp"
 #include "user/server/UART1RXServer.hpp"
 #include "user/server/UART2RXServer.hpp"
+#include "user/server/UART2TXServer.hpp"
 #include "io/bwio.hpp"
 #include "Constants.hpp"
 #include "string.h"
@@ -25,7 +26,13 @@ namespace Constants {
     namespace UART1RXServer {
         int TID = -1;
     }
+    namespace UART1TXServer {
+        int TID = -1;
+    }
     namespace UART2RXServer {
+        int TID = -1;
+    }
+    namespace UART2TXServer {
         int TID = -1;
     }
 }
@@ -55,6 +62,10 @@ void bootLoader() {
 
     tid = Create(2, uart2rxServer);
     // bwprintf(COM2, "BootLoader - Created UART2RX Server with tid: %d\n\r", tid);
+    Constants::UART2RXServer::TID = tid;
+
+    tid = Create(2, uart2txServer);
+    // bwprintf(COM2, "BootLoader - Created UART2TX Server with tid: %d\n\r", tid);
     Constants::UART2RXServer::TID = tid;
 
     tid = Create(3, manualTrainControl);
