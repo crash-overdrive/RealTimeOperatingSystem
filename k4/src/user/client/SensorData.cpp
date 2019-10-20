@@ -1,6 +1,7 @@
 #include "Constants.hpp"
 #include "data-structures/RingBuffer.hpp"
 #include "io/bwio.hpp"
+#include "io/io.hpp"
 #include "io/ts7200.h"
 #include "user/client/SensorData.hpp"
 #include "user/syscall/UserSyscall.hpp"
@@ -104,10 +105,7 @@ void sensorData() {
 
         while(!sensorHistory.empty()) {
             Sensor sensor = sensorHistory.pop();
-            Putc(UART2_TX_SERVER, UART2, sensor.sensorBank);
-            Putc(UART2_TX_SERVER, UART2, (char)('0' + sensor.sensorNumber));
-            Putc(UART2_TX_SERVER, UART2, '\n');
-            Putc(UART2_TX_SERVER, UART2, '\r');
+            printf(UART2_TX_SERVER, UART2, "%c %d\n\r", sensor.sensorBank, sensor.sensorNumber);
         }
     }
 }

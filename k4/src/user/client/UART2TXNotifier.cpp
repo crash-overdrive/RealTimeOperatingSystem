@@ -9,7 +9,7 @@
 #define FOREVER for(;;)
 
 void uart2txNotifier() {
-    bwprintf(COM2, "UART2TX Notifier - entered server\n\r");
+    // bwprintf(COM2, "UART2TX Notifier - entered server\n\r");
 
     char msg[Constants::UART2TXServer::MSG_SIZE];
     msg[0] = Constants::Server::ACK;

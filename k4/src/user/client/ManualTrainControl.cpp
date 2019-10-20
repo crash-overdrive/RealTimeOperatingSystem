@@ -1,5 +1,6 @@
 #include "Constants.hpp"
 #include "io/bwio.hpp"
+#include "io/io.hpp"
 #include "io/ts7200.h"
 #include "user/client/ManualTrainControl.hpp"
 #include "user/syscall/UserSyscall.hpp"
@@ -22,34 +23,25 @@ void manualTrainControl() {
         char input[Constants::ManualTrainControl::MAX_COMMAND_SIZE] = {0};
         int inputSize = 0;
 
-        // TODO: print "Enter a command: "
-        bwprintf(COM2, "Enter a command: ");
-
-        int a, b, c, d;
-        bwprintf(COM2, "\r\n\r\nBefore we said hi %d %d %d\r\n", UART2, UART2_TX_SERVER, Constants::UART2TXServer::TID);
-        a = Putc(UART2_TX_SERVER, UART2, 'H');
-        b = Putc(UART2_TX_SERVER, UART2, 'I');
-        c = Putc(UART2_TX_SERVER, UART2, '\r');
-        d = Putc(UART2_TX_SERVER, UART2, '\n');
-        bwprintf(COM2, "After we said hi %d %d %d %d\r\n\r\n", a, b, c, d);
+        printf(UART2_TX_SERVER, UART2, "Enter a command: ");
 
         do {
             
             ch = Getc(UART2_RX_SERVER, COM2);
             // int x = Putc(UART2_SERVER, COM2, ch);
-            bwprintf(COM2, "%c", ch);
+            printf(UART2_TX_SERVER, UART2, "%c", ch);
             input[inputSize] = ch;
             ++inputSize;
 
             if (ch == Constants::ManualTrainControl::BACKSPACE && inputSize > 0) {
                 --inputSize;
                 bwputc(COM2, ch);
-                bwprintf(COM2, "%c", ch);
+                printf(UART2_TX_SERVER, UART2, "%c", ch);
             }
             // TODO: support for backspace?
 
         } while(ch != Constants::ManualTrainControl::ENTER && inputSize < Constants::ManualTrainControl::MAX_COMMAND_SIZE);
-        bwprintf(COM2, "\n\r");
+        printf(UART2_TX_SERVER, UART2, "\n\r");
         input[inputSize - 1] = '\0';
 
         char* commandToken = strtok(input, Constants::ManualTrainControl::DELIMITER);
@@ -94,7 +86,7 @@ void manualTrainControl() {
             Putc(UART2_TX_SERVER, UART2, 'H');
             Putc(UART2_TX_SERVER, UART2, 'I');
 
-            bwprintf(COM2, "Setting train: %d to speed: %d\n\r", trainNumber, trainSpeed);
+            printf(UART2_TX_SERVER, UART2, "Setting train: %d to speed: %d\n\r", trainNumber, trainSpeed);
 
             bwputc(COM1, trainSpeed);
             bwputc(COM1, trainNumber);
@@ -130,7 +122,7 @@ void manualTrainControl() {
 
             bwputc(COM1, trainSpeed);
             bwputc(COM1, trainNumber);
-            bwprintf(COM2, "Reversing train: %d to speed: %d\n\r", trainNumber, trainSpeed);
+            printf(UART2_TX_SERVER, UART2, "Reversing train: %d to speed: %d\n\r", trainNumber, trainSpeed);
 
         } 
         
@@ -165,12 +157,12 @@ void manualTrainControl() {
                 bwputc(COM1, Constants::MarklinConsole::STRAIGHT_SWITCH);
                 bwputc(COM1, switchNumber);
                 bwputc(COM1, Constants::MarklinConsole::SWITCH_OFF_TURNOUT);
-                bwprintf(COM2, "Switching %d to %c\n\r", switchNumber, Constants::ManualTrainControl::STRAIGHT_SWITCH_INPUT);
+                printf(UART2_TX_SERVER, UART2, "Switching %d to %c\n\r", switchNumber, Constants::ManualTrainControl::STRAIGHT_SWITCH_INPUT);
             } else if (switchDirection == Constants::ManualTrainControl::CURVED_SWITCH_INPUT) {
                 bwputc(COM1, Constants::MarklinConsole::CURVED_SWITCH);
                 bwputc(COM1, switchNumber);
                 bwputc(COM1, Constants::MarklinConsole::SWITCH_OFF_TURNOUT);
-                bwprintf(COM2, "Switching %d to %c\n\r", switchNumber, Constants::ManualTrainControl::CURVED_SWITCH_INPUT);
+                printf(UART2_TX_SERVER, UART2, "Switching %d to %c\n\r", switchNumber, Constants::ManualTrainControl::CURVED_SWITCH_INPUT);
             } else {
                 // TODO: Error out
             }
@@ -184,7 +176,7 @@ void manualTrainControl() {
         
         else {
             // TODO: Error
-            bwprintf(COM2, "Invalid Command\n\r");
+            printf(UART2_TX_SERVER, UART2, "Invalid Command\n\r");
         }
 
     }
