@@ -26,8 +26,6 @@ void uart2txServer() {
 
     int notifierTid = Create(0, uart2txNotifier);
     // bwprintf(COM2, "UART2TX Server - created notifier with tid %d\n\r", notifierTid);
-    // uart2.enableTXInterrupt();
-
 
     FOREVER {
         msglen = Receive(&tid, msg, Constants::UART2TXServer::MSG_SIZE);
@@ -64,18 +62,14 @@ void uart2txServer() {
                 waitbufData.push(msg[0]);
             }
 
-            // bwprintf(COM2, "UART2TX Server - full? %d", uart2.isTXFull());
             // While uart2 can transmit, push characters
             while (!uart2.isTXFull() && !txbuf.empty()) {
                 uart2.putc(txbuf.pop());
-                // bwprintf(COM2, "Did we transmit anything?");
             }
             // If we have characters to transmit and uart2 is full, enable transmission interrupts
             if (uart2.isTXFull() && !txbuf.empty()) {
-                // bwprintf(COM2, "Did we enable interrupts?");
                 uart2.enableTXInterrupt();
             }
-            // bwprintf(COM2, "bufsize? %d", txbuf.size());
         }
     }
 }
