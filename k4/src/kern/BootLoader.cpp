@@ -7,6 +7,7 @@
 #include "user/client/ClockNotifier.hpp"
 #include "user/client/ManualTrainControl.hpp"
 #include "user/client/SensorData.hpp"
+#include "user/client/Test.hpp"
 #include "user/server/RockPaperScissorServer.hpp"
 #include "user/server/NameServer.hpp"
 #include "user/server/ClockServer.hpp"
@@ -73,8 +74,8 @@ void bootLoader() {
     // bwprintf(COM2, "BootLoader - Created UART2TX Server with tid: %d\n\r", tid);
     Constants::UART2TXServer::TID = tid;
 
-    tid = Create(6, manualTrainControl);
-    tid = Create(6, sensorData);
+    tid = Create(6, testTyping);
+    // tid = Create(6, sensorData);
 
     // tid = Create(3, clockClient);
     // tid = Create(4, clockClient);
