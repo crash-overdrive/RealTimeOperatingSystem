@@ -1,5 +1,6 @@
 #include "Constants.hpp"
 #include "io/bwio.hpp"
+#include "io/ts7200.h"
 #include "user/client/ManualTrainControl.hpp"
 #include "user/syscall/UserSyscall.hpp"
 
@@ -8,8 +9,9 @@
 
 void manualTrainControl() {
     
-    // int UART1_SERVER = WhoIs("UART1RX SERVER");
-    int UART2_SERVER = WhoIs("UART2RX");
+    const int UART1_SERVER = WhoIs("UART1RX");
+    const int UART2_RX_SERVER = WhoIs("UART2RX");
+    const int UART2_TX_SERVER = WhoIs("UART2TX");
 
     int trainSpeeds[Constants::ManualTrainControl::NUM_TRAINS] = {0};
     char switchOrientations[Constants::ManualTrainControl::NUM_SENSORS];
@@ -25,7 +27,7 @@ void manualTrainControl() {
 
         do {
             
-            ch = Getc(UART2_SERVER, COM2);
+            ch = Getc(UART2_RX_SERVER, COM2);
             // int x = Putc(UART2_SERVER, COM2, ch);
             bwprintf(COM2, "%c", ch);
             input[inputSize] = ch;
@@ -80,6 +82,9 @@ void manualTrainControl() {
                 trainSpeed = trainSpeed*10 + trainSpeedToken[temp] - '0';
                 ++temp;
             }
+
+            Putc(UART2_TX_SERVER, UART2, 'H');
+            Putc(UART2_TX_SERVER, UART2, 'I');
 
             bwprintf(COM2, "Setting train: %d to speed: %d\n\r", trainNumber, trainSpeed);
 
