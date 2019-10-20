@@ -18,7 +18,7 @@ void Kernel::initialize() {
 	uart2.setConfig(BPF8, OFF, OFF, OFF);
     uart1.enableRXInterrupt();
     uart2.enableRXInterrupt();
-    uart2.enableTXInterrupt();
+    // uart2.enableTXInterrupt();
 
     // Draw GUI
     // drawGUI();
@@ -140,7 +140,7 @@ void Kernel::handle(int* stackPointer)  {
 
         } else if (vic1Status & UART2_TX_INTR2_MASK) {
 
-            // bwprintf(COM2, "Kernel - UART 2 transmit interrupt\n\r");
+            bwprintf(COM2, "Kernel - UART 2 transmit interrupt\n\r");
             uart2.disableTXInterrupt();
             handleInterrupt(uart2TXBlockedQueue);
 

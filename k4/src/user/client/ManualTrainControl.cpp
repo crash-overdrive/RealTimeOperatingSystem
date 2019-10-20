@@ -25,6 +25,14 @@ void manualTrainControl() {
         // TODO: print "Enter a command: "
         bwprintf(COM2, "Enter a command: ");
 
+        int a, b, c, d;
+        bwprintf(COM2, "\r\n\r\nBefore we said hi %d %d %d\r\n", UART2, UART2_TX_SERVER, Constants::UART2TXServer::TID);
+        a = Putc(UART2_TX_SERVER, UART2, 'H');
+        b = Putc(UART2_TX_SERVER, UART2, 'I');
+        c = Putc(UART2_TX_SERVER, UART2, '\r');
+        d = Putc(UART2_TX_SERVER, UART2, '\n');
+        bwprintf(COM2, "After we said hi %d %d %d %d\r\n\r\n", a, b, c, d);
+
         do {
             
             ch = Getc(UART2_RX_SERVER, COM2);
