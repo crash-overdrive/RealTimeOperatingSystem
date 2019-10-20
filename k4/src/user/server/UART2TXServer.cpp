@@ -34,16 +34,19 @@ void uart2txServer() {
 
         if (tid == notifierTid) {
             // We've been notified that uart2 is ready for transmission so flush as much of buffer as possible
+
+            // While uart2 can transmit, push characters
             while (!uart2.isTXFull() && !txbuf.empty()) {
                 uart2.putc(txbuf.pop());
             }
-            if (!uart2.isTXEmpty()) {
+            // If we have characters to transmit and uart2 is full, enable transmission interrupts
+            if (uart2.isTXFull() && !txbuf.empty()) {
                 uart2.enableTXInterrupt();
-                // bwprintf(COM2, "UART2TX Server - re-enabling interrupts\n\r");
             }
             reply[0] = Constants::Server::ACK;
             Reply(tid, reply, 1);
 
+            // Move data from the wait buffer to the transmit buffer
             while (!waitbuf.empty() && !txbuf.full()) {
                 tid = waitbuf.pop();
                 txbuf.push(waitbufData.pop());
@@ -52,54 +55,27 @@ void uart2txServer() {
             }
         } else {
             // Request is coming from the kernel, so put the received character on the tx buffer
-            // bwprintf(COM2, "UART2TX Server - full? %d", uart2.isTXFull());
-            if (!uart2.isTXFull()) {
-                // bwprintf(COM2, "UART2TX Server - the buff wasn't full");
-                uart2.putc(msg[0]);
-                reply[0] = Constants::Server::ACK;
-                Reply(tid, reply, 1);
-            }
-            else if (!txbuf.full()) {
-                uart2.enableTXInterrupt();
+            if (!txbuf.full()) {
                 txbuf.push(msg[0]);
-                // bwprintf(COM2, "UART2TX Server - buffer length %d\n\r", txbuf.size());
                 reply[0] = Constants::Server::ACK;
                 Reply(tid, reply, 1);
             } else {
                 waitbuf.push(tid);
                 waitbufData.push(msg[0]);
             }
+
+            // bwprintf(COM2, "UART2TX Server - full? %d", uart2.isTXFull());
+            // While uart2 can transmit, push characters
+            while (!uart2.isTXFull() && !txbuf.empty()) {
+                uart2.putc(txbuf.pop());
+                // bwprintf(COM2, "Did we transmit anything?");
+            }
+            // If we have characters to transmit and uart2 is full, enable transmission interrupts
+            if (uart2.isTXFull() && !txbuf.empty()) {
+                // bwprintf(COM2, "Did we enable interrupts?");
+                uart2.enableTXInterrupt();
+            }
+            // bwprintf(COM2, "bufsize? %d", txbuf.size());
         }
-
-        // if (tid == notifierTid) {
-        //     // We've been notified that uart2 is ready for transmission so flush as much of buffer as possible
-        //     while (!uart2.isTXFull() && !txbuf.empty()) {
-        //         uart2.putc(txbuf.pop());
-        //     }
-        //     if (!uart2.isTXEmpty()) {
-        //         uart2.enableTXInterrupt();
-        //         bwprintf(COM2, "UART2TX Server - re-enabling interrupts\n\r");
-        //     }
-        //     reply[0] = Constants::Server::ACK;
-        //     Reply(tid, reply, 1);
-
-        //     while (!waitbuf.empty() && !txbuf.full()) {
-        //         tid = waitbuf.pop();
-        //         txbuf.push(waitbufData.pop());
-        //         reply[0] = Constants::Server::ACK;
-        //         Reply(tid, reply, 1);
-        //     }
-        // } else {
-        //     // Request is coming from the kernel, so put the received character on the tx buffer
-        //     if (!txbuf.full()) {
-        //         txbuf.push(msg[0]);
-        //         bwprintf(COM2, "UART2TX Server - buffer length %d\n\r", txbuf.size());
-        //         reply[0] = Constants::Server::ACK;
-        //         Reply(tid, reply, 1);
-        //     } else {
-        //         waitbuf.push(tid);
-        //         waitbufData.push(msg[0]);
-        //     }
-        // }
     }
 }
