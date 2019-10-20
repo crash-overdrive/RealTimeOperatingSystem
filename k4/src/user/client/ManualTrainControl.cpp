@@ -1,5 +1,6 @@
 #include "Constants.hpp"
 #include "io/bwio.hpp"
+#include "io/io.hpp"
 #include "io/ts7200.h"
 #include "user/client/ManualTrainControl.hpp"
 #include "user/syscall/UserSyscall.hpp"
@@ -9,9 +10,9 @@
 
 void manualTrainControl() {
     
-    // int UART1_SERVER = WhoIs("UART1RX SERVER");
-    int UART2_SERVER = WhoIs("UART2RX");
-    int UART2_TX_SERVER = WhoIs("UART2TX");
+    const int UART1_SERVER = WhoIs("UART1RX");
+    const int UART2_RX_SERVER = WhoIs("UART2RX");
+    const int UART2_TX_SERVER = WhoIs("UART2TX");
 
     int trainSpeeds[Constants::ManualTrainControl::NUM_TRAINS] = {0};
     char switchOrientations[Constants::ManualTrainControl::NUM_SENSORS];
@@ -22,27 +23,25 @@ void manualTrainControl() {
         char input[Constants::ManualTrainControl::MAX_COMMAND_SIZE] = {0};
         int inputSize = 0;
 
-        // TODO: print "Enter a command: "
-        bwprintf(COM2, "Enter a command: ");
-
+        printf(UART2_TX_SERVER, UART2, "Enter a command: ");
 
         do {
             
-            ch = Getc(UART2_SERVER, COM2);
+            ch = Getc(UART2_RX_SERVER, COM2);
             // int x = Putc(UART2_SERVER, COM2, ch);
-            bwprintf(COM2, "%c", ch);
+            printf(UART2_TX_SERVER, UART2, "%c", ch);
             input[inputSize] = ch;
             ++inputSize;
 
             if (ch == Constants::ManualTrainControl::BACKSPACE && inputSize > 0) {
                 --inputSize;
                 bwputc(COM2, ch);
-                bwprintf(COM2, "%c", ch);
+                printf(UART2_TX_SERVER, UART2, "%c", ch);
             }
             // TODO: support for backspace?
 
         } while(ch != Constants::ManualTrainControl::ENTER && inputSize < Constants::ManualTrainControl::MAX_COMMAND_SIZE);
-        bwprintf(COM2, "\n\r");
+        printf(UART2_TX_SERVER, UART2, "\n\r");
         input[inputSize - 1] = '\0';
 
         char* commandToken = strtok(input, Constants::ManualTrainControl::DELIMITER);
@@ -84,7 +83,10 @@ void manualTrainControl() {
                 ++temp;
             }
 
-            bwprintf(COM2, "Setting train: %d to speed: %d\n\r", trainNumber, trainSpeed);
+            Putc(UART2_TX_SERVER, UART2, 'H');
+            Putc(UART2_TX_SERVER, UART2, 'I');
+
+            printf(UART2_TX_SERVER, UART2, "Setting train: %d to speed: %d\n\r", trainNumber, trainSpeed);
 
             bwputc(COM1, trainSpeed);
             bwputc(COM1, trainNumber);
@@ -120,7 +122,7 @@ void manualTrainControl() {
 
             bwputc(COM1, trainSpeed);
             bwputc(COM1, trainNumber);
-            bwprintf(COM2, "Reversing train: %d to speed: %d\n\r", trainNumber, trainSpeed);
+            printf(UART2_TX_SERVER, UART2, "Reversing train: %d to speed: %d\n\r", trainNumber, trainSpeed);
 
         } 
         
@@ -155,12 +157,12 @@ void manualTrainControl() {
                 bwputc(COM1, Constants::MarklinConsole::STRAIGHT_SWITCH);
                 bwputc(COM1, switchNumber);
                 bwputc(COM1, Constants::MarklinConsole::SWITCH_OFF_TURNOUT);
-                bwprintf(COM2, "Switching %d to %c\n\r", switchNumber, Constants::ManualTrainControl::STRAIGHT_SWITCH_INPUT);
+                printf(UART2_TX_SERVER, UART2, "Switching %d to %c\n\r", switchNumber, Constants::ManualTrainControl::STRAIGHT_SWITCH_INPUT);
             } else if (switchDirection == Constants::ManualTrainControl::CURVED_SWITCH_INPUT) {
                 bwputc(COM1, Constants::MarklinConsole::CURVED_SWITCH);
                 bwputc(COM1, switchNumber);
                 bwputc(COM1, Constants::MarklinConsole::SWITCH_OFF_TURNOUT);
-                bwprintf(COM2, "Switching %d to %c\n\r", switchNumber, Constants::ManualTrainControl::CURVED_SWITCH_INPUT);
+                printf(UART2_TX_SERVER, UART2, "Switching %d to %c\n\r", switchNumber, Constants::ManualTrainControl::CURVED_SWITCH_INPUT);
             } else {
                 // TODO: Error out
             }
@@ -174,7 +176,7 @@ void manualTrainControl() {
         
         else {
             // TODO: Error
-            bwprintf(COM2, "Invalid Command\n\r");
+            printf(UART2_TX_SERVER, UART2, "Invalid Command\n\r");
         }
 
     }

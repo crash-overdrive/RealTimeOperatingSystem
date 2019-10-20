@@ -263,6 +263,7 @@ void Kernel::run() {
     int* stackPointer;
     initialize();
     FOREVER {
+        // bwprintf(COM2, "Kernel - %d %d\n\r", uart1.getInterruptStatus(), uart2.getInterruptStatus());
         schedule();
         if (activeTask == nullptr) { 
             bwprintf(COM2, "Kernel - No active tasks scheduled!");

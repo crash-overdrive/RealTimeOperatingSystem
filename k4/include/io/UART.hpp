@@ -8,6 +8,7 @@ public:
     UART(int base);
 
     int setConfig(int wordLength, int fifoEnable, int stop, int parity);
+    int getControlBits(); // TODO: remove this later here and in .cpp
     void enableRXInterrupt();
     void disableRXInterrupt();
     void enableTXInterrupt();

@@ -1,6 +1,8 @@
 #include "Constants.hpp"
 #include "data-structures/RingBuffer.hpp"
 #include "io/bwio.hpp"
+#include "io/io.hpp"
+#include "io/ts7200.h"
 #include "user/client/SensorData.hpp"
 #include "user/syscall/UserSyscall.hpp"
 
@@ -33,19 +35,27 @@ int power(int base, int exponent) {
 	return result;
 }
 
-int getSensorValue(int sensorNumber) {
-    
+int getSensorBitValue(int bitNumber) {
+    return power(2, 8-bitNumber);
 }
 
-char getSensorBank(int sensorNumber) {
+int getSensorNumber(int sensorBankNumber, int bitNumber) {
+    if (sensorBankNumber % 2 != 0) {
+        return 8 + bitNumber;
+    } else {
+        return bitNumber;
+    }
+}
+
+char getSensorBank(int sensorBankNumber) {
     char sensorBank = '\0';
-    if (sensorNumber < 2) {
+    if (sensorBankNumber < 2) {
         sensorBank = 'A';
-    } else if (sensorNumber < 4) {
+    } else if (sensorBankNumber < 4) {
         sensorBank = 'B';
-    } else if (sensorNumber < 6) {        
+    } else if (sensorBankNumber < 6) {
         sensorBank = 'C';
-    } else if (sensorNumber < 8) {        
+    } else if (sensorBankNumber < 8) {
         sensorBank = 'D';
     } else {
         sensorBank = 'E';
@@ -58,44 +68,45 @@ char getSensorBank(int sensorNumber) {
 void sensorData() {
     DataStructures::RingBuffer<Sensor, Constants::SensorData::SENSOR_HISTORY_SIZE> sensorHistory;
 
-    int sensorValues[Constants::SensorData::NUMBER_OF_SENSOR_BANKS] = {0};
+    int sensorBankValues[Constants::SensorData::NUMBER_OF_SENSOR_BANKS] = {0};
 
     int UART1_SERVER = WhoIs("UART1RX");
+    int UART2_TX_SERVER = WhoIs("UART2TX");
 
     bwputc(COM1, Constants::MarklinConsole::SET_RESET_ON_FOR_SENSORS);
     
     FOREVER {
+        Delay(Constants::ClockServer::TID, 10);
         bwputc(COM1, Constants::MarklinConsole::REQUEST_5_SENSOR_DATA);
-        for (int i = 0; i < 10; ++i) {
-            sensorValues[i] = Getc(UART1_SERVER, COM1);
+        for (int sensorBankNumber = 0; sensorBankNumber < 10; ++sensorBankNumber) {
+            sensorBankValues[sensorBankNumber] = Getc(UART1_SERVER, COM1);
+            // bwprintf(COM2, "%d", sensorBankNumber);
 
-            if (sensorValues[i] != 0) {
+            if (sensorBankValues[sensorBankNumber] != 0) {
 
-                char sensorBank = getSensorBank(i);
+                char sensorBank = getSensorBank(sensorBankNumber);
 
-                for (int sensorNumber = 7; sensorNumber >= 0; --sensorNumber) {
+                for (int sensorBitNumber = 1; sensorBitNumber <= 8; ++sensorBitNumber) {
+                    int sensorBitValue = getSensorBitValue(sensorBitNumber);
 
-                    int sensorValue = power(2, sensorNumber);
-
-                    if(sensorValues[i] >= sensorValue) {
-
-                        sensorValues[i] = sensorValues[i] - sensorValue;
-                        if (i%2 != 0) {
-                            sensorHistory.push(Sensor(sensorBank, sensorNumber + 9));
-                            bwprintf(COM2, "%c %d sensor tripped\n\r", sensorBank, sensorNumber+9);
-                        } else {
-                            sensorHistory.push(Sensor(sensorBank, sensorNumber + 1));
-                            bwprintf(COM2, "%c %d sensor tripped\n\r", sensorBank, sensorNumber+9);
-                        }
-
-                    } 
+                    if(sensorBankValues[sensorBankNumber] >= sensorBitValue) {
+                        sensorBankValues[sensorBankNumber] = sensorBankValues[sensorBankNumber] - sensorBitValue;
+                        int sensorNumber = getSensorNumber(sensorBankNumber, sensorBitNumber);
+                        sensorHistory.push(Sensor(sensorBank, sensorNumber));
+                        // bwprintf(COM2, "%c %d sensor Tripped\n\r", sensorBank, sensorNumber);
+                    }
                 }
 
-                if(sensorValues[i] != 0) {
-                    bwprintf(COM2, "Sensor Data - invalid %d bank not 0\n\r", i);
+                if(sensorBankValues[sensorBankNumber] != 0) {
+                    bwprintf(COM2, "Sensor Data - invalid %d bank not 0: %d\n\r", sensorBankNumber, sensorBankValues[sensorBankNumber]);
                 }
             }
 
+        }
+
+        while(!sensorHistory.empty()) {
+            Sensor sensor = sensorHistory.pop();
+            printf(UART2_TX_SERVER, UART2, "%c %d\n\r", sensor.sensorBank, sensor.sensorNumber);
         }
     }
 }

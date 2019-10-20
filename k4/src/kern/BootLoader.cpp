@@ -6,6 +6,7 @@
 #include "user/client/ClockClient.hpp"
 #include "user/client/ClockNotifier.hpp"
 #include "user/client/ManualTrainControl.hpp"
+#include "user/client/SensorData.hpp"
 #include "user/server/RockPaperScissorServer.hpp"
 #include "user/server/NameServer.hpp"
 #include "user/server/ClockServer.hpp"
@@ -52,7 +53,7 @@ void bootLoader() {
     // tid = Create(1, receiveClient);
     // tid = Create(4, sendClient);
 
-    tid = Create(3, nameServer);
+    tid = Create(2, nameServer);
     Constants::NameServer::TID = tid;
     // bwprintf(COM2, "BootLoader - Created Name Server with tid: %d\n\r", tid);
 
@@ -60,7 +61,7 @@ void bootLoader() {
     // bwprintf(COM2, "BootLoader - Created Clock Server with tid: %d\n\r", tid);
     Constants::ClockServer::TID = tid;
 
-    tid = Create(2, uart1rxServer);
+    tid = Create(3, uart1rxServer);
     // bwprintf(COM2, "BootLoader - Created UART1RX Server with tid: %d\n\r", tid);
     Constants::UART1RXServer::TID = tid;
     
@@ -73,6 +74,7 @@ void bootLoader() {
     Constants::UART2TXServer::TID = tid;
 
     tid = Create(6, manualTrainControl);
+    tid = Create(6, sensorData);
 
     // tid = Create(3, clockClient);
     // tid = Create(4, clockClient);
