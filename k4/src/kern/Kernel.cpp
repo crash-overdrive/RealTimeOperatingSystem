@@ -129,7 +129,7 @@ void Kernel::handle(int* stackPointer)  {
         } else if (vic1Status & UART1_TX_INTR1_MASK) {
 
             // bwprintf(COM2, "Kernel - UART 1 transmit interrupt\n\r");
-            // uart1.disableTXInterrupt();
+            uart1.disableTXInterrupt();
             handleInterrupt(uart1TXBlockedQueue);
 
         } else if (vic1Status & UART2_RX_INTR2_MASK) {
@@ -263,6 +263,7 @@ void Kernel::run() {
     int* stackPointer;
     initialize();
     FOREVER {
+        // bwprintf(COM2, "Kernel - %d %d\n\r", uart1.getInterruptStatus(), uart2.getInterruptStatus());
         schedule();
         if (activeTask == nullptr) { 
             bwprintf(COM2, "Kernel - No active tasks scheduled!");

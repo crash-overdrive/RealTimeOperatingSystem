@@ -30,6 +30,12 @@ int UART::setConfig(int wordLength, int fifoEnable, int stop, int parity) {
     return 0;
 };
 
+int UART::getControlBits() {
+    volatile int flags;
+    flags = *(int *)(base + UART_CTRL_OFFSET);
+    return flags;
+}
+
 void UART::enableRXInterrupt() {
     volatile int flags;
     flags = *(int *)(base + UART_CTRL_OFFSET);

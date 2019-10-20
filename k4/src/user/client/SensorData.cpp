@@ -76,6 +76,7 @@ void sensorData() {
     bwputc(COM1, Constants::MarklinConsole::SET_RESET_ON_FOR_SENSORS);
     
     FOREVER {
+        Delay(Constants::ClockServer::TID, 10);
         bwputc(COM1, Constants::MarklinConsole::REQUEST_5_SENSOR_DATA);
         for (int sensorBankNumber = 0; sensorBankNumber < 10; ++sensorBankNumber) {
             sensorBankValues[sensorBankNumber] = Getc(UART1_SERVER, COM1);
