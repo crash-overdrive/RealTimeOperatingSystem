@@ -1,6 +1,7 @@
 #include "Constants.hpp"
 #include "data-structures/RingBuffer.hpp"
 #include "io/bwio.hpp"
+#include "io/ts7200.h"
 #include "user/client/SensorData.hpp"
 #include "user/syscall/UserSyscall.hpp"
 
@@ -69,6 +70,7 @@ void sensorData() {
     int sensorBankValues[Constants::SensorData::NUMBER_OF_SENSOR_BANKS] = {0};
 
     int UART1_SERVER = WhoIs("UART1RX");
+    int UART2_TX_SERVER = WhoIs("UART2TX");
 
     bwputc(COM1, Constants::MarklinConsole::SET_RESET_ON_FOR_SENSORS);
     
@@ -76,7 +78,7 @@ void sensorData() {
         bwputc(COM1, Constants::MarklinConsole::REQUEST_5_SENSOR_DATA);
         for (int sensorBankNumber = 0; sensorBankNumber < 10; ++sensorBankNumber) {
             sensorBankValues[sensorBankNumber] = Getc(UART1_SERVER, COM1);
-            bwprintf(COM2, "%d", sensorBankNumber);
+            // bwprintf(COM2, "%d", sensorBankNumber);
 
             if (sensorBankValues[sensorBankNumber] != 0) {
 
@@ -89,15 +91,23 @@ void sensorData() {
                         sensorBankValues[sensorBankNumber] = sensorBankValues[sensorBankNumber] - sensorBitValue;
                         int sensorNumber = getSensorNumber(sensorBankNumber, sensorBitNumber);
                         sensorHistory.push(Sensor(sensorBank, sensorNumber));
-                        bwprintf(COM2, "%c %d sensor Tripped\n\r", sensorBank, sensorNumber);
+                        // bwprintf(COM2, "%c %d sensor Tripped\n\r", sensorBank, sensorNumber);
                     }
                 }
 
                 if(sensorBankValues[sensorBankNumber] != 0) {
-                    bwprintf(COM2, "Sensor Data - invalid %d bank not 0\n\r", sensorBankNumber);
+                    bwprintf(COM2, "Sensor Data - invalid %d bank not 0: %d\n\r", sensorBankNumber, sensorBankValues[sensorBankNumber]);
                 }
             }
 
+        }
+
+        while(!sensorHistory.empty()) {
+            Sensor sensor = sensorHistory.pop();
+            Putc(UART2_TX_SERVER, UART2, sensor.sensorBank);
+            Putc(UART2_TX_SERVER, UART2, (char)('0' + sensor.sensorNumber));
+            Putc(UART2_TX_SERVER, UART2, '\n');
+            Putc(UART2_TX_SERVER, UART2, '\r');
         }
     }
 }
