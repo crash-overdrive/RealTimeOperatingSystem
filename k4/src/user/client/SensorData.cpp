@@ -70,7 +70,7 @@ void sensorData() {
 
     int sensorBankValues[Constants::SensorData::NUMBER_OF_SENSOR_BANKS] = {0};
 
-    int UART1_SERVER = WhoIs("UART1RX");
+    int UART1_RX_SERVER = WhoIs("UART1RX");
     int UART2_TX_SERVER = WhoIs("UART2TX");
 
     bwputc(COM1, Constants::MarklinConsole::SET_RESET_ON_FOR_SENSORS);
@@ -79,7 +79,7 @@ void sensorData() {
         Delay(Constants::ClockServer::TID, 10);
         bwputc(COM1, Constants::MarklinConsole::REQUEST_5_SENSOR_DATA);
         for (int sensorBankNumber = 0; sensorBankNumber < 10; ++sensorBankNumber) {
-            sensorBankValues[sensorBankNumber] = Getc(UART1_SERVER, COM1);
+            sensorBankValues[sensorBankNumber] = Getc(UART1_RX_SERVER, COM1);
             // bwprintf(COM2, "%d", sensorBankNumber);
 
             if (sensorBankValues[sensorBankNumber] != 0) {

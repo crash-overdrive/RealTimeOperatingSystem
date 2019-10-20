@@ -12,8 +12,8 @@ namespace Constants {
     const int REPLY_QUEUE_LENGTH = NUM_TASKS;
     const int TD_STACK_SIZE = 32768;
 
-    namespace ManualTrainControl {
-        const int MAX_COMMAND_SIZE = 10;
+    namespace TrainController {
+        const int MAX_SEND_MESSAGE_SIZE = 10;
         const int NUM_TRAINS = 100;
         const int NUM_SENSORS = 200;
         const char ENTER = (char)13;

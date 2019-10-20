@@ -5,7 +5,7 @@
 #include "user/client/ForkClient.hpp"
 #include "user/client/ClockClient.hpp"
 #include "user/client/ClockNotifier.hpp"
-#include "user/client/ManualTrainControl.hpp"
+#include "user/client/TrainController.hpp"
 #include "user/client/SensorData.hpp"
 #include "user/client/Test.hpp"
 #include "user/server/RockPaperScissorServer.hpp"
