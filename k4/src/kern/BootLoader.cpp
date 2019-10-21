@@ -83,7 +83,7 @@ void bootLoader() {
     tid = Create(7, trainController);
 
     tid = Create(7, terminalServer);
-    // tid = Create(6, sensorData);
+    tid = Create(8, sensorData);
 
     // tid = Create(3, clockClient);
     // tid = Create(4, clockClient);

@@ -66,18 +66,20 @@ char getSensorBank(int sensorBankNumber) {
 
 
 void sensorData() {
-    DataStructures::RingBuffer<Sensor, Constants::SensorData::SENSOR_HISTORY_SIZE> sensorHistory;
+    DataStructures::RingBuffer<Sensor, Constants::SensorData::NUMBER_OF_SENSORS> sensorHistory;
 
     int sensorBankValues[Constants::SensorData::NUMBER_OF_SENSOR_BANKS] = {0};
 
+    int UART1_TX_SERVER = WhoIs("UART1TX");
     int UART1_RX_SERVER = WhoIs("UART1RX");
     int UART2_TX_SERVER = WhoIs("UART2TX");
+    int CLOCK_SERVER = WhoIs("CLOCK SERVER");
 
-    bwputc(COM1, Constants::MarklinConsole::SET_RESET_ON_FOR_SENSORS);
+    Putc(UART1_TX_SERVER, UART1, Constants::MarklinConsole::SET_RESET_ON_FOR_SENSORS);
     
     FOREVER {
-        Delay(Constants::ClockServer::TID, 10);
-        bwputc(COM1, Constants::MarklinConsole::REQUEST_5_SENSOR_DATA);
+        Delay(CLOCK_SERVER, 20);
+        Putc(UART1_TX_SERVER, UART1, Constants::MarklinConsole::REQUEST_5_SENSOR_DATA);
         for (int sensorBankNumber = 0; sensorBankNumber < 10; ++sensorBankNumber) {
             sensorBankValues[sensorBankNumber] = Getc(UART1_RX_SERVER, COM1);
             // bwprintf(COM2, "%d", sensorBankNumber);

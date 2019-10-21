@@ -26,7 +26,7 @@ namespace Constants {
 
     namespace SensorData {
         const int NUMBER_OF_SENSOR_BANKS = 10;
-        const int SENSOR_HISTORY_SIZE = 10;
+        const int NUMBER_OF_SENSORS = 80;
     }
 
     namespace MarklinConsole {
