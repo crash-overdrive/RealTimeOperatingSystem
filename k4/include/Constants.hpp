@@ -135,7 +135,8 @@ namespace Constants {
         RECIEVE,
         REPLY,
         AWAIT_EVENT,
-        HALT
+        HALT,
+        SWITCH_OFF
     };
 
     enum EVENTS {

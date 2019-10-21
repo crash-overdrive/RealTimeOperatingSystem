@@ -227,6 +227,15 @@ void Kernel::handleInterrupt(DataStructures::RingBuffer<TaskDescriptor *, Consta
     }
 }
 
+void Kernel::handleSwitchOff() {
+    activeTask->taskState = Constants::STATE::ZOMBIE;
+    while (!ready_queue.empty()) {
+        TaskDescriptor* taskDescriptor = ready_queue.pop();
+        taskDescriptor->taskState = Constants::STATE::ZOMBIE;
+        exit_queue.push(taskDescriptor);
+    }
+}
+
 TaskDescriptor* Kernel::lookupTD(int tid) {
     if (tid < 0 || tid >= Constants::NUM_TASKS || tasks[tid].taskState == Constants::ZOMBIE) {
         return nullptr;

@@ -8,10 +8,11 @@
 
 
 void trainController() {
-    
+    RegisterAs("TRAIN_SERVER");
     int trainSpeeds[Constants::TrainController::NUM_TRAINS] = {0};
     char switchOrientations[Constants::TrainController::NUM_SENSORS];
 
+    const int UART1_TX_SERVER = WhoIs("UART1TX");
 
     FOREVER {
         int sendTid;
@@ -69,14 +70,11 @@ void trainController() {
                 continue;
             }
 
-            // Putc(UART2_TX_SERVER, UART2, 'H');
-            // Putc(UART2_TX_SERVER, UART2, 'I');
-
-            // printf(UART2_TX_SERVER, UART2, "Setting train: %d to speed: %d\n\r", trainNumber, trainSpeed);
-
-            // bwputc(COM1, trainSpeed);
-            // bwputc(COM1, trainNumber);
             trainSpeeds[trainNumber] = trainSpeed;
+
+            Putc(UART1_TX_SERVER, UART1, trainSpeed);
+            Putc(UART1_TX_SERVER, UART1, trainNumber);
+            // printf(UART2_TX_SERVER, UART2, "Setting train: %d to speed: %d\n\r", trainNumber, trainSpeed);
 
             Reply(sendTid, &Constants::Server::ACK, 1);
 
@@ -104,16 +102,16 @@ void trainController() {
             }
 
             int trainSpeed = trainSpeeds[trainNumber];
+            Putc(UART1_TX_SERVER, UART1, Constants::MarklinConsole::STOP_TRAIN);
+            Putc(UART1_TX_SERVER, UART1, trainNumber);
+
+            Putc(UART1_TX_SERVER, UART1, Constants::MarklinConsole::REVERSE_TRAIN);
+            Putc(UART1_TX_SERVER, UART1, trainNumber);
+
+            Putc(UART1_TX_SERVER, UART1, trainSpeed);
+            Putc(UART1_TX_SERVER, UART1, trainNumber);
 
             Reply(sendTid, &Constants::Server::ACK, 1);
-            // bwputc(COM1, Constants::MarklinConsole::STOP_TRAIN);
-            // bwputc(COM1, trainNumber);
-            
-            // bwputc(COM1, Constants::MarklinConsole::REVERSE_TRAIN);
-            // bwputc(COM1, trainNumber);
-
-            // bwputc(COM1, trainSpeed);
-            // bwputc(COM1, trainNumber);
             // printf(UART2_TX_SERVER, UART2, "Reversing train: %d to speed: %d\n\r", trainNumber, trainSpeed);
 
         } 
@@ -149,15 +147,17 @@ void trainController() {
             switchDirection = switchDirectionToken[0];
 
             if (switchDirection == Constants::TrainController::STRAIGHT_SWITCH_INPUT) {
-                // bwputc(COM1, Constants::MarklinConsole::STRAIGHT_SWITCH);
-                // bwputc(COM1, switchNumber);
-                // bwputc(COM1, Constants::MarklinConsole::SWITCH_OFF_TURNOUT);
+                Putc(UART1_TX_SERVER, UART1, Constants::MarklinConsole::STRAIGHT_SWITCH);
+                Putc(UART1_TX_SERVER, UART1, switchNumber);
+                Putc(UART1_TX_SERVER, UART1, Constants::MarklinConsole::SWITCH_OFF_TURNOUT);
+                
                 // printf(UART2_TX_SERVER, UART2, "Switching %d to %c\n\r", switchNumber, Constants::TrainController::STRAIGHT_SWITCH_INPUT);
                 Reply(sendTid, &Constants::Server::ACK, 1);
             } else if (switchDirection == Constants::TrainController::CURVED_SWITCH_INPUT) {
-                // bwputc(COM1, Constants::MarklinConsole::CURVED_SWITCH);
-                // bwputc(COM1, switchNumber);
-                // bwputc(COM1, Constants::MarklinConsole::SWITCH_OFF_TURNOUT);
+                Putc(UART1_TX_SERVER, UART1, Constants::MarklinConsole::CURVED_SWITCH);
+                Putc(UART1_TX_SERVER, UART1, switchNumber);
+                Putc(UART1_TX_SERVER, UART1, Constants::MarklinConsole::SWITCH_OFF_TURNOUT);
+                
                 // printf(UART2_TX_SERVER, UART2, "Switching %d to %c\n\r", switchNumber, Constants::TrainController::CURVED_SWITCH_INPUT);
                 Reply(sendTid, &Constants::Server::ACK, 1);
             } else {
@@ -169,7 +169,7 @@ void trainController() {
         
         else if (!memcmp(commandToken, "q", 1) && sendMessageSize == 2) {
             Reply(sendTid, &Constants::Server::ACK, 1);
-            Exit();
+            SwitchOff();
         }
         
         else {

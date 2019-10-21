@@ -180,4 +180,5 @@ int Getc(int tid, int uart);
 
 int Putc(int tid, int uart, char ch);
 
+void SwitchOff();
 #endif
