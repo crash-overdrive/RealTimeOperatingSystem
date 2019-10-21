@@ -12,6 +12,7 @@
 #include "user/server/NameServer.hpp"
 #include "user/server/ClockServer.hpp"
 #include "user/server/UART1RXServer.hpp"
+#include "user/server/UART1TXServer.hpp"
 #include "user/server/UART2RXServer.hpp"
 #include "user/server/UART2TXServer.hpp"
 #include "io/bwio.hpp"
@@ -65,16 +66,20 @@ void bootLoader() {
     tid = Create(3, uart1rxServer);
     // bwprintf(COM2, "BootLoader - Created UART1RX Server with tid: %d\n\r", tid);
     Constants::UART1RXServer::TID = tid;
+
+    tid = Create(4, uart1txServer);
+    // bwprintf(COM2, "BootLoader - Created UART2TX Server with tid: %d\n\r", tid);
+    Constants::UART1TXServer::TID = tid;
     
-    tid = Create(4, uart2rxServer);
+    tid = Create(5, uart2rxServer);
     // bwprintf(COM2, "BootLoader - Created UART2RX Server with tid: %d\n\r", tid);
     Constants::UART2RXServer::TID = tid;
 
-    tid = Create(5, uart2txServer);
+    tid = Create(6, uart2txServer);
     // bwprintf(COM2, "BootLoader - Created UART2TX Server with tid: %d\n\r", tid);
     Constants::UART2TXServer::TID = tid;
 
-    tid = Create(6, testTyping);
+    tid = Create(7, testTyping);
     // tid = Create(6, sensorData);
 
     // tid = Create(3, clockClient);
