@@ -95,4 +95,6 @@ int sysReply(int tid, const char *reply, int rplen);
 */
 int sysAwaitEvent(int eventId);
 
+void sysSwitchOff();
+
 #endif

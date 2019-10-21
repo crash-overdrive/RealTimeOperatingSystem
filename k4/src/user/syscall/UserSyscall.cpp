@@ -198,3 +198,7 @@ int Putc(int tid, int uart, char ch) {
 
     return 0;
 }
+
+void SwitchOff() {
+    sysSwitchOff();
+}

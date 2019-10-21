@@ -214,6 +214,8 @@ void Kernel::handle(int* stackPointer)  {
                 activeTask->returnValue = handleAwaitEvent((int)arg1);
                 break;
 
+            case Constants::SWI::SWITCH_OFF:
+                handleSwitchOff();
             default:
                 bwprintf(COM2, "Kernel - Invalid SWI: %d\n\r", request);
                 break;
@@ -283,25 +285,7 @@ void Kernel::run() {
         // bwprintf(COM2, "Kernel - %d %d\n\r", uart1.getInterruptStatus(), uart2.getInterruptStatus());
         schedule();
         if (activeTask == nullptr) { 
-            bwprintf(COM2, "Kernel - No active tasks scheduled!\n\r");
-            if (!uart1RXBlockedQueue.empty()) {
-                bwprintf(COM2, "U1RX qne\n\r");
-            }
-            if (!uart2RXBlockedQueue.empty()) {
-                bwprintf(COM2, "U2RX qne\n\r");
-            }
-            if (!uart1TXBlockedQueue.empty()) {
-                bwprintf(COM2, "U1TX qne\n\r");
-            }
-            if (!uart2TXBlockedQueue.empty()) {
-                bwprintf(COM2, "U2TX qne\n\r");
-            }
-            if (!timerBlockedQueue.empty()) {
-                bwprintf(COM2, "Timer qne\n\r");
-            }
-            if (!replyQueue.empty()) {
-                bwprintf(COM2, "reply qne\n\r");
-            }
+            bwprintf(COM2, "Kernel - No active tasks scheduled, Shutting down!\n\r");
             // asm volatile("msr cpsr_c, #0b11010011");
             break; 
         }

@@ -66,6 +66,7 @@ class Kernel {
         void handleTimerInterrupt(int timerValue);
         // void handleInterrupt(int data, DataStructures::RingBuffer<TaskDescriptor, Constants::NUM_TASKS> &blockQueue);
         void handleInterrupt(DataStructures::RingBuffer<TaskDescriptor *, Constants::NUM_TASKS> &blockQueue);
+        void handleSwitchOff();
 
         /*
          * Lookup TD by tid
