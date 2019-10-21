@@ -17,10 +17,12 @@ void uart2txServer() {
     char msg[Constants::UART2TXServer::MSG_SIZE];
     int msglen;
     char reply[Constants::UART2TXServer::RP_SIZE];
+    int result;
     UART uart2 = UART(UART2_BASE);
     DataStructures::RingBuffer<char, Constants::UART2TXServer::BUFFER_SIZE> txbuf;
     DataStructures::RingBuffer<int, Constants::NUM_TASKS> waitbuf;
     DataStructures::RingBuffer<char, Constants::NUM_TASKS> waitbufData;
+    bool blocked = false;
 
     RegisterAs("UART2TX");
 
@@ -33,20 +35,23 @@ void uart2txServer() {
         if (tid == notifierTid) {
             // We've been notified that uart2 is ready for transmission so flush as much of buffer as possible
 
+            // bwprintf(COM2, "N");
+            blocked = false;
             reply[0] = Constants::Server::ACK;
-            Reply(tid, reply, 1);
+            result = Reply(tid, reply, 1);
+            if (result < 0) {
+                bwprintf(COM2, "UART2TXServer - An error was returned from Reply");
+            }
 
             while (!uart2.isClearToSend()) {
-                bwprintf(COM1, "Y");
                 // This is a trap
             }
 
             // While uart2 can transmit, push characters
-            while (!uart2.isTXFull() && !txbuf.empty()) {
+            if (uart2.isTXEmpty() &&  !txbuf.empty()) {
                 uart2.putc(txbuf.pop());
                 uart2.enableTXInterrupt();
-                // bwprintf(COM1, "I%d", txbuf.size());
-                // bwprintf(COM2, "TXIRQenNOT\r\n");
+                blocked = true;
             }
             // If we have characters to transmit and uart2 is full, enable transmission interrupts
             // if (uart2.isTXFull() && !txbuf.empty()) {
@@ -69,16 +74,13 @@ void uart2txServer() {
             } else {
                 waitbuf.push(tid);
                 waitbufData.push(msg[0]);
-                bwprintf(COM1, "B");
             }
 
             // While uart2 can transmit, push characters
-            while (!uart2.isTXFull() && !txbuf.empty()) {
+            if (!blocked && !uart2.isTXFull() && !txbuf.empty()) {
                 uart2.putc(txbuf.pop());
                 uart2.enableTXInterrupt();
-                // bwprintf(COM1, "T%d", txbuf.size());
-                // bwprintf(COM1, "T");
-                // bwprintf(COM2, "TXIRQen\r\n");
+                blocked = true;
             }
             // If we have characters to transmit and uart2 is full, enable transmission interrupts
             // if (uart2.isTXFull() && !txbuf.empty()) {

@@ -15,6 +15,10 @@ public:
     void disableRXInterrupt();
     void enableTXInterrupt();
     void disableTXInterrupt();
+    bool isMISInterrupt();
+    bool isRXInterrupt();
+    void clearRXInterrupt();
+    bool isTXInterrupt();
     void clearTXInterrupt();
     bool isRXEmpty();
     bool isRXFull();

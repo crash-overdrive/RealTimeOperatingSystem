@@ -145,6 +145,21 @@ void Kernel::handle(int* stackPointer)  {
             // uart2.clearTXInterrupt();
             handleInterrupt(uart2TXBlockedQueue);
 
+        // This is here as an artefact of exploration
+        // } else if (vic2Status & INT_UART2_MASK) {
+        //     if (uart2.isRXInterrupt()) {
+        //         // bwprintf(COM2, "RX_INT\r\n");
+        //         uart2.disableRXInterrupt();
+        //         uart2.clearRXInterrupt();
+        //         handleInterrupt(uart2RXBlockedQueue);
+        //     } else if (uart2.isTXInterrupt()) {
+        //         uart2.disableTXInterrupt();
+        //         uart2.clearTXInterrupt();
+        //         // if (uart2.isMISInterrupt()) {
+        //         //     bwprintf(COM2, "YEAH MIS\r\n");
+        //         // }
+        //         handleInterrupt(uart2TXBlockedQueue);
+        //     }
         } else if (vic2Status & TC3UI_MASK) {
 
             // bwprintf(COM2, "Kernel - The interrupt was a timer 3 overflow interrupt!\n\r");
@@ -249,6 +264,7 @@ void Kernel::handle(int* stackPointer)  {
             break;
 
         case Constants::UART2TX_BLOCKED:
+            // bwprintf(COM2, "Kernel - Putting %d on UART2RXBlockedQueue\n\r", activeTask->tid);
             uart2TXBlockedQueue.push(activeTask);
             break;
 

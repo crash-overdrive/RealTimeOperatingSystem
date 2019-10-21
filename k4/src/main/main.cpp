@@ -25,6 +25,7 @@ int main () {
     *(int *)(VIC1_IRQ_BASE + IRQ_ENABLE_OFFSET) = UART2_TX_INTR2_MASK;
 
     *(int *)(VIC2_IRQ_BASE + IRQ_ENABLE_OFFSET) = TC3UI_MASK;
+    // *(int *)(VIC2_IRQ_BASE + IRQ_ENABLE_OFFSET) = TC3UI_MASK | INT_UART2_MASK;
 
     // Set all interrupts to IRQ
     *(int *)(VIC1_IRQ_BASE + IRQ_SELECT_OFFSET) = 0;

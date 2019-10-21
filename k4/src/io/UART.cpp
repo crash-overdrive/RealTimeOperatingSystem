@@ -60,6 +60,27 @@ void UART::disableTXInterrupt() {
     *(int *)(base + UART_CTRL_OFFSET) = flags & ~TIEN_MASK;
 }
 
+bool UART::isMISInterrupt() {
+    volatile bool m = *(int *)(base + UART_INTR_OFFSET) & MIS_MASK;
+    return m;
+}
+
+bool UART::isRXInterrupt() {
+    volatile bool rx = *(int *)(base + UART_INTR_OFFSET) & RIS_MASK;
+    return rx;
+}
+
+void UART::clearRXInterrupt() {
+    volatile int flags;
+    flags = *(int *)(base + UART_INTR_OFFSET);
+    *(int *)(base + UART_INTR_OFFSET) = flags & ~RIS_MASK;
+}
+
+bool UART::isTXInterrupt() {
+    volatile bool tx = *(int *)(base + UART_INTR_OFFSET) & TIS_MASK;
+    return tx;
+}
+
 void UART::clearTXInterrupt() {
     volatile int flags;
     flags = *(int *)(base + UART_INTR_OFFSET);
