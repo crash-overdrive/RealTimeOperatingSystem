@@ -21,10 +21,12 @@ void trainController() {
         int sendMessageSize = Receive(&sendTid, sendMessage, Constants::TrainController::MAX_SEND_MESSAGE_SIZE);
         // TODO: Verify if this should be -1 or -2
         sendMessage[sendMessageSize - 1] = '\0';
+        // bwprintf(COM1, "%d", sendMessageSize);
+        // bwprintf(COM1, "%s", sendMessage);
 
         char* commandToken = strtok(sendMessage, Constants::TrainController::DELIMITER);
 
-        if (!memcmp(commandToken, "tr ", 3)) {
+        if (!memcmp(commandToken, "tr\0", 3)) {
             int trainNumber = 0;
             int trainSpeed = 0;
 
@@ -80,7 +82,7 @@ void trainController() {
 
         } 
         
-        else if (!memcmp(commandToken, "rv ", 3)) {
+        else if (!memcmp(commandToken, "rv\0", 3)) {
             int trainNumber = 0;
 
             char* trainNumberToken = strtok(nullptr, Constants::TrainController::DELIMITER);
@@ -116,7 +118,7 @@ void trainController() {
 
         } 
         
-        else if (!memcmp(commandToken, "sw ", 3)) {
+        else if (!memcmp(commandToken, "sw\0", 3)) {
             int switchNumber = 0;
             char switchDirection;
 
@@ -167,7 +169,7 @@ void trainController() {
 
         } 
         
-        else if (!memcmp(commandToken, "q", 1) && sendMessageSize == 2) {
+        else if (!memcmp(commandToken, "q\0", 2) && sendMessageSize == 2) {
             Reply(sendTid, &Constants::Server::ACK, 1);
             SwitchOff();
         }

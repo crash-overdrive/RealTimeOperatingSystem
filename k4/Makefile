@@ -23,7 +23,7 @@ LDFLAGS = -static -e main -nmagic -T ../src/linker.ld -L $(XLIBDIR1) -L lib -L $
 # -msoft-float: no FP co-processor
 CPPFLAGS = -fno-exceptions -fno-unwind-tables -fno-rtti -std=c++17 -g -S -fPIC -Wall -mcpu=arm920t -msoft-float -I. -I./include -lstdc++
 
-OPTIMIZATION := $(if $(O),$(addprefix -O, $(O)),-O3)
+OPTIMIZATION := $(if $(O),$(addprefix -O, $(O)),-O0)
 CPPFLAGS += $(OPTIMIZATION)
 
 CPPFILES := $(shell find src -name '*.cpp')

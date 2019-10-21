@@ -216,6 +216,7 @@ void Kernel::handle(int* stackPointer)  {
 
             case Constants::SWI::SWITCH_OFF:
                 handleSwitchOff();
+                break;
             default:
                 bwprintf(COM2, "Kernel - Invalid SWI: %d\n\r", request);
                 break;
