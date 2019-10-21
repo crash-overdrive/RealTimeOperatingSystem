@@ -23,7 +23,6 @@ void terminalServer() {
 
     FOREVER {
         ch = Getc(UART2_RX_SERVER, UART2);
-        // bwprintf(COM1, "CRY\r\n");
         if (ch == Constants::TrainController::ENTER) {
             msg[msglen] = (char)ch;
             msglen++;

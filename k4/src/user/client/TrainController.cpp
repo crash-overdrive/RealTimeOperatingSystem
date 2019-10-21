@@ -13,6 +13,7 @@ void trainController() {
     char switchOrientations[Constants::TrainController::NUM_SENSORS];
 
     const int UART1_TX_SERVER = WhoIs("UART1TX");
+    const int CLOCK_SERVER = WhoIs("CLOCK SERVER");
 
     FOREVER {
         int sendTid;
@@ -74,11 +75,11 @@ void trainController() {
 
             trainSpeeds[trainNumber] = trainSpeed;
 
+            Reply(sendTid, &Constants::Server::ACK, 1);
+
             Putc(UART1_TX_SERVER, UART1, trainSpeed);
             Putc(UART1_TX_SERVER, UART1, trainNumber);
             // printf(UART2_TX_SERVER, UART2, "Setting train: %d to speed: %d\n\r", trainNumber, trainSpeed);
-
-            Reply(sendTid, &Constants::Server::ACK, 1);
 
         } 
         
@@ -103,17 +104,21 @@ void trainController() {
                 ++temp;
             }
 
+            Reply(sendTid, &Constants::Server::ACK, 1);
             int trainSpeed = trainSpeeds[trainNumber];
             Putc(UART1_TX_SERVER, UART1, Constants::MarklinConsole::STOP_TRAIN);
             Putc(UART1_TX_SERVER, UART1, trainNumber);
 
+            Delay(CLOCK_SERVER, 27*trainSpeed);
+
             Putc(UART1_TX_SERVER, UART1, Constants::MarklinConsole::REVERSE_TRAIN);
             Putc(UART1_TX_SERVER, UART1, trainNumber);
+
+            Delay(CLOCK_SERVER, 5);
 
             Putc(UART1_TX_SERVER, UART1, trainSpeed);
             Putc(UART1_TX_SERVER, UART1, trainNumber);
 
-            Reply(sendTid, &Constants::Server::ACK, 1);
             // printf(UART2_TX_SERVER, UART2, "Reversing train: %d to speed: %d\n\r", trainNumber, trainSpeed);
 
         } 
@@ -149,19 +154,21 @@ void trainController() {
             switchDirection = switchDirectionToken[0];
 
             if (switchDirection == Constants::TrainController::STRAIGHT_SWITCH_INPUT) {
+                Reply(sendTid, &Constants::Server::ACK, 1);
                 Putc(UART1_TX_SERVER, UART1, Constants::MarklinConsole::STRAIGHT_SWITCH);
                 Putc(UART1_TX_SERVER, UART1, switchNumber);
                 Putc(UART1_TX_SERVER, UART1, Constants::MarklinConsole::SWITCH_OFF_TURNOUT);
                 
                 // printf(UART2_TX_SERVER, UART2, "Switching %d to %c\n\r", switchNumber, Constants::TrainController::STRAIGHT_SWITCH_INPUT);
-                Reply(sendTid, &Constants::Server::ACK, 1);
+                
             } else if (switchDirection == Constants::TrainController::CURVED_SWITCH_INPUT) {
+                Reply(sendTid, &Constants::Server::ACK, 1);
                 Putc(UART1_TX_SERVER, UART1, Constants::MarklinConsole::CURVED_SWITCH);
                 Putc(UART1_TX_SERVER, UART1, switchNumber);
                 Putc(UART1_TX_SERVER, UART1, Constants::MarklinConsole::SWITCH_OFF_TURNOUT);
                 
                 // printf(UART2_TX_SERVER, UART2, "Switching %d to %c\n\r", switchNumber, Constants::TrainController::CURVED_SWITCH_INPUT);
-                Reply(sendTid, &Constants::Server::ACK, 1);
+                
             } else {
                 Reply(sendTid, &Constants::Server::ERR, 1);
             }
