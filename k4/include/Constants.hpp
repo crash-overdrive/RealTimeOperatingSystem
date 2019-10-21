@@ -98,6 +98,13 @@ namespace Constants {
         const int RP_SIZE = 1;
     }
 
+    namespace TerminalServer {
+        const int BUFFER_SIZE = 1024;
+        const int MSG_SIZE = 128;
+        const int RP_SIZE = 128;
+        const int CMD_SIZE = 1024;
+    }
+
 
     namespace RockPaperScissorServer {
         extern int TID;

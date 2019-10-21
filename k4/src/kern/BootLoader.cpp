@@ -15,6 +15,7 @@
 #include "user/server/UART1TXServer.hpp"
 #include "user/server/UART2RXServer.hpp"
 #include "user/server/UART2TXServer.hpp"
+#include "user/server/TerminalServer.hpp"
 #include "io/bwio.hpp"
 #include "Constants.hpp"
 #include "string.h"
@@ -79,7 +80,7 @@ void bootLoader() {
     // bwprintf(COM2, "BootLoader - Created UART2TX Server with tid: %d\n\r", tid);
     Constants::UART2TXServer::TID = tid;
 
-    tid = Create(7, testTyping);
+    tid = Create(7, terminalServer);
     // tid = Create(6, sensorData);
 
     // tid = Create(3, clockClient);
