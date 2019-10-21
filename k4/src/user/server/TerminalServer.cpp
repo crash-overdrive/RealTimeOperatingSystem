@@ -27,9 +27,11 @@ void terminalServer() {
         if (ch == Constants::TrainController::ENTER) {
             msg[msglen] = (char)ch;
             msglen++;
+            Putc(UART2_TX_SERVER, UART2, '\n');
+            Putc(UART2_TX_SERVER, UART2, '\r');
             result = Send(TRAIN_SERVER, msg, msglen, reply, rplen);
             msglen = 0;
-        } else if (ch == Constants::TrainController::BACKSPACE) {
+        } else if (ch == Constants::TrainController::BACKSPACE && msglen > 0) {
             msglen--;
             Putc(UART2_TX_SERVER, UART2, '\033');
             Putc(UART2_TX_SERVER, UART2, '[');
