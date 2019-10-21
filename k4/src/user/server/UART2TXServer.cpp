@@ -35,12 +35,12 @@ void uart2txServer() {
 
             reply[0] = Constants::Server::ACK;
             Reply(tid, reply, 1);
-            
+
             while (!uart2.isClearToSend()) {
                 bwprintf(COM1, "Y");
                 // This is a trap
             }
-            
+
             // While uart2 can transmit, push characters
             while (!uart2.isTXFull() && !txbuf.empty()) {
                 uart2.putc(txbuf.pop());
