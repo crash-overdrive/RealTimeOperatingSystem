@@ -33,16 +33,25 @@ void uart2txServer() {
         if (tid == notifierTid) {
             // We've been notified that uart2 is ready for transmission so flush as much of buffer as possible
 
+            reply[0] = Constants::Server::ACK;
+            Reply(tid, reply, 1);
+            
+            while (!uart2.isClearToSend()) {
+                bwprintf(COM1, "Y");
+                // This is a trap
+            }
+            
             // While uart2 can transmit, push characters
             while (!uart2.isTXFull() && !txbuf.empty()) {
                 uart2.putc(txbuf.pop());
+                uart2.enableTXInterrupt();
+                // bwprintf(COM1, "I%d", txbuf.size());
+                // bwprintf(COM2, "TXIRQenNOT\r\n");
             }
             // If we have characters to transmit and uart2 is full, enable transmission interrupts
-            if (uart2.isTXFull() && !txbuf.empty()) {
-                uart2.enableTXInterrupt();
-            }
-            reply[0] = Constants::Server::ACK;
-            Reply(tid, reply, 1);
+            // if (uart2.isTXFull() && !txbuf.empty()) {
+            //     uart2.enableTXInterrupt();
+            // }
 
             // Move data from the wait buffer to the transmit buffer
             while (!waitbuf.empty() && !txbuf.full()) {
@@ -60,16 +69,23 @@ void uart2txServer() {
             } else {
                 waitbuf.push(tid);
                 waitbufData.push(msg[0]);
+                bwprintf(COM1, "B");
             }
 
             // While uart2 can transmit, push characters
             while (!uart2.isTXFull() && !txbuf.empty()) {
                 uart2.putc(txbuf.pop());
+                uart2.enableTXInterrupt();
+                // bwprintf(COM1, "T%d", txbuf.size());
+                // bwprintf(COM1, "T");
+                // bwprintf(COM2, "TXIRQen\r\n");
             }
             // If we have characters to transmit and uart2 is full, enable transmission interrupts
-            if (uart2.isTXFull() && !txbuf.empty()) {
-                uart2.enableTXInterrupt();
-            }
+            // if (uart2.isTXFull() && !txbuf.empty()) {
+            //     uart2.enableTXInterrupt();
+            // }
+
+            // bwprintf(COM2, "bs %d", txbuf.size());
         }
     }
 }

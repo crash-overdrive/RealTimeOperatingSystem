@@ -14,7 +14,6 @@ void uart2txNotifier() {
     char msg[Constants::UART2TXServer::MSG_SIZE];
     char reply[Constants::UART2TXServer::RP_SIZE];
     int rplen, result, uart2tx_tid;
-    UART uart2 = UART(UART2_BASE);
     // TODO(sgaweda): add a queue to store queued tasks
 
     uart2tx_tid = WhoIs("UART2TX");
@@ -26,8 +25,11 @@ void uart2txNotifier() {
 
         // bwprintf(COM2, "SENDING TO UART2TX SERVER\n\r");
 
-        // This should not be reading this, whois should identify what the correct server is at the top of the notifier
         rplen = Send(uart2tx_tid, msg, 1, reply, 1);
+        // if (rplen < 0) {
+        //     bwprintf(COM1, "We have a problem");
+        // }
+
         if (rplen == 1 && reply[0] == Constants::Server::ERR) {
             bwprintf(COM2, "UART1R Notifier - ERR: %d\n\r", reply[0]);
         } else if (!(rplen == 1 && reply[0] == Constants::Server::ACK)) {

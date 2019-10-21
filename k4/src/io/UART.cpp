@@ -60,6 +60,12 @@ void UART::disableTXInterrupt() {
     *(int *)(base + UART_CTRL_OFFSET) = flags & ~TIEN_MASK;
 }
 
+void UART::clearTXInterrupt() {
+    volatile int flags;
+    flags = *(int *)(base + UART_INTR_OFFSET);
+    *(int *)(base + UART_INTR_OFFSET) = flags & ~TIS_MASK;
+}
+
 bool UART::isRXEmpty() {
     volatile bool empty = *(int *)(base + UART_FLAG_OFFSET) & RXFE_MASK;
     return empty;
@@ -78,6 +84,11 @@ bool UART::isTXEmpty() {
 bool UART::isTXFull() {
     volatile bool full = *(int *)(base + UART_FLAG_OFFSET) & TXFF_MASK;
     return full;
+}
+
+bool UART::isClearToSend() {
+    volatile bool cts = *(int *)(base + UART_FLAG_OFFSET) & CTS_MASK;
+    return true;
 }
 
 char UART::getc() {

@@ -71,28 +71,28 @@ namespace Constants {
     }
 
     namespace UART1RXServer {
-        extern int TID;
+        extern volatile int TID;
         const int BUFFER_SIZE = 1024;
         const int MSG_SIZE = 1;
         const int RP_SIZE = 1;
     }
 
     namespace UART1TXServer {
-        extern int TID;
+        extern volatile int TID;
         const int BUFFER_SIZE = 1024;
         const int MSG_SIZE = 1;
         const int RP_SIZE = 1;
     }
 
     namespace UART2RXServer {
-        extern int TID;
+        extern volatile int TID;
         const int BUFFER_SIZE = 1024;
         const int MSG_SIZE = 1;
         const int RP_SIZE = 1;
     }
 
     namespace UART2TXServer {
-        extern int TID;
+        extern volatile int TID;
         const int BUFFER_SIZE = 1024;
         const int MSG_SIZE = 1;
         const int RP_SIZE = 1;

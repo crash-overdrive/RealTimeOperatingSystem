@@ -3,6 +3,8 @@
 
 class UART {
     int base;
+    int rxIRQEnabled = false;
+    int txIRQEnabled = false;
 
 public:
     UART(int base);
@@ -13,10 +15,12 @@ public:
     void disableRXInterrupt();
     void enableTXInterrupt();
     void disableTXInterrupt();
+    void clearTXInterrupt();
     bool isRXEmpty();
     bool isRXFull();
     bool isTXEmpty();
     bool isTXFull();
+    bool isClearToSend();
     char getc();
     void putc(char c);
 };

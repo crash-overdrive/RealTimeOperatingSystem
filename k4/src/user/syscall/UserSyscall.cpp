@@ -189,6 +189,7 @@ int Putc(int tid, int uart, char ch) {
     if (uart != UART1 && uart != UART2 ||
         uart == UART1 && tid != Constants::UART1TXServer::TID ||
         uart == UART2 && tid != Constants::UART2TXServer::TID) {
+        bwprintf(COM1, "& %d, %d, %d, %d", uart, tid, Constants::UART1TXServer::TID, Constants::UART2TXServer::TID);
         return -1;
     }
 

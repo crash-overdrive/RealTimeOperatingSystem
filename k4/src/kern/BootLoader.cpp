@@ -26,16 +26,16 @@ namespace Constants {
         int TID = -1;
     }
     namespace UART1RXServer {
-        int TID = -1;
+        volatile int TID = -1;
     }
     namespace UART1TXServer {
-        int TID = -1;
+        volatile int TID = -1;
     }
     namespace UART2RXServer {
-        int TID = -1;
+        volatile int TID = -1;
     }
     namespace UART2TXServer {
-        int TID = -1;
+        volatile int TID = -1;
     }
 }
 void bootLoader() {
@@ -58,9 +58,9 @@ void bootLoader() {
     Constants::NameServer::TID = tid;
     // bwprintf(COM2, "BootLoader - Created Name Server with tid: %d\n\r", tid);
 
-    tid = Create(1, clockServer);
-    // bwprintf(COM2, "BootLoader - Created Clock Server with tid: %d\n\r", tid);
-    Constants::ClockServer::TID = tid;
+    // tid = Create(1, clockServer);
+    // // bwprintf(COM2, "BootLoader - Created Clock Server with tid: %d\n\r", tid);
+    // Constants::ClockServer::TID = tid;
 
     tid = Create(3, uart1rxServer);
     // bwprintf(COM2, "BootLoader - Created UART1RX Server with tid: %d\n\r", tid);
