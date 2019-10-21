@@ -49,10 +49,10 @@ void clockServer() {
             switch (sendMessage[0]) {
             case Constants::ClockServer::TICK:
                 {
+                    Reply(sendTid, replyMessage, 1);
                     ++numberOfTicksElapsed;
 
                     // bwprintf(COM2, "Clock Server - Received from Notifier: %d ticks\n\r", numberOfTicksElapsed);
-                    Reply(sendTid, replyMessage, 1);
 
                     // iterate through clockServerEntries and reply to the elements which are ready
                     int length = clockServerEntries.size();

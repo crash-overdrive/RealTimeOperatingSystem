@@ -108,7 +108,7 @@ void sensorData() {
 
         while(!sensorHistory.empty()) {
             Sensor sensor = sensorHistory.pop();
-            printf(UART2_TX_SERVER, UART2, "%c %d\n\r", sensor.sensorBank, sensor.sensorNumber);
+            printf(UART2_TX_SERVER, UART2, "%c%d", sensor.sensorBank, sensor.sensorNumber);
         }
     }
 }

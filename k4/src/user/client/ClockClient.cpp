@@ -1,30 +1,47 @@
 #include "user/client/ClockClient.hpp"
 #include "user/syscall/UserSyscall.hpp"
-#include "io/bwio.hpp"
+#include "io/io.hpp"
+#include "io/ts7200.h"
 #include "Constants.hpp"
 #include "string.h"
 
+#define FOREVER for(;;)
+
+class SystemTime {
+    public:
+        int minutes;
+        int seconds;
+        int tenthOfASecond;
+
+        SystemTime() {
+            minutes = 0;
+            seconds = 0;
+            tenthOfASecond = 0;
+        }
+
+        SystemTime(int mins, int secs, int tenthofsec) {
+            minutes = mins;
+            seconds = secs;
+            tenthOfASecond = tenthofsec;
+        }
+};
+
+SystemTime calculateSystemTime(int ticksPassed) {
+	int milliSecondsElapsed = ticksPassed * 10;
+	int secondsElapsed = milliSecondsElapsed / 1000;
+	int tenthOfASecond = milliSecondsElapsed % 1000 / 100;
+
+	SystemTime systemTime = SystemTime(secondsElapsed / 60, secondsElapsed % 60, tenthOfASecond);
+	return systemTime;
+}
+
 void clockClient() {
-
-    
-    int parentTid = MyParentTid();
-    int myTid = MyTid();
-
-    char sendMessage[] = "a";
-    char replyMessage[8];
-    int replySize = Send(parentTid, sendMessage, 2, replyMessage, 8);
-    
-    int t;
-    int n;
-    memcpy(&t, replyMessage, sizeof(t));
-    memcpy(&n, replyMessage + 4, sizeof(n));
-
-    // bwprintf(COM2, "t: %d  n: %d\n\r", t, n);
     int clockServerTid = WhoIs("CLOCK SERVER");
+    int UART2_TX = WhoIs("UART2TX");
 
-    for (int i = 1; i <= n; ++i) {
-        int time = Delay(clockServerTid, t);
-        bwprintf(COM2, "tid: %d  Delay Interval: %d  #delays: %d #ticks: %d\n\r", myTid, t, i, time);
+    FOREVER {
+        int time = Delay(clockServerTid, 10);
+        SystemTime sysTime = calculateSystemTime(time);
+        printf(UART2_TX, UART2, "\033[s\033[H%d:%d.%d\033[u", sysTime.minutes, sysTime.seconds, sysTime.tenthOfASecond);
     }
-    Exit();
 }
