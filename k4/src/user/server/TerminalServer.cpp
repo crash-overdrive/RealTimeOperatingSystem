@@ -14,26 +14,23 @@ void terminalServer() {
     char reply[Constants::TerminalServer::RP_SIZE];
     int msglen, rplen, ch, result;
 
-    DataStructures::RingBuffer<char, Constants::TerminalServer::CMD_SIZE> cmdbuf;
+    // DataStructures::RingBuffer<char, Constants::TerminalServer::CMD_SIZE> cmdbuf;
     // DataStructures::RingBuffer<char, Constants::TerminalServer::CMD_SIZE> outbuf;
 
     const int UART2_RX_SERVER = WhoIs("UART2RX");
     const int UART2_TX_SERVER = WhoIs("UART2TX");
-    // const int TRAIN_SERVER = WhoIs("TRAIN_SERVER");
-    const int TRAIN_SERVER = 10;
-    
+    const int TRAIN_SERVER = WhoIs("TRAIN_SERVER");
+
     FOREVER {
         ch = Getc(UART2_RX_SERVER, UART2);
         // bwprintf(COM1, "CRY\r\n");
         if (ch == Constants::TrainController::ENTER) {
-            cmdbuf.push((char)ch);
-            msglen = cmdbuf.size();
-            for (int i = 0; i < msglen; ++i) {
-                msg[i] = cmdbuf.pop();
-            }
+            msg[msglen] = (char)ch;
+            msglen++;
             result = Send(TRAIN_SERVER, msg, msglen, reply, rplen);
+            msglen = 0;
         } else if (ch == Constants::TrainController::BACKSPACE) {
-            cmdbuf.pop();
+            msglen--;
             Putc(UART2_TX_SERVER, UART2, '\033');
             Putc(UART2_TX_SERVER, UART2, '[');
             Putc(UART2_TX_SERVER, UART2, '1');
@@ -44,7 +41,8 @@ void terminalServer() {
             Putc(UART2_TX_SERVER, UART2, '1');
             Putc(UART2_TX_SERVER, UART2, 'D');
         } else {
-            cmdbuf.push((char)ch);
+            msg[msglen] = (char)ch;
+            msglen++;
             Putc(UART2_TX_SERVER, UART2, ch);
         }
     }
