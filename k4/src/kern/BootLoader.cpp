@@ -88,7 +88,7 @@ void bootLoader() {
     // tid = Create(3, clockClient);
     // tid = Create(4, clockClient);
     // tid = Create(5, clockClient);
-    // tid = Create(6, clockClient);
+    tid = Create(6, clockClient);
 
     // tid = Create(3, clockClient);
     // tid = Create(4, clockClient);

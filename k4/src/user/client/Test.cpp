@@ -6,15 +6,15 @@
 
 void testTyping() {
     
-    int UART1_SERVER = WhoIs("UART1RX");
-    int UART2_RX_SERVER = WhoIs("UART2RX");
+    // int UART1_SERVER = WhoIs("UART1RX");
+    // int UART2_RX_SERVER = WhoIs("UART2RX");
     int UART2_TX_SERVER = WhoIs("UART2TX");
     // bwprintf(COM1, "u.%d!", UART2_TX_SERVER);
-    for (int i = 0; i < 100; ++i) {
+    for (int i = 0; i < 100000; ++i) {
         int x = Putc(UART2_TX_SERVER, UART2, 'S');
         // bwprintf(COM1, "x");
         if (x < 0) {
-            bwprintf(COM1, "%d", x);
+            bwprintf(COM1, "test: %d", x);
         }
         // bwprintf(COM1, "%d", x);
     }

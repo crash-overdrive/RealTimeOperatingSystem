@@ -74,7 +74,11 @@ int* Kernel::activate() {
     unsigned volatile int startIdleTaskTimeStamp;
     unsigned volatile int stopIdleTaskTimeStamp;
     
-    activeTask->sp[3] = activeTask->returnValue;
+    if (activeTask->sp[0] == 0) {
+        activeTask->sp[3] = activeTask->returnValue;
+    } else if (activeTask->sp[0] != 1) {
+        bwprintf(COM2, "Kernel - Activate - ActiveTask sp[0] error: %d\n\r", activeTask->sp[0]);
+    }
 
     //handle idle task start timing
     if (activeTask == haltTD) {
