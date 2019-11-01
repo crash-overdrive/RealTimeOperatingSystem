@@ -1,36 +1,8 @@
+#include <cstdarg>
+
 #include "io/io.hpp"
 #include "io/ts7200.h"
 #include "user/syscall/UserSyscall.hpp"
-
-char ioc2x( char ch ) {
-	if ( (ch <= 9) ) return '0' + ch;
-	return 'a' + ch - 10;
-}
-
-int putx(  int tid, int uart, char c ) {
-	char chh, chl;
-
-	chh = ioc2x( c / 16 );
-	chl = ioc2x( c % 16 );
-	Putc(tid, uart, chh );
-	return Putc( tid, uart, chl );
-}
-
-int putr(  int tid, int uart, unsigned int reg ) {
-	int byte;
-	char *ch = (char *) &reg;
-
-	for( byte = 3; byte >= 0; byte-- ) putx( tid, uart, ch[byte] );
-	return Putc( tid, uart, ' ' );
-}
-
-int putstr(  int tid, int uart, char *str ) {
-	while( *str ) {
-		if( Putc( tid, uart, *str ) < 0 ) return -1;
-		str++;
-	}
-	return 0;
-}
 
 void putw(  int tid, int uart, int n, char fc, char *bf ) {
 	char ch;
@@ -48,9 +20,9 @@ int a2d( char ch ) {
 	return -1;
 }
 
-char a2i( char ch, char **src, int base, int *nump ) {
+char a2i( char ch, const char **src, int base, int *nump ) {
 	int num, digit;
-	char *p;
+	const char *p;
 
 	p = *src; num = 0;
 	while( ( digit = a2d( ch ) ) >= 0 ) {
@@ -88,7 +60,7 @@ void i2a( int num, char *bf ) {
 	ui2a( num, 10, bf );
 }
 
-void format (  int tid, int uart, char *fmt, va_list va ) {
+void format (  int tid, int uart, const char *fmt, va_list va ) {
 	char bf[12];
 	char ch, lz;
 	int w;
@@ -118,7 +90,7 @@ void format (  int tid, int uart, char *fmt, va_list va ) {
 			switch( ch ) {
 			case 0: return;
 			case 'c':
-				Putc( tid, uart, va_arg( va, char ) );
+				Putc( tid, uart, va_arg( va, int ) );
 				break;
 			case 's':
 				putw( tid, uart, w, 0, va_arg( va, char* ) );
@@ -143,7 +115,7 @@ void format (  int tid, int uart, char *fmt, va_list va ) {
 	}
 }
 
-void printf( int tid, int uart, char *fmt, ... ) {
+void printf( int tid, int uart, const char *fmt, ... ) {
 	va_list va;
 
 	va_start(va,fmt);

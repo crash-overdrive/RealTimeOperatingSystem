@@ -3,6 +3,7 @@
 #include "io/ep9302.h"
 #include "io/ts7200.h"
 #include "kern/BootLoader.hpp"
+#include "kern/BootLoaderTest.hpp"
 #include "kern/IdleTask.hpp"
 #include "kern/Kernel.hpp"
 #include "kern/Message.hpp"
@@ -74,7 +75,11 @@ int* Kernel::activate() {
     unsigned volatile int startIdleTaskTimeStamp;
     unsigned volatile int stopIdleTaskTimeStamp;
     
-    activeTask->sp[3] = activeTask->returnValue;
+    if (activeTask->sp[0] == 0) {
+        activeTask->sp[3] = activeTask->returnValue;
+    } else if (activeTask->sp[0] != 1) {
+        bwprintf(COM2, "Kernel - Activate - ActiveTask sp[0] error: %d\n\r", activeTask->sp[0]);
+    }
 
     //handle idle task start timing
     if (activeTask == haltTD) {
@@ -110,14 +115,14 @@ void Kernel::handle(int* stackPointer)  {
 
             // bwprintf(COM2, "Kernel - The interrupt was a timer 1 underflow interrupt\n\r");
             *(int *)(TIMER1_BASE + CLR_OFFSET) = 1; // Clear the interrupt
-
+            handleInterrupt(timer1BlockedQueue);
             timeSpentInIdle = 0;
-
-            handleTimerInterrupt(1);
+            
 
         } else if (vic1Status & TC2UI_MASK) {
 
             // bwprintf(COM2, "Kernel - The interrupt was a timer 2 underflow interrupt\n\r");
+            handleInterrupt(timer2BlockedQueue);
             *(int *)(TIMER2_BASE + CLR_OFFSET) = 1;
 
         } else if (vic1Status & UART1_RX_INTR1_MASK) {
@@ -163,6 +168,7 @@ void Kernel::handle(int* stackPointer)  {
         } else if (vic2Status & TC3UI_MASK) {
 
             // bwprintf(COM2, "Kernel - The interrupt was a timer 3 overflow interrupt!\n\r");
+            handleInterrupt(timer3BlockedQueue);
             *(int *)(TIMER3_BASE + CLR_OFFSET) = 1;
 
         } else {
@@ -217,6 +223,7 @@ void Kernel::handle(int* stackPointer)  {
             case Constants::SWI::SWITCH_OFF:
                 handleSwitchOff();
                 break;
+
             default:
                 bwprintf(COM2, "Kernel - Invalid SWI: %d\n\r", request);
                 break;
@@ -225,48 +232,58 @@ void Kernel::handle(int* stackPointer)  {
 
     // bwprintf(COM2, "Task state is: %d %d\n\r", activeTask->tid, activeTask->taskState);
     switch (activeTask->taskState) {
-        case Constants::READY:
+        case Constants::STATE::READY:
             // bwprintf(COM2, "Pushing %d to ready queue\n\r", activeTask->tid);
             ready_queue.push(activeTask, activeTask->priority);
             break;
 
-        case Constants::ZOMBIE:
+        case Constants::STATE::ZOMBIE:
             exit_queue.push(activeTask);
             break;
 
-        case Constants::ACTIVE:
+        case Constants::STATE::ACTIVE:
             bwprintf(COM2, "Kernel - Task shouldn't have ACTIVE state\n\r");
             break;
 
-        case Constants::SEND_BLOCKED:
+        case Constants::STATE::SEND_BLOCKED:
             // bwprintf(COM2, "TID: %d on SEND_BLOCKED\n\r", activeTask->tid);
             break;
-        case Constants::RECEIVE_BLOCKED:
+        case Constants::STATE::RECEIVE_BLOCKED:
             // bwprintf(COM2, "TID: %d on RECEIVE_BLOCKED\n\r", activeTask->tid);
             break;
-        case Constants::REPLY_BLOCKED:
+        case Constants::STATE::REPLY_BLOCKED:
             // bwprintf(COM2, "TID: %d on REPLY_BLOCKED\n\r", activeTask->tid);
             break;
 
-        case Constants::TIMER_BLOCKED:
+        case Constants::STATE::TIMER_1_BLOCKED:
             // bwprintf(COM2, "Kernel - Putting %d on timerBlockedQueue\n\r", activeTask->tid);
-            timerBlockedQueue.push(activeTask);
+            timer1BlockedQueue.push(activeTask);
             break;
 
-        case Constants::UART1RX_BLOCKED:
+        case Constants::STATE::TIMER_2_BLOCKED:
+            // bwprintf(COM2, "Kernel - Putting %d on timerBlockedQueue\n\r", activeTask->tid);
+            timer2BlockedQueue.push(activeTask);
+            break;
+
+        case Constants::STATE::TIMER_3_BLOCKED:
+            // bwprintf(COM2, "Kernel - Putting %d on timerBlockedQueue\n\r", activeTask->tid);
+            timer3BlockedQueue.push(activeTask);
+            break;
+
+        case Constants::STATE::UART1RX_BLOCKED:
             uart1RXBlockedQueue.push(activeTask);
             break;
 
-        case Constants::UART1TX_BLOCKED:
+        case Constants::STATE::UART1TX_BLOCKED:
             uart1TXBlockedQueue.push(activeTask);
             break;
 
-        case Constants::UART2RX_BLOCKED:
+        case Constants::STATE::UART2RX_BLOCKED:
             // bwprintf(COM2, "Kernel - Putting %d on UART2RXBlockedQueue\n\r", activeTask->tid);
             uart2RXBlockedQueue.push(activeTask);
             break;
 
-        case Constants::UART2TX_BLOCKED:
+        case Constants::STATE::UART2TX_BLOCKED:
             // bwprintf(COM2, "Kernel - Putting %d on UART2RXBlockedQueue\n\r", activeTask->tid);
             uart2TXBlockedQueue.push(activeTask);
             break;
@@ -274,8 +291,7 @@ void Kernel::handle(int* stackPointer)  {
         default:
             bwprintf(COM2, "Kernel - Received invalid task State: %d \n\r", activeTask->taskState);
             break;
-    }
-    
+    }    
 }
 
 

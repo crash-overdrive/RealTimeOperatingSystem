@@ -18,7 +18,7 @@ void clockNotifier() {
     sendMessage[0] = Constants::ClockServer::TICK;
 
     FOREVER {
-        int result = AwaitEvent(Constants::TIMER_INTERRUPT);
+        int result = AwaitEvent(Constants::TIMER_1_INTERRUPT);
         
         // Send to time server
         int replySize = Send(Constants::ClockServer::TID, sendMessage, 1, replyMessage, Constants::ClockServer::REPLY_MESSAGE_MAX_SIZE);

@@ -64,7 +64,7 @@ int Kernel::handleMyParentTid() {
 }
 
 void Kernel::handleExit() {
-    activeTask->taskState = Constants::ZOMBIE;
+    activeTask->taskState = Constants::STATE::ZOMBIE;
 }
 
 int Kernel::handleSend(SendRequest *sendRequest) {
@@ -179,8 +179,16 @@ int Kernel::handleReply(int tid, const char *reply, int rplen) {
 
 int Kernel::handleAwaitEvent(int eventId) {
     switch (eventId) {
-        case Constants::TIMER_INTERRUPT:
-            activeTask->taskState = Constants::TIMER_BLOCKED;
+        case Constants::TIMER_1_INTERRUPT:
+            activeTask->taskState = Constants::TIMER_1_BLOCKED;
+            break;
+
+        case Constants::TIMER_2_INTERRUPT:
+            activeTask->taskState = Constants::TIMER_2_BLOCKED;
+            break;
+
+        case Constants::TIMER_3_INTERRUPT:
+            activeTask->taskState = Constants::TIMER_3_BLOCKED;
             break;
 
         case Constants::UART1RX_IRQ:
@@ -196,26 +204,16 @@ int Kernel::handleAwaitEvent(int eventId) {
             break;
 
         case Constants::UART2TX_IRQ:
-            // bwprintf(COM2, "Kernel Handler - Await Event for UART2TX_IRQ: %d\n\r", eventId);
             activeTask->taskState = Constants::UART2TX_BLOCKED;
             break;
 
         default:
-            bwprintf(COM2, "Kernel Handler - Unknown Await Event encountered: %d\n\r", eventId);
+            bwprintf(COM2, "Kernel Handler - Unknown Await Event encountered: %d\n\r", eventId);            
             return -1; // Invalid event should be returned from AwaitEvent
         }
     return 1;
 }
 
-void Kernel::handleTimerInterrupt(int timerValue) {
-    while(!timerBlockedQueue.empty()) {
-        TaskDescriptor* task = timerBlockedQueue.pop();
-        // bwprintf(COM2, "Kernel Handler - Popping TaskId: %d off the timer blocked queue\n\r", task->tid);
-        task->taskState = Constants::READY;
-        // bwprintf(COM2, "Pushing %d to ready queue\n\r", task->tid);
-        ready_queue.push(task, task->priority);
-    }
-}
 
 // void Kernel::handleInterrupt(int data, DataStructures::RingBuffer<TaskDescriptor, Constants::NUM_TASKS> &blockedQueue) {
 void Kernel::handleInterrupt(DataStructures::RingBuffer<TaskDescriptor *, Constants::NUM_TASKS> &blockedQueue) {
