@@ -4,7 +4,7 @@
 #include "user/syscall/UserSyscall.hpp"
 #define FOREVER for(;;)
 
-void testTyping() {
+void testPrinting() {
     
     // int UART1_SERVER = WhoIs("UART1RX");
     // int UART2_RX_SERVER = WhoIs("UART2RX");
@@ -37,4 +37,18 @@ void testTyping() {
 
     Exit();
 
+}
+
+void testTyping() {
+    int UART2_RX_SERVER = WhoIs("UART2RX");
+    int UART2_TX_SERVER = WhoIs("UART2TX");
+    // bwprintf(COM1, "u.%d!", UART2_TX_SERVER);
+    FOREVER {
+        int x = Getc(UART2_RX_SERVER, UART2);
+        for (int i = 0; i < 100; ++i) {
+            Putc(UART2_TX_SERVER, UART2, x);
+        } 
+    }
+    Putc(UART2_TX_SERVER, UART2, 'e');
+    Exit();
 }

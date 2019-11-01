@@ -3,6 +3,7 @@
 #include "io/ep9302.h"
 #include "io/ts7200.h"
 #include "kern/BootLoader.hpp"
+#include "kern/BootLoaderTest.hpp"
 #include "kern/IdleTask.hpp"
 #include "kern/Kernel.hpp"
 #include "kern/Message.hpp"

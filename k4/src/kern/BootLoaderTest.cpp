@@ -20,26 +20,6 @@
 #include "Constants.hpp"
 #include "string.h"
 
-namespace Constants {
-    namespace NameServer {
-        int TID = -1;
-    }
-    namespace ClockServer {
-        int TID = -1;
-    }
-    namespace UART1RXServer {
-        volatile int TID = -1;
-    }
-    namespace UART1TXServer {
-        volatile int TID = -1;
-    }
-    namespace UART2RXServer {
-        volatile int TID = -1;
-    }
-    namespace UART2TXServer {
-        volatile int TID = -1;
-    }
-}
 void bootLoaderTest() {
     int tid;
     // tid = Create(2, daughterClient);
@@ -72,9 +52,9 @@ void bootLoaderTest() {
     // bwprintf(COM2, "BootLoader - Created UART2TX Server with tid: %d\n\r", tid);
     // Constants::UART1TXServer::TID = tid;
     
-    // tid = Create(5, uart2rxServer);
-    // bwprintf(COM2, "BootLoader - Created UART2RX Server with tid: %d\n\r", tid);
-    // Constants::UART2RXServer::TID = tid;
+    tid = Create(5, uart2rxServer);
+    bwprintf(COM2, "BootLoader - Created UART2RX Server with tid: %d\n\r", tid);
+    Constants::UART2RXServer::TID = tid;
 
     tid = Create(6, uart2txServer);
     // bwprintf(COM2, "BootLoader - Created UART2TX Server with tid: %d\n\r", tid);
@@ -95,7 +75,8 @@ void bootLoaderTest() {
     // tid = Create(5, clockClient);
     // tid = Create(6, clockClient);
 
-    tid = Create(7, testTyping);
+    tid = Create(6, testTyping);
+    tid = Create(7, testPrinting);
 
     // int sendTid;
 
