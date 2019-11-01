@@ -43,15 +43,15 @@ void uart2txServer() {
                 bwprintf(COM2, "UART2TXServer - An error was returned from Reply");
             }
 
-            while (!uart2.isClearToSend()) {
-                // This is a trap
-            }
+            // while (!uart2.isClearToSend()) {
+            //     // This is a trap
+            // }
 
             // While uart2 can transmit, push characters
             if (uart2.isTXEmpty() &&  !txbuf.empty()) {
                 uart2.putc(txbuf.pop());
-                uart2.enableTXInterrupt();
                 blocked = true;
+                uart2.enableTXInterrupt();
             }
             // If we have characters to transmit and uart2 is full, enable transmission interrupts
             // if (uart2.isTXFull() && !txbuf.empty()) {

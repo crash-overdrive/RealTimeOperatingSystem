@@ -43,15 +43,15 @@ void uart1txServer() {
                 bwprintf(COM2, "UART1TXServer - An error was returned from Reply");
             }
 
-            while (!uart1.isClearToSend()) {
-                // This is a trap
-            }
+            // while (!uart1.isClearToSend()) {
+            //     // This is a trap
+            // }
 
             // While uart1 can transmit, push characters
             if (uart1.isTXEmpty() &&  !txbuf.empty()) {
                 uart1.putc(txbuf.pop());
-                uart1.enableTXInterrupt();
                 blocked = true;
+                uart1.enableTXInterrupt();
             }
             // If we have characters to transmit and uart1 is full, enable transmission interrupts
             // if (uart1.isTXFull() && !txbuf.empty()) {
@@ -66,6 +66,10 @@ void uart1txServer() {
                 Reply(tid, reply, 1);
             }
         } else {
+            // while (!uart1.isClearToSend()) {
+            //     // This is a trap
+            // }
+
             // Request is coming from the kernel, so put the received character on the tx buffer
             if (!txbuf.full()) {
                 txbuf.push(msg[0]);

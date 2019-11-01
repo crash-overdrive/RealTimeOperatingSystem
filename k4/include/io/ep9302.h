@@ -19,7 +19,7 @@
 #define INT_UART2 53
 #define INT_UART3 54
 
-
+// TODO(sgaweda): brackets
 #define TC1UI_MASK 0x1<<4 // starting from 0
 #define TC2UI_MASK 0x1<<5
 #define TC3UI_MASK 0x1<<19 // 52-32
