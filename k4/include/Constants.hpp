@@ -118,7 +118,9 @@ namespace Constants {
         REPLY_BLOCKED,
         BLOCKED,
         ZOMBIE,
-        TIMER_BLOCKED,
+        TIMER_1_BLOCKED,
+        TIMER_2_BLOCKED,
+        TIMER_3_BLOCKED,
         UART1RX_BLOCKED,
         UART1TX_BLOCKED,
         UART2RX_BLOCKED,
@@ -140,7 +142,9 @@ namespace Constants {
     };
 
     enum EVENTS {
-        TIMER_INTERRUPT,
+        TIMER_1_INTERRUPT,
+        TIMER_2_INTERRUPT,
+        TIMER_3_INTERRUPT,
         UART1RX_IRQ,
         UART1TX_IRQ,
         UART2RX_IRQ,
