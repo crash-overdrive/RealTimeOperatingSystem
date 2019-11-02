@@ -150,6 +150,11 @@ namespace Constants {
         UART2RX_IRQ,
         UART2TX_IRQ,
     };
+
+    enum MSG {
+        RDY,
+        TX,
+    };
 };
 
 #endif

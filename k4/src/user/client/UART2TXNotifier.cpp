@@ -23,12 +23,7 @@ void uart2txNotifier() {
         result = AwaitEvent(Constants::UART2TX_IRQ);
         // bwprintf(COM2, "UART1R Notifier - exited AwaitEvent\n\r");
 
-        // bwprintf(COM2, "SENDING TO UART2TX SERVER\n\r");
-
         rplen = Send(uart2tx_tid, msg, 1, reply, 1);
-        // if (rplen < 0) {
-        //     bwprintf(COM1, "We have a problem");
-        // }
 
         if (rplen == 1 && reply[0] == Constants::Server::ERR) {
             bwprintf(COM2, "UART2TX Notifier - ERR: %d\n\r", reply[0]);
