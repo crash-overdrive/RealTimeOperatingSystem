@@ -1,15 +1,15 @@
-#ifndef TX_MESSAGE
-#define TX_MESSAGE
+#ifndef CHAR_MESSAGE
+#define CHAR_MESSAGE
 
 #include "../../Constants.hpp"
 #include "MessageHeader.hpp"
 
-class TXMessage {
+class CharMessage {
 public:
     MessageHeader mh;
     char ch;
 
-    TXMessage();
+    CharMessage();
 
     int size();
 };

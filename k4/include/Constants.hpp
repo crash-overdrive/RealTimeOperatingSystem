@@ -154,7 +154,9 @@ namespace Constants {
 
     enum MSG {
         RDY,
+        CHAR,
         TX,
+        RX,
         TEXT,
     };
 };

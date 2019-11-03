@@ -83,9 +83,11 @@ void bootLoader() {
     Constants::UART2TXServer::TID = tid;
 
     tid = Create(7, trainController);
+    // bwprintf(COM2, "BootLoader - Created Train Controller with tid: %d\n\r", tid);
 
     tid = Create(7, terminalServer);
     int tstid = tid;
+    // bwprintf(COM2, "BootLoader - Created Terminal Server with tid: %d\n\r", tid);
 
     tid = Create(8, sensorData);
 
@@ -102,6 +104,7 @@ void bootLoader() {
     textmsg.msglen = 17;
 
     Send(tstid, (char*)&textmsg, textmsg.size(), "reply", 6);
+    // bwprintf(COM2, "Bootloader - Exiting");
 
     // tid = Create(3, clockClient);
     // tid = Create(4, clockClient);

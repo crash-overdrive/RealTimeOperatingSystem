@@ -1,25 +1,21 @@
 #include "Constants.hpp"
 #include "io/bwio.hpp"
 #include "io/ts7200.h"
-// #include "io/UART.hpp"
 #include "user/message/MessageHeader.hpp"
 #include "user/message/ThinMessage.hpp"
-#include "user/message/TXMessage.hpp"
+#include "user/message/CharMessage.hpp"
 #include "user/syscall/UserSyscall.hpp"
 
 
 #define FOREVER for(;;)
 
 void uart2txCourier() {
-    RegisterAs("UART2TXC");
-
-    // char msg[256], reply[256];
     const int UART2TX = WhoIs("UART2TX");
     const int TERM = WhoIs("TERM");
     MessageHeader * mh;
     ThinMessage readymsg;
     readymsg.mh.type = Constants::MSG::RDY;
-    TXMessage txmsg;
+    CharMessage txmsg;
     int result;
 
     FOREVER {

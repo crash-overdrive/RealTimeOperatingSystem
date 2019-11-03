@@ -24,7 +24,7 @@ void uart2rxNotifier() {
         result = AwaitEvent(Constants::UART2RX_IRQ);
         // bwprintf(COM2, "UART1R Notifier - exited AwaitEvent\n\r");
 
-        // bwprintf(COM2, "SENDING TO UART2RX SERVER\n\r");
+        // bwprintf(COM2, "UART2RXN - Ssending to UART2RX\n\r");
 
         // This should not be reading this, whois should identify what the correct server is at the top of the notifier
         rplen = Send(uart2rx_tid, msg, 1, reply, 1);
