@@ -23,14 +23,6 @@ void uart2txCourier() {
     int result;
 
     FOREVER {
-        // Receive character from UART2TX
-
-        // Send(UART2TX, (char*)&readymsg, readymsg.size(), (char*)&txmsg, txmsg.size());
-        // mh = (MessageHeader *)&txmsg;
-        // if (mh->type != Constants::MSG::TX) {
-        //     bwprintf(COM2, "UART2TXCourier - Expected TX_MSG but received unexpected msg type");
-        // }
-
         // Get character from terminal server
         Send(TERM, (char*)&readymsg, readymsg.size(), (char*)&txmsg, txmsg.size());
         mh = (MessageHeader *)&txmsg;
@@ -40,6 +32,8 @@ void uart2txCourier() {
 
         // Send the character to UART2
         result = Putc(UART2TX, UART2, txmsg.ch);
-        // TODO(sgaweda): ERROR CHECKING result
+        if (result < 0) {
+            bwprintf(COM2, "UART2TXCourier - Putc returned \"Invalid Server\"");
+        }
     }
 }
