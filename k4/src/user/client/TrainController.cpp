@@ -22,8 +22,6 @@ void trainController() {
         int sendMessageSize = Receive(&sendTid, sendMessage, Constants::TrainController::MAX_SEND_MESSAGE_SIZE);
         // TODO: Verify if this should be -1 or -2
         sendMessage[sendMessageSize - 1] = '\0';
-        // bwprintf(COM1, "%d", sendMessageSize);
-        // bwprintf(COM1, "%s", sendMessage);
 
         char* commandToken = strtok(sendMessage, Constants::TrainController::DELIMITER);
 
@@ -38,7 +36,8 @@ void trainController() {
             }
 
             int numberOfDigitsInTrainNumber = strspn(trainNumberToken, Constants::TrainController::DIGITS);
-            if (numberOfDigitsInTrainNumber == 0 || numberOfDigitsInTrainNumber > 2) {
+            if (numberOfDigitsInTrainNumber == 0 || numberOfDigitsInTrainNumber > 2 || 
+                trainNumberToken[numberOfDigitsInTrainNumber] != '\0') {
                 Reply(sendTid, &Constants::Server::ERR, 1);
                 continue;
             }
@@ -57,7 +56,9 @@ void trainController() {
             }
             
             int numberOfDigitsInTrainSpeed = strspn(trainSpeedToken, Constants::TrainController::DIGITS);
-            if (numberOfDigitsInTrainSpeed == 0 || numberOfDigitsInTrainSpeed > 2) {
+            if (numberOfDigitsInTrainSpeed == 0 || numberOfDigitsInTrainSpeed > 2 || 
+                trainSpeedToken[numberOfDigitsInTrainSpeed] != '\0'  || 
+                &sendMessage[sendMessageSize - 1] != &trainSpeedToken[numberOfDigitsInTrainSpeed]) {
                 Reply(sendTid, &Constants::Server::ERR, 1);
                 continue;
             }
@@ -93,7 +94,9 @@ void trainController() {
             }
 
             int numberOfDigitsInTrainNumber = strspn(trainNumberToken, Constants::TrainController::DIGITS);
-            if (numberOfDigitsInTrainNumber == 0 || numberOfDigitsInTrainNumber > 2) {
+            if (numberOfDigitsInTrainNumber == 0 || numberOfDigitsInTrainNumber > 2 || 
+                trainNumberToken[numberOfDigitsInTrainNumber] != '\0' ||
+                &trainNumberToken[numberOfDigitsInTrainNumber] != &sendMessage[sendMessageSize - 1]) {
                 Reply(sendTid, &Constants::Server::ERR, 1);
                 continue;
             }
@@ -134,7 +137,8 @@ void trainController() {
             }
 
             int numberOfDigitsInSwitchNumber = strspn(switchNumberToken, Constants::TrainController::DIGITS);
-            if (numberOfDigitsInSwitchNumber == 0 || numberOfDigitsInSwitchNumber > 3) {
+            if (numberOfDigitsInSwitchNumber == 0 || numberOfDigitsInSwitchNumber > 3 || 
+                switchNumberToken[numberOfDigitsInSwitchNumber] != '\0') {
                 Reply(sendTid, &Constants::Server::ERR, 1);
                 continue;
             }
@@ -151,6 +155,10 @@ void trainController() {
                 continue;
             }
             
+            if (&switchDirectionToken[1] != &sendMessage[sendMessageSize - 1]) {
+                Reply(sendTid, &Constants::Server::ERR, 1);
+                continue;
+            }
             switchDirection = switchDirectionToken[0];
 
             if (switchDirection == Constants::TrainController::STRAIGHT_SWITCH_INPUT) {
