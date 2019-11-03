@@ -209,7 +209,7 @@ void Kernel::handle(int* stackPointer)  {
                 break;
 
             case Constants::SWI::RECIEVE:
-                activeTask->returnValue = handleReceive((int *) arg1, (int *) arg2, (int) arg3);
+                activeTask->returnValue = handleReceive((int *) arg1, (char *) arg2, (int) arg3);
                 break;
 
             case Constants::SWI::REPLY:

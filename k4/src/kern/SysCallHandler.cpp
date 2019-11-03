@@ -108,7 +108,7 @@ int Kernel::handleSend(SendRequest *sendRequest) {
     }
 }
 
-int Kernel::handleReceive(int *tid, int *msg, int msglen) {
+int Kernel::handleReceive(int *tid, char *msg, int msglen) {
     // bwprintf(COM2, "Size of receive: %d\n\r", activeTask->receiveQueue.size());
     if (!activeTask->receiveQueue.empty()) {
         KernelSendRequest *kSendRequest = activeTask->receiveQueue.pop();

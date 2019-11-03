@@ -22,7 +22,7 @@ void terminalServer() {
 
     MessageHeader *mh;
     TXMessage txmsg;
-    TextMessage *textmsg;
+    TextMessage *textmsg = (TextMessage *)&msg;
 
     // int msglen, rplen, ch, result;
 
@@ -43,9 +43,10 @@ void terminalServer() {
             // TODO: handle empty message
         }
 
-        // Check who we recieved
+        // Check the type of the message received
         mh = (MessageHeader *)&msg;
         if (mh->type == Constants::MSG::RDY) {
+            // Send a character any are buffered
             if (!outbuf.empty()) {
                 txmsg.ch = outbuf.pop();
                 Reply(tid, (char *)&txmsg, txmsg.size());
@@ -54,22 +55,11 @@ void terminalServer() {
                 courierBlocked = true;
             }
         } else if (mh->type == Constants::MSG::TEXT) {
-            textmsg = (TextMessage *)&msg;
-            textmsg->msg[17] = '\0';
-            bwprintf(COM2, "Message arrived with msglen %d and size %d\r\n", textmsg->msglen, result);
-            // bwprintf(COM2, "%d,%d,%d,%d,%d\r\n", textmsg->msg[0], textmsg->msg[1], textmsg->msg[2], textmsg->msg[3], textmsg->msg[textmsg->msglen-1]);
-            // bwprintf(COM2, "%c,%c,%c,%c,%c\r\n", textmsg->msg[0], textmsg->msg[1], textmsg->msg[2], textmsg->msg[3], textmsg->msg[textmsg->msglen-1]);
-            bwprintf(COM2, "%d,%d,%d,%d\r\n", textmsg->msg[0], textmsg->msg[1], textmsg->msg[2], textmsg->msg[3]);
-            bwprintf(COM2, "%c,%c,%c,%c\r\n", textmsg->msg[0], textmsg->msg[1], textmsg->msg[2], textmsg->msg[3]);
-            bwprintf(COM2, "%s", "This is a test too\r\n");
-            for (int i = 0; i < 25; ++i) {
-                bwprintf(COM2, "%d\r\n", ((char *)&textmsg)[i]);
-            }
-            bwprintf(COM2, "%s", textmsg->msg);
-            bwprintf(COM2, "THIS IS BETWEEN\r\n");
+            // Atomically buffer the message
             for (int i = 0; i < textmsg->msglen; ++i) {
                 outbuf.push(textmsg->msg[i]);
             }
+            // Send a character if possible
             if (!outbuf.empty() && courierBlocked) {
                 txmsg.ch = outbuf.pop();
                 Reply(courier, (char* )&txmsg, txmsg.size());

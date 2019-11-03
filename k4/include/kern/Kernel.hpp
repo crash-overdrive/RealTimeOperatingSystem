@@ -61,7 +61,7 @@ class Kernel {
         int handleMyParentTid();
         void handleExit();
         int handleSend(SendRequest *sr);
-        int handleReceive(int *tid, int *msg, int msglen);
+        int handleReceive(int *tid, char *msg, int msglen);
         int handleReply(int tid, const char *reply, int rplen);
         int handleAwaitEvent(int eventId);
 

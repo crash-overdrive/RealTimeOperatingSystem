@@ -22,7 +22,7 @@ public:
 class KernelRecieveRequest {
 public:
     int *tid;
-    int *msg;
+    char *msg;
     int msglen;
 };
 

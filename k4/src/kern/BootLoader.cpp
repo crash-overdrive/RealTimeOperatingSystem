@@ -99,13 +99,8 @@ void bootLoader() {
     for (int i = 0; i < 17; ++i) {
         textmsg.msg[i] = msg[i];
     }
-    // msg[17] = '\0';
-    textmsg.msglen = 18;
-    for (int i = 0; i < 25; ++i) {
-        bwprintf(COM2, "%d\r\n", ((char *)&textmsg)[i]);
-    }
-    bwprintf(COM2, "%s", textmsg.msg);
-    bwprintf(COM2, "%d\r\n", textmsg.size());
+    textmsg.msglen = 17;
+
     Send(tstid, (char*)&textmsg, textmsg.size(), "reply", 6);
 
     // tid = Create(3, clockClient);
