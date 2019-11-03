@@ -20,6 +20,8 @@
 #include "Constants.hpp"
 #include "string.h"
 
+#include "user/message/TextMessage.hpp"
+
 namespace Constants {
     namespace NameServer {
         int TID = -1;
@@ -83,12 +85,28 @@ void bootLoader() {
     tid = Create(7, trainController);
 
     tid = Create(7, terminalServer);
+    int tstid = tid;
+
     tid = Create(8, sensorData);
 
     // tid = Create(3, clockClient);
     // tid = Create(4, clockClient);
     // tid = Create(5, clockClient);
-    tid = Create(6, clockClient);
+    tid = Create(7, clockClient);
+
+    TextMessage textmsg;
+    char msg[17] = "this is a test\r\n";
+    for (int i = 0; i < 17; ++i) {
+        textmsg.msg[i] = msg[i];
+    }
+    // msg[17] = '\0';
+    textmsg.msglen = 18;
+    for (int i = 0; i < 25; ++i) {
+        bwprintf(COM2, "%d\r\n", ((char *)&textmsg)[i]);
+    }
+    bwprintf(COM2, "%s", textmsg.msg);
+    bwprintf(COM2, "%d\r\n", textmsg.size());
+    Send(tstid, (char*)&textmsg, textmsg.size(), "reply", 6);
 
     // tid = Create(3, clockClient);
     // tid = Create(4, clockClient);

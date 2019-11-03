@@ -11,6 +11,7 @@ namespace Constants {
     const int RECEIVE_QUEUE_LENGTH = 32;
     const int REPLY_QUEUE_LENGTH = NUM_TASKS;
     const int TD_STACK_SIZE = 32768;
+    const int MAX_MSGLEN = 128;
 
     namespace TrainController {
         const int MAX_SEND_MESSAGE_SIZE = 10;
@@ -154,6 +155,7 @@ namespace Constants {
     enum MSG {
         RDY,
         TX,
+        TEXT,
     };
 };
 
