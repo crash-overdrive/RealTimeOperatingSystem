@@ -22,6 +22,7 @@
 #include "string.h"
 
 #include "user/message/TextMessage.hpp"
+#include "user/message/TRMessage.hpp"
 
 namespace Constants {
     namespace NameServer {
@@ -76,7 +77,8 @@ void bootLoader() {
     Constants::UART1TXServer::TID = tid;
 
     tid = Create(4, marklinServer);
-    
+    int mstid = tid;
+
     tid = Create(5, uart2rxServer);
     // bwprintf(COM2, "BootLoader - Created UART2RX Server with tid: %d\n\r", tid);
     Constants::UART2RXServer::TID = tid;
@@ -99,14 +101,20 @@ void bootLoader() {
     // tid = Create(5, clockClient);
     tid = Create(7, clockClient);
 
-    TextMessage textmsg;
-    char msg[17] = "this is a test\r\n";
-    for (int i = 0; i < 17; ++i) {
-        textmsg.msg[i] = msg[i];
-    }
-    textmsg.msglen = 17;
+    // TextMessage textmsg;
+    // char msg[17] = "this is a test\r\n";
+    // for (int i = 0; i < 17; ++i) {
+    //     textmsg.msg[i] = msg[i];
+    // }
+    // textmsg.msglen = 17;
 
-    Send(tstid, (char*)&textmsg, textmsg.size(), "reply", 6);
+    // Send(tstid, (char*)&textmsg, textmsg.size(), "reply", 6);
+
+    TRMessage trmsg;
+    trmsg.train = 1;
+    trmsg.speed = 10;
+    trmsg.headlights = true;
+    Send(mstid, (char*)&trmsg, trmsg.size(), "reply", 6);
     // bwprintf(COM2, "Bootloader - Exiting");
 
     // tid = Create(3, clockClient);

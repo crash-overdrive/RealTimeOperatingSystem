@@ -7,9 +7,12 @@
 #include "user/client/UART1RXCourier.hpp"
 #include "user/client/UART1TXCourier.hpp"
 #include "user/message/MessageHeader.hpp"
+#include "user/message/CharMessage.hpp"
+#include "user/message/RVMessage.hpp"
+#include "user/message/SWMessage.hpp"
 #include "user/message/TextMessage.hpp"
 #include "user/message/ThinMessage.hpp"
-#include "user/message/CharMessage.hpp"
+#include "user/message/TRMessage.hpp"
 #include "user/server/MarklinServer.hpp"
 #include "user/syscall/UserSyscall.hpp"
 
@@ -34,6 +37,10 @@ void marklinServer() {
     CharMessage *rxmsg = (CharMessage *)&msg;
     ThinMessage rdymsg;
     rdymsg.mh.type = Constants::MSG::RDY;
+
+    TRMessage *trmsg = (TRMessage *)&msg;
+    RVMessage *rvmsg = (RVMessage *)&msg;
+    SWMessage *swmsg = (SWMessage *)&msg;
 
     // TODO(sgaweda): make this a proper constant
     DataStructures::RingBuffer<char, 16> outbuf;
@@ -62,6 +69,48 @@ void marklinServer() {
             // Atomically buffer the message
             for (int i = 0; i < outmsg->msglen; ++i) {
                 outbuf.push(outmsg->msg[i]);
+            }
+
+            // Send a character if possible
+            if (!outbuf.empty() && txcBlocked && !reading) {
+                txmsg.ch = outbuf.pop();
+                Reply(TXC, (char*)&txmsg, txmsg.size());
+                txcBlocked = false;
+            }
+
+            Reply(tid, (char*)&rdymsg, rdymsg.size());
+        } else if (mh->type == Constants::MSG::TR) {
+            if (trmsg->headlights) { bwprintf(COM2, "HEADLIGHTS ON!\r\n"); }
+            outbuf.push(trmsg->speed + (trmsg->headlights ? 16 : 0));
+            outbuf.push(trmsg->train);
+
+            // Send a character if possible
+            if (!outbuf.empty() && txcBlocked && !reading) {
+                txmsg.ch = outbuf.pop();
+                Reply(TXC, (char*)&txmsg, txmsg.size());
+                txcBlocked = false;
+            }
+
+            Reply(tid, (char*)&rdymsg, rdymsg.size());
+        } else if (mh->type == Constants::MSG::RV) {
+            outbuf.push(15);
+            outbuf.push(rvmsg->train);
+
+            // Send a character if possible
+            if (!outbuf.empty() && txcBlocked && !reading) {
+                txmsg.ch = outbuf.pop();
+                Reply(TXC, (char*)&txmsg, txmsg.size());
+                txcBlocked = false;
+            }
+
+            Reply(tid, (char*)&rdymsg, rdymsg.size());
+        } else if (mh->type == Constants::MSG::SW) {
+            if (swmsg->state == 'c' || swmsg->state == 'C') {
+                outbuf.push(34);
+            } else if (swmsg->state == 's' || swmsg->state == 'S') {
+                outbuf.push(33);
+            } else {
+                bwprintf(COM2, "Marklin Server - Received invalid track state!");
             }
 
             // Send a character if possible

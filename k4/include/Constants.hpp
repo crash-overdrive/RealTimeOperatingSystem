@@ -160,6 +160,9 @@ namespace Constants {
         TEXT,
         RESET,
         REQUEST,
+        TR,
+        RV,
+        SW,
     };
 };
 
