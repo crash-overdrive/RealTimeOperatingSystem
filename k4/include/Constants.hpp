@@ -13,7 +13,7 @@ namespace Constants {
     const int TD_STACK_SIZE = 32768;
     const int MAX_MSGLEN = 128;
 
-    namespace TrainController {
+    namespace TrainCommandServer {
         const int MAX_SEND_MESSAGE_SIZE = 10;
         const int NUM_TRAINS = 100;
         const int NUM_SENSORS = 200;
