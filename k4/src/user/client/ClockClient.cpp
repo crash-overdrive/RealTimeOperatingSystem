@@ -1,5 +1,6 @@
 #include "user/client/ClockClient.hpp"
 #include "user/syscall/UserSyscall.hpp"
+#include "io/StringFormat.hpp"
 #include "io/io.hpp"
 #include "io/ts7200.h"
 #include "Constants.hpp"
@@ -42,6 +43,10 @@ void clockClient() {
     FOREVER {
         int time = Delay(clockServerTid, 10);
         SystemTime sysTime = calculateSystemTime(time);
-        printf(UART2_TX, UART2, "\033[s\033[H%d:%d.%d\033[u", sysTime.minutes, sysTime.seconds, sysTime.tenthOfASecond);
+        char buffer[50];
+        int length = format(buffer, "\033[s\033[H%d:%d.%d\033[u", sysTime.minutes, sysTime.seconds, sysTime.tenthOfASecond);
+        for (int i = 0; i < length; ++i) {
+            Putc(UART2_TX, UART2, buffer[i]);
+        }
     }
 }
