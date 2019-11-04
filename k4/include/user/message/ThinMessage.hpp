@@ -7,6 +7,9 @@ class ThinMessage {
 public:
     MessageHeader mh;
 
+    ThinMessage();
+    ThinMessage(Constants::MSG type);
+
     int size();
 };
 

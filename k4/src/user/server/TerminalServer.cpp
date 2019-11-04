@@ -3,13 +3,13 @@
 #include "io/bwio.hpp"
 #include "io/ts7200.h"
 #include "io/UART.hpp"
+#include "user/client/UART2RXCourier.hpp"
+#include "user/client/UART2TXCourier.hpp"
 #include "user/message/MessageHeader.hpp"
 #include "user/message/TextMessage.hpp"
 #include "user/message/ThinMessage.hpp"
 #include "user/message/CharMessage.hpp"
 #include "user/server/TerminalServer.hpp"
-#include "user/server/UART2TXCourier.hpp"
-#include "user/server/UART2RXCourier.hpp"
 #include "user/syscall/UserSyscall.hpp"
 
 #define FOREVER for (;;)
@@ -21,7 +21,6 @@ void terminalServer() {
     bool txcBlocked = false;
     int tid, result;
     char msg[Constants::TerminalServer::MSG_SIZE];
-    // char reply[Constants::TerminalServer::RP_SIZE];
 
     MessageHeader *mh;
     CharMessage txmsg;
@@ -33,17 +32,8 @@ void terminalServer() {
     ThinMessage rdymsg;
     rdymsg.mh.type = Constants::MSG::RDY;
 
-    // int msglen, rplen, ch, result;
-
-    // DataStructures::RingBuffer<char, Constants::TerminalServer::CMD_SIZE> cmdbuf;
-
     // TODO(sgaweda): make this a proper constant
     DataStructures::RingBuffer<char, 1024> outbuf;
-
-    // const int UART2_RX_SERVER = WhoIs("UART2RX");
-    // const int UART2_TX_COURIER = WhoIs("UART2TXC");
-    // const int UART2_TX_SERVER = WhoIs("UART2TX");
-    // const int TRAIN_SERVER = WhoIs("TRAIN_SERVER");
 
     FOREVER {
         // TODO(sgaweda): refactor to only use reply

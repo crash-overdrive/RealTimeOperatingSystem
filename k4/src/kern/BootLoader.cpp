@@ -15,6 +15,7 @@
 #include "user/server/UART1TXServer.hpp"
 #include "user/server/UART2RXServer.hpp"
 #include "user/server/UART2TXServer.hpp"
+#include "user/server/MarklinServer.hpp"
 #include "user/server/TerminalServer.hpp"
 #include "io/bwio.hpp"
 #include "Constants.hpp"
@@ -73,6 +74,8 @@ void bootLoader() {
     tid = Create(4, uart1txServer);
     // bwprintf(COM2, "BootLoader - Created UART2TX Server with tid: %d\n\r", tid);
     Constants::UART1TXServer::TID = tid;
+
+    tid = Create(4, marklinServer);
     
     tid = Create(5, uart2rxServer);
     // bwprintf(COM2, "BootLoader - Created UART2RX Server with tid: %d\n\r", tid);
@@ -89,7 +92,7 @@ void bootLoader() {
     int tstid = tid;
     // bwprintf(COM2, "BootLoader - Created Terminal Server with tid: %d\n\r", tid);
 
-    tid = Create(8, sensorData);
+    // tid = Create(8, sensorData);
 
     // tid = Create(3, clockClient);
     // tid = Create(4, clockClient);

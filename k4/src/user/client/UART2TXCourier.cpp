@@ -1,6 +1,7 @@
 #include "Constants.hpp"
 #include "io/bwio.hpp"
 #include "io/ts7200.h"
+#include "user/client/UART2TXCourier.hpp"
 #include "user/message/MessageHeader.hpp"
 #include "user/message/ThinMessage.hpp"
 #include "user/message/CharMessage.hpp"

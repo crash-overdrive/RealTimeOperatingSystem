@@ -4,6 +4,8 @@
 #include "io/io.hpp"
 #include "io/ts7200.h"
 #include "user/client/SensorData.hpp"
+#include "user/message/TextMessage.hpp"
+#include "user/message/ThinMessage.hpp"
 #include "user/syscall/UserSyscall.hpp"
 
 #define FOREVER for(;;)
@@ -70,45 +72,72 @@ void sensorData() {
 
     int sensorBankValues[Constants::SensorData::NUMBER_OF_SENSOR_BANKS] = {0};
 
-    int UART1_TX_SERVER = WhoIs("UART1TX");
-    int UART1_RX_SERVER = WhoIs("UART1RX");
+    // int UART1_TX_SERVER = WhoIs("UART1TX");
+    // int UART1_RX_SERVER = WhoIs("UART1RX");
     int UART2_TX_SERVER = WhoIs("UART2TX");
     int CLOCK_SERVER = WhoIs("CLOCK SERVER");
+    int TERM = WhoIs("TERM"); // TODO(sgaweda): Remove this when GUI server is created
+    int MARKLIN = WhoIs("MARKLIN");
 
-    Putc(UART1_TX_SERVER, UART1, Constants::MarklinConsole::SET_RESET_ON_FOR_SENSORS);
+    int result;
+    // char data[Constants::SensorData::NUMBER_OF_SENSOR_BANKS];
+    ThinMessage reset(Constants::MSG::RESET);
+    ThinMessage request(Constants::MSG::REQUEST);
+    TextMessage data;
+    MessageHeader *mh = (MessageHeader *)&data;
+
+    result = Send(MARKLIN, (char*)&reset, reset.size(), (char*)&data, data.size());
+    if (result < 0) {
+        bwprintf(COM2, "Reset request send to Marklin server failed\r\n");
+    }
     
     FOREVER {
-        Delay(CLOCK_SERVER, 20);
-        Putc(UART1_TX_SERVER, UART1, Constants::MarklinConsole::REQUEST_5_SENSOR_DATA);
-        for (int sensorBankNumber = 0; sensorBankNumber < 10; ++sensorBankNumber) {
-            sensorBankValues[sensorBankNumber] = Getc(UART1_RX_SERVER, COM1);
-            // bwprintf(COM2, "%d", sensorBankNumber);
+        // TODO(sgwaeda): I think we will want to remove this Delay, so that sensor data reads happen as often as possible
+        //   Furthermore, even if we want a delay, this actually isn't a good way to do it because it's 100ms from when we get here, but we need to send to other servers
+        //   and the delay from sending to those servers will likely skew this to be more than 100ms!
+        Delay(CLOCK_SERVER, 10);
+        result = Send(MARKLIN, (char*)&request, request.size(), (char*)&data, data.size());
+        if (result < 0) {
+            bwprintf(COM2, "Data request send to Marklin server failed\r\n");
+        }
 
-            if (sensorBankValues[sensorBankNumber] != 0) {
+        if (mh->type == Constants::MSG::TEXT) {
+            for (int sensorBankNumber = 0; sensorBankNumber < Constants::SensorData::NUMBER_OF_SENSOR_BANKS; ++sensorBankNumber) {
+                // TODO(sgaweda): Remove the redundancy here, we don't need sensorBankValues because we have data
+                //   ALSO: why is sensoBankValues an array of ints instead of bytes??? Is it because you wanted to print it below?
+                sensorBankValues[sensorBankNumber] = data.msg[sensorBankNumber];
+                // bwprintf(COM2, "%d", sensorBankNumber);
 
-                char sensorBank = getSensorBank(sensorBankNumber);
+                if (sensorBankValues[sensorBankNumber] != 0) {
 
-                for (int sensorBitNumber = 1; sensorBitNumber <= 8; ++sensorBitNumber) {
-                    int sensorBitValue = getSensorBitValue(sensorBitNumber);
+                    char sensorBank = getSensorBank(sensorBankNumber);
 
-                    if(sensorBankValues[sensorBankNumber] >= sensorBitValue) {
-                        sensorBankValues[sensorBankNumber] = sensorBankValues[sensorBankNumber] - sensorBitValue;
-                        int sensorNumber = getSensorNumber(sensorBankNumber, sensorBitNumber);
-                        sensorHistory.push(Sensor(sensorBank, sensorNumber));
-                        // bwprintf(COM2, "%c %d sensor Tripped\n\r", sensorBank, sensorNumber);
+                    for (int sensorBitNumber = 1; sensorBitNumber <= 8; ++sensorBitNumber) {
+                        int sensorBitValue = getSensorBitValue(sensorBitNumber);
+
+                        if(sensorBankValues[sensorBankNumber] >= sensorBitValue) {
+                            sensorBankValues[sensorBankNumber] = sensorBankValues[sensorBankNumber] - sensorBitValue;
+                            int sensorNumber = getSensorNumber(sensorBankNumber, sensorBitNumber);
+                            sensorHistory.push(Sensor(sensorBank, sensorNumber));
+                            // bwprintf(COM2, "%c %d sensor Tripped\n\r", sensorBank, sensorNumber);
+                        }
+                    }
+
+                    if(sensorBankValues[sensorBankNumber] != 0) {
+                        bwprintf(COM2, "Sensor Data - invalid %d bank not 0: %d\n\r", sensorBankNumber, sensorBankValues[sensorBankNumber]);
                     }
                 }
 
-                if(sensorBankValues[sensorBankNumber] != 0) {
-                    bwprintf(COM2, "Sensor Data - invalid %d bank not 0: %d\n\r", sensorBankNumber, sensorBankValues[sensorBankNumber]);
-                }
             }
 
-        }
-
-        while(!sensorHistory.empty()) {
-            Sensor sensor = sensorHistory.pop();
-            printf(UART2_TX_SERVER, UART2, "%c%d", sensor.sensorBank, sensor.sensorNumber);
+            while(!sensorHistory.empty()) {
+                Sensor sensor = sensorHistory.pop();
+                // TODO(sgaweda): remove this hogwash, GUI should be printing this anyway
+                //   SHASH! Maybe come up with a proper string format function?
+                printf(UART2_TX_SERVER, UART2, "%c%d", sensor.sensorBank, sensor.sensorNumber);
+            }
+        } else {
+            bwprintf(COM2, "Sensor Data - Expected MSG::TEXT but received a different response type");
         }
     }
 }

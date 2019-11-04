@@ -158,6 +158,8 @@ namespace Constants {
         TX,
         RX,
         TEXT,
+        RESET,
+        REQUEST,
     };
 };
 
