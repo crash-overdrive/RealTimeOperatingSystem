@@ -1,5 +1,5 @@
 #include "user/server/ClockServer.hpp"
-#include "user/client/ClockNotifier.hpp"
+#include "user/notifier/ClockNotifier.hpp"
 #include "user/syscall/UserSyscall.hpp"
 #include "data-structures/RingBuffer.hpp"
 #include "io/bwio.hpp"
