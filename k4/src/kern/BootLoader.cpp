@@ -5,7 +5,7 @@
 #include "user/client/ForkClient.hpp"
 #include "user/client/ClockClient.hpp"
 #include "user/notifier/ClockNotifier.hpp"
-#include "user/client/TrainController.hpp"
+#include "user/server/TrainCommandServer.hpp"
 #include "user/client/SensorData.hpp"
 #include "user/client/Test.hpp"
 #include "user/server/RockPaperScissorServer.hpp"
@@ -87,7 +87,7 @@ void bootLoader() {
     // bwprintf(COM2, "BootLoader - Created UART2TX Server with tid: %d\n\r", tid);
     Constants::UART2TXServer::TID = tid;
 
-    tid = Create(7, trainController);
+    tid = Create(7, trainCommandServer);
     // bwprintf(COM2, "BootLoader - Created Train Controller with tid: %d\n\r", tid);
 
     tid = Create(7, terminalServer);

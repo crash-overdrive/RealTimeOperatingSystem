@@ -1,13 +1,13 @@
 #include "Constants.hpp"
 #include "io/bwio.hpp"
 #include "io/ts7200.h"
-#include "user/client/TrainController.hpp"
+#include "user/server/TrainCommandServer.hpp"
 #include "user/syscall/UserSyscall.hpp"
 
 #define FOREVER for(;;)
 
 
-void trainController() {
+void trainCommandServer() {
     RegisterAs("TRAIN_SERVER");
     int trainSpeeds[Constants::TrainController::NUM_TRAINS] = {0};
     char switchOrientations[Constants::TrainController::NUM_SENSORS];
