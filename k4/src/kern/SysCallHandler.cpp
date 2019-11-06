@@ -2,6 +2,7 @@
 #include "kern/Kernel.hpp"
 #include "kern/TaskDescriptor.hpp"
 #include "io/bwio.hpp"
+#include "io/ts7200.h"
 
 int Kernel::handleCreate(int priority, void (*function)()) {
     taskNumber++;
@@ -11,9 +12,9 @@ int Kernel::handleCreate(int priority, void (*function)()) {
     }
 
     if (taskNumber >= Constants::NUM_TASKS) {
-        return -2;  
+        return -2;
     }
-    
+
     TaskDescriptor* newTD = &tasks[taskNumber];
 
     newTD->tid = taskNumber;
@@ -24,7 +25,7 @@ int Kernel::handleCreate(int priority, void (*function)()) {
     } else {
         newTD->parentTid = activeTask->tid;
     }
-    
+
     newTD->priority = priority;
     newTD->taskState = Constants::READY;
 
@@ -49,7 +50,7 @@ int Kernel::handleCreate(int priority, void (*function)()) {
     newTD->stack[Constants::TD_STACK_SIZE - 18] = 0; // IRQ handle sentinal
 
     newTD->sp = &(newTD->stack[Constants::TD_STACK_SIZE - 18]);
-    
+
     ready_queue.push(newTD, newTD->priority);
 
     return taskNumber;
@@ -208,7 +209,7 @@ int Kernel::handleAwaitEvent(int eventId) {
             break;
 
         default:
-            bwprintf(COM2, "Kernel Handler - Unknown Await Event encountered: %d\n\r", eventId);            
+            bwprintf(COM2, "Kernel Handler - Unknown Await Event encountered: %d\n\r", eventId);
             return -1; // Invalid event should be returned from AwaitEvent
         }
     return 1;
@@ -234,6 +235,17 @@ void Kernel::handleSwitchOff() {
     }
 }
 
+int Kernel::handleHalt() {
+    unsigned volatile int startIdleTaskTimeStamp = *(int *)(TIMER2_BASE + VAL_OFFSET);
+    int haltAddress = 0x80930008;
+
+    volatile int haltValue = * (int*)haltAddress;
+
+    unsigned volatile int stopIdleTaskTimeStamp = *(int *)(TIMER2_BASE + VAL_OFFSET);
+    timeSpentInIdle = (startIdleTaskTimeStamp - stopIdleTaskTimeStamp + timeSpentInIdle);
+    return timeSpentInIdle;
+}
+
 TaskDescriptor* Kernel::lookupTD(int tid) {
     if (tid < 0 || tid >= Constants::NUM_TASKS || tasks[tid].taskState == Constants::ZOMBIE) {
         return nullptr;
@@ -241,4 +253,3 @@ TaskDescriptor* Kernel::lookupTD(int tid) {
 
     return &tasks[tid];
 }
-

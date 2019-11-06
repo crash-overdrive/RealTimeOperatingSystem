@@ -80,7 +80,7 @@ void marklinServer() {
 
             Reply(tid, (char*)&rdymsg, rdymsg.size());
         } else if (mh->type == Constants::MSG::TR) {
-            if (trmsg->headlights) { bwprintf(COM2, "HEADLIGHTS ON!\r\n"); }
+            // if (trmsg->headlights) { bwprintf(COM2, "HEADLIGHTS ON!\r\n"); }
             outbuf.push(trmsg->speed + (trmsg->headlights ? 16 : 0));
             outbuf.push(trmsg->train);
 

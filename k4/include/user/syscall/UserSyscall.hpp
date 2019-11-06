@@ -5,9 +5,9 @@
  * Allocates and initializes a task descriptor, using the given priority, and the given function pointer as a pointer to the entry point of executable code,
  * essentially a function with no arguments and no return value. When Create returns, the task descriptor has all the state needed to run the task, the task’s
  * stack has been suitably initialized, and the task has been entered into its ready queue so that it will run the next time it is scheduled.
- * 
+ *
  * Returns:
- *   tid: the positive integer task id of the newly created task. The task id must be unique, in the sense that no other active task has the same task id. 
+ *   tid: the positive integer task id of the newly created task. The task id must be unique, in the sense that no other active task has the same task id.
  *   -1 : invalid priority
  *   -2 : kernel is out of task descriptors
  */
@@ -15,7 +15,7 @@ int Create(int priority, void (*function)());
 
 /*
  * Returns the task id of the calling task.
- * 
+ *
  * Returns:
  *   tid: the positive integer task id of the task that calls it.
  */
@@ -24,7 +24,7 @@ int MyTid();
 /*
  * Returns the task id of the task that created the calling task. This will be problematic only if the task has exited or been destroyed, in which case the
  * return value is implementation-dependent.
- * 
+ *
  * Returns:
  *   tid: the task id of the task that created the calling task.
  */
@@ -49,7 +49,7 @@ void Exit();
  * first rplen characters of the reply. The caller is expected to check the return value and to act accordingly. There is no guarantee that Send() will return.
  * If, for example, the task to which the message is directed never calls Receive(), Send() never returns and the sending task remains blocked forever. Send()
  * has a passing resemblance, and no more, to a remote procedure call.
- * 
+ *
  * Returns:
  *   size: the size of the message returned by the replying task. The actual reply is less than or equal to the size of the reply buffer provided for it.
  *         Longer replies are truncated.
@@ -64,7 +64,7 @@ int Send(int tid, const char *msg, int msglen, char *reply, int rplen);
  * argument msg must point to a buffer at least as large as msglen. The kernel will not overflow the message buffer. If the size of the message set exceeds
  * msglen, the message is truncated and the buffer contains the first msglen characters of the message sent. The caller is expected to check the return value
  * and to act accordingly.
- * 
+ *
  * Returns:
  *   size: the size of the message sent by the sender (stored in tid). The actual message is less than or equal to the size of the message buffer supplied.
  *         Longer messages are truncated.
@@ -74,7 +74,7 @@ int Receive(int *tid, char *msg, int msglen);
 /*
  * Sends a reply to a task that previously sent a message. When it returns without error, the reply has been copied into the sender’s memory. The calling task
  * and the sender return at the same logical time, so whichever is of higher priority runs first. If they are of the same priority, the sender runs first.
- * 
+ *
  * Returns:
  *    0: success.
  *   -1: reply message was truncated.
@@ -86,9 +86,9 @@ int Reply(int tid, const char *reply, int rplen);
 /*
  * Registers the task id of the caller under the given name. On return without error it is guaranteed that all WhoIs() calls by any task will return the task
  * id of the caller until the registration is overwritten. If another task has already registered with the given name, its registration is overwritten.
- * 
+ *
  * RegisterAs() is actually a wrapper covering a send to the name server.
- * 
+ *
  * Returns:
  *    0: success.
  *   -1: invalid name server task id inside wrapper.
@@ -96,10 +96,10 @@ int Reply(int tid, const char *reply, int rplen);
 int RegisterAs(const char* name);
 
 /*
- * asks the name server for the task id of the task that is registered under the given name. Whether WhoIs() blocks waiting for a registration or returns 
- * with an error, if no task is registered under the given name, is implementation-dependent. There is guaranteed to be a unique task id associated with 
+ * asks the name server for the task id of the task that is registered under the given name. Whether WhoIs() blocks waiting for a registration or returns
+ * with an error, if no task is registered under the given name, is implementation-dependent. There is guaranteed to be a unique task id associated with
  * each registered name, but the registered task may change at any time after a call to WhoIs().
- * 
+ *
  * WhoIs() is actually a wrapper covering a send to the name server.
  *
  * Returns:
@@ -110,7 +110,7 @@ int WhoIs(const char* name);
 
 /*
  * Blocks until the event identified by eventid occurs then returns with volatile data, if any.
- * 
+ *
  * Returns:
  *   >-1: volatile data, in the form of a positive integer.
  *    -1: invalid event.
@@ -122,7 +122,7 @@ int AwaitEvent(int eventId);
  * returns the number of ticks since the clock server was created and initialized. With a 10 millisecond tick and a 32-bit unsigned int for the time wraparound
  * is almost 12,000 hours, plenty of time for your demo.
  * Time is actually a wrapper for a send to the clock server. The argument is the tid of the clock server.
- * 
+ *
  * Returns:
  *   >-1: time in ticks since the clock server initialized.
  *    -1: tid is not a valid clock server task.
@@ -132,9 +132,9 @@ int Time(int tid);
 /*
  * returns after the given number of ticks has elapsed. How long after is not guaranteed because the caller may have to wait on higher priority tasks. Delay()
  * is (almost) identical to Yield() if ticks is zero.
- * 
+ *
  * Delay() is actually a wrapper for a send to the clock server.
- * 
+ *
  * Returns:
  *   >-1: success. The current time returned (as in Time())
  *    -1: tid is not a valid clock server task.
@@ -145,9 +145,9 @@ int Delay(int tid, int ticks);
 /*
  * returns when the time since clock server initialization is greater or equal than the given number of ticks. How long after is not guaranteed because the
  * caller may have to wait on higher priority tasks. Also, DelayUntil(tid, Time(tid) + ticks) may differ from Delay(tid, ticks) by a small amount.
- * 
+ *
  * DelayUntil is actually a wrapper for a send to the clock server.
- * 
+ *
  * Returns:
  *   >-1: success. The current time returned (as in Time())
  *    -1: tid is not a valid clock server task.
@@ -158,9 +158,9 @@ int DelayUntil(int tid, int ticks);
 /*
  * returns next unreturned character from the given UART. The first argument is the task id of the appropriate server. How communication errors are handled is
  * implementation-dependent.
- * 
+ *
  * Getc() is actually a wrapper for a send to the appropriate server.
- * 
+ *
  * Returns:
  *   >-1: new character from the given UART.
  *    -1: tid is not a valid uart server task.
@@ -170,9 +170,9 @@ int Getc(int tid, int uart);
 /*
  * queues the given character for transmission by the given UART. On return the only guarantee is that the character has been queued. Whether it has been
  * transmitted or received is not guaranteed. How communication errors are handled is implementation-dependent.
- * 
+ *
  * Putc() is actually a wrapper for a send to the appropriate server.
- * 
+ *
  * Returns:
  *   0: success.
  *  -1: tid is not a valid uart server task.
@@ -181,4 +181,6 @@ int Getc(int tid, int uart);
 int Putc(int tid, int uart, char ch);
 
 void SwitchOff();
+
+int Halt();
 #endif

@@ -29,7 +29,7 @@ class Kernel {
         DataStructures::RingBuffer<TaskDescriptor *, Constants::NUM_TASKS> uart1TXBlockedQueue;
         DataStructures::RingBuffer<TaskDescriptor *, Constants::NUM_TASKS> uart2RXBlockedQueue;
         DataStructures::RingBuffer<TaskDescriptor *, Constants::NUM_TASKS> uart2TXBlockedQueue;
-        
+
         TaskDescriptor tasks[Constants::NUM_TASKS];
 
         UART uart1;
@@ -44,9 +44,6 @@ class Kernel {
 
         void initialize();
 
-        // Draws the kernel's graphical user interface
-        void drawGUI();
-
         // Sets the active task to the task descriptor of the next scheduled task.
         void schedule();
 
@@ -59,19 +56,20 @@ class Kernel {
         int handleCreate(int priority, void (*function)());
         int handleMyTid();
         int handleMyParentTid();
-        void handleExit();
         int handleSend(SendRequest *sr);
         int handleReceive(int *tid, char *msg, int msglen);
         int handleReply(int tid, const char *reply, int rplen);
         int handleAwaitEvent(int eventId);
+        int handleHalt();
+        void handleExit();
+        void handleSwitchOff();
 
         // void handleInterrupt(int data, DataStructures::RingBuffer<TaskDescriptor, Constants::NUM_TASKS> &blockQueue);
         void handleInterrupt(DataStructures::RingBuffer<TaskDescriptor *, Constants::NUM_TASKS> &blockQueue);
-        void handleSwitchOff();
 
         /*
          * Lookup TD by tid
-         * 
+         *
          * Returns:
          *   TD*    : pointer to task descriptor if tid corresponds to an existing task
          *   nullptr: null otherwise
