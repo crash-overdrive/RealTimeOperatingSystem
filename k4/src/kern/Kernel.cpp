@@ -83,7 +83,8 @@ void Kernel::handle(int* stackPointer)  {
         if (vic1Status & TC1UI_MASK) {
             *(int *)(TIMER1_BASE + CLR_OFFSET) = 1; // Clear the interrupt
             handleInterrupt(timer1BlockedQueue);
-            timeSpentInIdle = 0;
+            timeSpentInIdleInLastTick = timeSpentInIdleInThisTick;
+            timeSpentInIdleInThisTick = 0;
         } else if (vic1Status & TC2UI_MASK) {
             *(int *)(TIMER2_BASE + CLR_OFFSET) = 1;
             handleInterrupt(timer2BlockedQueue);
@@ -171,12 +172,8 @@ void Kernel::handle(int* stackPointer)  {
                 break;
 
             case Constants::SWI::HALT:
-                if (timeSpentInIdle == 0) {
-                    activeTask->returnValue = handleHalt();
-                } else {
-                    handleHalt();
-                    activeTask->returnValue = 0;
-                }
+                activeTask->returnValue = timeSpentInIdleInLastTick;
+                timeSpentInIdleInThisTick = timeSpentInIdleInThisTick + handleHalt();
                 break;
 
             default:

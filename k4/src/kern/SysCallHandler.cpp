@@ -242,8 +242,7 @@ int Kernel::handleHalt() {
     volatile int haltValue = * (int*)haltAddress;
 
     unsigned volatile int stopIdleTaskTimeStamp = *(int *)(TIMER2_BASE + VAL_OFFSET);
-    timeSpentInIdle = (startIdleTaskTimeStamp - stopIdleTaskTimeStamp + timeSpentInIdle);
-    return timeSpentInIdle;
+    return startIdleTaskTimeStamp - stopIdleTaskTimeStamp;
 }
 
 TaskDescriptor* Kernel::lookupTD(int tid) {

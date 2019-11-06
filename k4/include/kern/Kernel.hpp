@@ -40,7 +40,8 @@ class Kernel {
         volatile int taskNumber = -1;
 
         TaskDescriptor *haltTD;
-        unsigned int timeSpentInIdle = 0;
+        unsigned int timeSpentInIdleInThisTick = 0;
+        unsigned int timeSpentInIdleInLastTick = 0;
 
         void initialize();
 
