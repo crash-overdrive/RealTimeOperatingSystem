@@ -18,8 +18,8 @@ void idleTask() {
     FOREVER {
         int timeSpentInIdleFor50Ticks = 0;
         int idleTimePrevious = 0;
-        int i = 1;
-        for (; i <= 50; ) {
+        int i = 0;
+        for (; i < 10; ) {
             int idleTime = Halt();
             if (idleTime != idleTimePrevious) {
                 ++i;

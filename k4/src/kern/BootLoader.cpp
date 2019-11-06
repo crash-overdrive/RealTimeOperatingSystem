@@ -71,7 +71,7 @@ void bootLoader() {
     // tid = Create(7, trainCommandServer);
     // bwprintf(COM2, "BootLoader - Created Train Controller with tid: %d\n\r", tid);
 
-    // tid = Create(7, terminalServer);
+    tid = Create(7, terminalServer);
     int tstid = tid;
     // bwprintf(COM2, "BootLoader - Created Terminal Server with tid: %d\n\r", tid);
 
