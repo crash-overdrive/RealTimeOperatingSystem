@@ -60,8 +60,8 @@ int RegisterAs(const char* name) {
     sendMessage[sendMessageSize - 1] = Constants::NameServer::REGISTER_AS;
 
     int replyMessageSize = Send(Constants::NameServer::TID, sendMessage, sendMessageSize, replyMessage, Constants::NameServer::REPLY_MESSAGE_MAX_SIZE);
-    
-    if (!strcmp(replyMessage, Constants::NameServer::SUCCESS_REPLY)) {         
+
+    if (!strcmp(replyMessage, Constants::NameServer::SUCCESS_REPLY)) {
         return 0;
     }
     bwprintf(COM2, "RegisterAs Failure: %d\n\r", name);
@@ -78,7 +78,7 @@ int WhoIs(const char* name) {
 
 
     int replyMessageSize = Send(Constants::NameServer::TID, sendMessage, sendMessageSize, replyMessage, Constants::NameServer::REPLY_MESSAGE_MAX_SIZE);
-    
+
     if (replyMessageSize == sizeof(int)) {
         int tid;
         memcpy(&tid, replyMessage, replyMessageSize);
@@ -99,7 +99,7 @@ int Time(int tid) {
     sendMessage[0] = Constants::ClockServer::TIME;
 
     int replySize = Send(tid, sendMessage, 1, replyMessage, Constants::ClockServer::REPLY_MESSAGE_MAX_SIZE);
-    
+
     if(replySize == 5 && replyMessage[0] == Constants::ClockServer::ACKNOWLEDGE) {
         int ticks;
         memcpy(&ticks, replyMessage+1, sizeof(ticks));
@@ -114,11 +114,11 @@ int Time(int tid) {
 int Delay(int tid, int ticks) {
     if (tid != Constants::ClockServer::TID) {
         return -1;
-    } 
+    }
     if (ticks < 0) {
         return -2;
     }
-    
+
     char replyMessage[Constants::ClockServer::REPLY_MESSAGE_MAX_SIZE];
 
     char sendMessage[Constants::ClockServer::SEND_MESSAGE_MAX_SIZE];
@@ -200,4 +200,9 @@ int Putc(int tid, int uart, char ch) {
 
 void SwitchOff() {
     sysSwitchOff();
+}
+
+int Halt() {
+    int idleTime = sysHalt();
+    return idleTime;
 }

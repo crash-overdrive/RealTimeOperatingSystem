@@ -4,7 +4,6 @@
 #include "io/ts7200.h"
 #include "kern/BootLoader.hpp"
 #include "kern/BootLoaderTest.hpp"
-#include "kern/IdleTask.hpp"
 #include "kern/Kernel.hpp"
 #include "kern/Message.hpp"
 #include "user/syscall/UserSyscall.hpp"
@@ -32,7 +31,7 @@ void Kernel::initialize() {
     }
 
     // TODO: Refactor interrupt setup to be in Config.s
-    
+
     // Setup 0x8, 0x28
     // asm volatile("mov r12, #0xe59ff018"); // e59ff018 = ldr pc, [pc, #24]
     // asm volatile("str r12, #0x8");
@@ -49,21 +48,7 @@ void Kernel::initialize() {
 
     // Create the system's first task
     handleCreate(0, bootLoader);
-
-    // Create the system's idle task
-    haltTD = lookupTD(handleCreate(Constants::NUM_PRIORITIES-1, idleTask));
 }
-
-// void Kernel::drawGUI() {
-//     // TODO: refactor this into a graphics context maybe?
-//     bwprintf(COM2, "\0337\033[3;40f╔═════════════════════╗");
-//     bwprintf(COM2, "\033[4;40f║ \033[4mIdle Time:\033[24m   \033[41m0.000%\033[47m ║");
-//     bwprintf(COM2, "\033[5;40f╚═════════════════════╝\0338");
-
-//     bwprintf(COM2, "\0337\033[2J\033[3;47f\033[37m╔═════════════════════╗");
-//     bwprintf(COM2, "\033[4;47f║ \033[4mIdle Time:\033[24m   \033[31m0.000%%\033[37m ║");
-//     bwprintf(COM2, "\033[5;47f╚═════════════════════╝\0338");
-// }
 
 void Kernel::schedule() {
     activeTask = ready_queue.pop();
@@ -71,31 +56,15 @@ void Kernel::schedule() {
 }
 
 int* Kernel::activate() {
-    
-    unsigned volatile int startIdleTaskTimeStamp;
-    unsigned volatile int stopIdleTaskTimeStamp;
-    
     if (activeTask->sp[0] == 0) {
         activeTask->sp[3] = activeTask->returnValue;
     } else if (activeTask->sp[0] != 1) {
         bwprintf(COM2, "Kernel - Activate - ActiveTask sp[0] error: %d\n\r", activeTask->sp[0]);
     }
 
-    //handle idle task start timing
-    if (activeTask == haltTD) {
-        startIdleTaskTimeStamp = *(int *)(TIMER3_BASE + VAL_OFFSET);
-    } 
-
     // Exit Kernel
     int* stackPointer = kernelExit((int) activeTask->sp);
     activeTask->sp = stackPointer;
-
-    //handle idle task stop timing
-    if (activeTask == haltTD) {
-        stopIdleTaskTimeStamp = *(int *)(TIMER3_BASE + VAL_OFFSET);
-        timeSpentInIdle = (startIdleTaskTimeStamp - stopIdleTaskTimeStamp + timeSpentInIdle);
-        activeTask->returnValue = timeSpentInIdle;
-    }
 
     return stackPointer;
 }
@@ -104,7 +73,7 @@ void Kernel::handle(int* stackPointer)  {
     // Set the state of the activeTask to be READY
     // If it needs to be changed then the appropriate handler will do it
     activeTask->taskState = Constants::STATE::READY;
-    
+
     // Handle Hardware Interrupts
     if (stackPointer[0]) {
         int vic1Status = *(int *)(VIC1_IRQ_BASE + IRQ_STATUS_OFFSET);
@@ -112,44 +81,28 @@ void Kernel::handle(int* stackPointer)  {
         // bwprintf(COM2, "Kernel - Hardware interrupt vic1Status %d vic2Status %d \n\r", vic1Status, vic2Status);
 
         if (vic1Status & TC1UI_MASK) {
-
-            // bwprintf(COM2, "Kernel - The interrupt was a timer 1 underflow interrupt\n\r");
             *(int *)(TIMER1_BASE + CLR_OFFSET) = 1; // Clear the interrupt
             handleInterrupt(timer1BlockedQueue);
-            timeSpentInIdle = 0;
-            
-
+            timeSpentInIdleInLastTick = timeSpentInIdleInThisTick;
+            timeSpentInIdleInThisTick = 0;
         } else if (vic1Status & TC2UI_MASK) {
-
-            // bwprintf(COM2, "Kernel - The interrupt was a timer 2 underflow interrupt\n\r");
-            handleInterrupt(timer2BlockedQueue);
             *(int *)(TIMER2_BASE + CLR_OFFSET) = 1;
-
+            handleInterrupt(timer2BlockedQueue);
+        } else if (vic2Status & TC3UI_MASK) {
+            *(int *)(TIMER3_BASE + CLR_OFFSET) = 1;
+            handleInterrupt(timer3BlockedQueue);
         } else if (vic1Status & UART1_RX_INTR1_MASK) {
-
-            // bwprintf(COM2, "Kernel - UART 1 receive interrupt\n\r");
             uart1.disableRXInterrupt();
             handleInterrupt(uart1RXBlockedQueue);
-
         } else if (vic1Status & UART1_TX_INTR1_MASK) {
-
-            // bwprintf(COM2, "Kernel - UART 1 transmit interrupt\n\r");
             uart1.disableTXInterrupt();
             handleInterrupt(uart1TXBlockedQueue);
-
         } else if (vic1Status & UART2_RX_INTR2_MASK) {
-
-            // bwprintf(COM2, "Kernel - UART 2 receive interrupt\n\r");
             uart2.disableRXInterrupt();
             handleInterrupt(uart2RXBlockedQueue);
-
         } else if (vic1Status & UART2_TX_INTR2_MASK) {
-
-            // bwprintf(COM2, "Kernel - UART 2 transmit interrupt\n\r");
             uart2.disableTXInterrupt();
-            // uart2.clearTXInterrupt();
             handleInterrupt(uart2TXBlockedQueue);
-
         // This is here as an artefact of exploration
         // } else if (vic2Status & INT_UART2_MASK) {
         //     if (uart2.isRXInterrupt()) {
@@ -165,12 +118,6 @@ void Kernel::handle(int* stackPointer)  {
         //         // }
         //         handleInterrupt(uart2TXBlockedQueue);
         //     }
-        } else if (vic2Status & TC3UI_MASK) {
-
-            // bwprintf(COM2, "Kernel - The interrupt was a timer 3 overflow interrupt!\n\r");
-            handleInterrupt(timer3BlockedQueue);
-            *(int *)(TIMER3_BASE + CLR_OFFSET) = 1;
-
         } else {
             bwprintf(COM2, "Kernel - ERROR: Kernel interrupted with unknown interrupt\n\r");
             TRAP
@@ -222,6 +169,11 @@ void Kernel::handle(int* stackPointer)  {
 
             case Constants::SWI::SWITCH_OFF:
                 handleSwitchOff();
+                break;
+
+            case Constants::SWI::HALT:
+                activeTask->returnValue = timeSpentInIdleInLastTick;
+                timeSpentInIdleInThisTick = timeSpentInIdleInThisTick + handleHalt();
                 break;
 
             default:
@@ -291,7 +243,7 @@ void Kernel::handle(int* stackPointer)  {
         default:
             bwprintf(COM2, "Kernel - Received invalid task State: %d \n\r", activeTask->taskState);
             break;
-    }    
+    }
 }
 
 
@@ -301,10 +253,10 @@ void Kernel::run() {
     FOREVER {
         // bwprintf(COM2, "Kernel - %d %d\n\r", uart1.getInterruptStatus(), uart2.getInterruptStatus());
         schedule();
-        if (activeTask == nullptr) { 
+        if (activeTask == nullptr) {
             bwprintf(COM2, "Kernel - No active tasks scheduled, Shutting down!\n\r");
             // asm volatile("msr cpsr_c, #0b11010011");
-            break; 
+            break;
         }
         stackPointer = activate();
         handle(stackPointer);

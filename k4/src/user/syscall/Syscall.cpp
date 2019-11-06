@@ -56,3 +56,10 @@ int sysReply(int tid, const char *reply, int rplen) {
 void sysSwitchOff() {
     asm volatile("swi %c0" :: "i"(Constants::SWI::SWITCH_OFF));
 }
+
+int sysHalt() {
+    int retval;
+    asm volatile("swi %c0" :: "i"(Constants::SWI::HALT));
+    asm volatile("mov %0, r0" : "=r"(retval));
+    return retval;
+}
