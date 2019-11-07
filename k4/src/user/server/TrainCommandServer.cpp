@@ -2,9 +2,11 @@
 #include "io/bwio.hpp"
 #include "io/ts7200.h"
 #include "user/courier/TrainMarklinCourier.hpp"
-#include "user/message/TRMessage.hpp"
 #include "user/message/RVMessage.hpp"
 #include "user/message/SWMessage.hpp"
+#include "user/message/TextMessage.hpp"
+#include "user/message/ThinMessage.hpp"
+#include "user/message/TRMessage.hpp"
 #include "user/server/TrainCommandServer.hpp"
 #include "user/syscall/UserSyscall.hpp"
 
@@ -18,23 +20,33 @@ void trainCommandServer() {
 
     const int CLOCK_SERVER = WhoIs("CLOCK SERVER");
     TRMessage trmsg;
-    SWMessage swmsg;
-
     trmsg.headlights = true;
+    SWMessage swmsg;
+    TextMessage sendTextMessage;
+    MessageHeader* messageHeader = (MessageHeader*)&sendTextMessage;
+    ThinMessage readyMessage(Constants::MSG::RDY);
 
     int switchCourierTid = Create(0, trainMarklinCourier);
-    int automaticTrainControlTid1 = Create(0, trainMarklinCourier);
     int manualTrainControlTid = Create(0, trainMarklinCourier);
+    // int automaticTrainControlTid1 = Create(0, trainMarklinCourier);
 
     FOREVER {
         int sendTid;
-        char sendMessage[Constants::TrainCommandServer::MAX_SEND_MESSAGE_SIZE] = {0};
 
-        int sendMessageSize = Receive(&sendTid, sendMessage, Constants::TrainCommandServer::MAX_SEND_MESSAGE_SIZE);
-        // TODO: Verify if this should be -1 or -2
-        sendMessage[sendMessageSize - 1] = '\0';
+        int result = Receive(&sendTid, (char*)&sendTextMessage, Constants::TrainCommandServer::MAX_SEND_MESSAGE_SIZE);
+        if(result < 0) {
+            // TODO: handle empty message
+        }
 
-        char* commandToken = strtok(sendMessage, Constants::TrainCommandServer::DELIMITER);
+        if (messageHeader->type != Constants::MSG::TEXT) {
+            bwprintf(COM2, "TrainCommandServer - Expected MSG::TEXT but received a different response type\n\r");
+            // Reply(sendTid, )
+        }
+        // char* sendMessage = sendTextMessage.msg;
+        //TODO: fix this
+        // sendMessage[sendMessageSize - 1] = '\0';
+
+        char* commandToken = strtok(sendTextMessage.msg, Constants::TrainCommandServer::DELIMITER);
 
         if (!memcmp(commandToken, "tr\0", 3)) {
             int trainNumber = 0;
