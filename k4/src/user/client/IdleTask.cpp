@@ -34,6 +34,7 @@ void idleTask() {
                 currIdleTime += idleTime;
             }
         }
+
         idlemsg.integer = currIdleTime * 10 / i / 508;
         idlemsg.fractional = currIdleTime * 1000 / i / 508 % 100;
 

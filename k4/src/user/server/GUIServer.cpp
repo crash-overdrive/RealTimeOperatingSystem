@@ -20,11 +20,6 @@ int GUI::insertSetDisplayAttrs(char *str, int attr) {
     char attrstr[6] = {0};
     format(attrstr, Constants::VT100::SET_ATTR, attr);
     return format(str, "%s", attrstr);
-    // str[index++] = '\033';
-    // str[index++] = '[';
-    // // Logic for inserting attr
-    // str[index++] = 'm';
-    // return index;
 }
 
 int GUI::insertSaveCursorAndAttrs(char *str, int index) {

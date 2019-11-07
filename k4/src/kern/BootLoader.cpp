@@ -4,6 +4,7 @@
 #include "user/client/ClockClient.hpp"
 #include "user/client/IdleTask.hpp"
 #include "user/client/SensorData.hpp"
+#include "user/client/Test.hpp"
 #include "user/server/ClockServer.hpp"
 #include "user/server/GUIServer.hpp"
 #include "user/server/MarklinServer.hpp"
@@ -69,7 +70,8 @@ void bootLoader() {
     // bwprintf(COM2, "BootLoader - Created UART2TX Server with tid: %d\n\r", tid);
     Constants::UART2TXServer::TID = tid;
 
-    tid = Create(7, trainCommandServer);
+    tid = Create(8, trainCommandServer);
+    int tcstid = tid;
     // bwprintf(COM2, "BootLoader - Created Train Controller with tid: %d\n\r", tid);
 
     tid = Create(7, terminalServer);
@@ -95,6 +97,9 @@ void bootLoader() {
     // textmsg.msglen = 17;
 
     // Send(tstid, (char*)&textmsg, textmsg.size(), "reply", 6);
+
+    tid = Create(10, testTCStr);
+    tid = Create(10, testTCSsw);
 
     // TRMessage trmsg;
     // trmsg.train = 1;

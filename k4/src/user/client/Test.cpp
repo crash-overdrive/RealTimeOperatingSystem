@@ -1,11 +1,12 @@
 #include "io/bwio.hpp"
 #include "io/ts7200.h"
 #include "user/client/Test.hpp"
+#include "user/message/TextMessage.hpp"
 #include "user/syscall/UserSyscall.hpp"
 #define FOREVER for(;;)
 
 void testPrinting() {
-    
+
     // int UART1_SERVER = WhoIs("UART1RX");
     // int UART2_RX_SERVER = WhoIs("UART2RX");
     int UART2_TX_SERVER = WhoIs("UART2TX");
@@ -47,8 +48,34 @@ void testTyping() {
         int x = Getc(UART2_RX_SERVER, UART2);
         for (int i = 0; i < 100; ++i) {
             Putc(UART2_TX_SERVER, UART2, x);
-        } 
+        }
     }
     Putc(UART2_TX_SERVER, UART2, 'e');
+    Exit();
+}
+
+void testTCStr() {
+    TextMessage textmsg;
+    char msg[9] = "tr 58 14";
+    for (int i = 0; i < 9; ++i) {
+        textmsg.msg[i] = msg[i];
+    }
+    textmsg.msglen = 9;
+
+    Send(8, (char*)&textmsg, textmsg.size(), "reply", 6);
+
+    Exit();
+}
+
+void testTCSsw() {
+    TextMessage textmsg;
+    char msg[7] = "sw 7 C";
+    for (int i = 0; i < 7; ++i) {
+        textmsg.msg[i] = msg[i];
+    }
+    textmsg.msglen = 7;
+
+    Send(8, (char*)&textmsg, textmsg.size(), "reply", 6);
+
     Exit();
 }

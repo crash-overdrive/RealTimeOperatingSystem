@@ -3,5 +3,7 @@
 
 void testPrinting();
 void testTyping();
+void testTCStr();
+void testTCSsw();
 
 #endif

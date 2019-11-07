@@ -14,7 +14,7 @@ namespace Constants {
     const int MAX_MSGLEN = 512;
 
     namespace TrainCommandServer {
-        const int MAX_SEND_MESSAGE_SIZE = 10;
+        const int MAX_SEND_MESSAGE_SIZE = 128; // TODO: choose appropriate constant
         const int NUM_TRAINS = 100;
         const int NUM_SENSORS = 200;
         const char ENTER = (char)13;
