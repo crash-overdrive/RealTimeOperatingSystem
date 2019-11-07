@@ -22,9 +22,11 @@ void clockClient() {
     FOREVER {
         int ticks = Delay(clockServerTid, 10);
         sysTime.setSystemTime(ticks);
+
         timemsg.m = sysTime.minutes;
         timemsg.s = sysTime.seconds;
         timemsg.ms = sysTime.tenthOfASecond;
+
         Send(GUI, (char*)&timemsg, timemsg.size(), (char*)&rdymsg, rdymsg.size());
         if (rdymsg.mh.type != Constants::MSG::RDY) {
             bwprintf(COM2, "Clock Client - Expected MSG::RDY but received a different response type");

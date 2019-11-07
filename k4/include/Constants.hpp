@@ -118,14 +118,15 @@ namespace Constants {
         const char CLEAR_SCREEN[] = "\033[2J";
         const char SAVE_CURSOR_AND_ATTRS[] = "\0337";
         const char RESTORE_CURSOR_AND_ATTRS[] = "\0338";
+        const char MOVE_CURSOR_POS[] = "\033[%d;%df"; // Must be formatted with values!
         const char MOVE_CURSOR_TO_HOME[] = "\033[H";
         const char MOVE_CURSOR_POS_TO_TIME[] = "\033[2;8f";
         const char MOVE_CURSOR_POS_TO_IDLE[] = "\033[2;23f";
-        // const char MOVE_CURSOR_POS_TO_SWITCH[] = "\033[9;4f"; THIS CAN'T BE HARDCODED
         const char MOVE_CURSOR_POS_TO_SENSOR[] = "\033[9;5f";
         const char MOVE_CURSOR_POS_TO_CONSOLE[] = "\033[21;5f";
         const char MOVE_CURSOR_POS_TO_FEEDBACK[] = "\033[22;5f";
         const char MOVE_CURSOR_POS_TO_MSGLOG[] = "\033[25;5f";
+        const char SET_ATTR[] = "\033[%dm";
         const char SET_UNDERSCORE[] = "\033[4m";
         const char UNSET_UNDERSCORE[] = "\033[24m";
         const char UNSET_BLINK[] = "\033[25m";

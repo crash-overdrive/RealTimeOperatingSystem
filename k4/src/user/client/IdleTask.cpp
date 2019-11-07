@@ -6,6 +6,8 @@
 #include "io/StringFormat.hpp"
 #include "io/ts7200.h"
 #include "user/client/IdleTask.hpp"
+#include "user/message/IdleMessage.hpp"
+#include "user/message/ThinMessage.hpp"
 #include "user/syscall/UserSyscall.hpp"
 
 #define FOREVER for(;;)
@@ -14,23 +16,31 @@ void idleTask() {
     // Initialize TIMER2 for Idle task
     *(int *)(TIMER2_BASE + LDR_OFFSET) = 0xFFFFFFFF;
     *(int *)(TIMER2_BASE + CRTL_OFFSET) = ENABLE_MASK | MODE_MASK | CLKSEL_MASK;
-    int UART2_TX = WhoIs("UART2TX");
+
+    int GUI = WhoIs("GUI");
+
+    IdleMessage idlemsg;
+    ThinMessage rdymsg(Constants::MSG::RDY);
+
     FOREVER {
-        int timeSpentInIdleFor50Ticks = 0;
-        int idleTimePrevious = 0;
+        int currIdleTime = 0;
+        int prevIdleTime = 0;
         int i = 0;
         for (; i < 10; ) {
             int idleTime = Halt();
-            if (idleTime != idleTimePrevious) {
+            if (idleTime != prevIdleTime) {
                 ++i;
-                idleTimePrevious = idleTime;
-                timeSpentInIdleFor50Ticks += idleTime;
+                prevIdleTime = idleTime;
+                currIdleTime += idleTime;
             }
         }
-        // char buffer[50];
-        // int length = format(buffer, "\033[s\033[0;10H%d.%d%%\033[u", timeSpentInIdleFor50Ticks * 10 / i / 508 , timeSpentInIdleFor50Ticks * 10 / i % 508);
-        // for (int j = 0; j < length; ++j) {
-        //     Putc(UART2_TX, 1, buffer[j]);
-        // }
+
+        idlemsg.integer = currIdleTime * 10 / i / 508;
+        idlemsg.fractional = currIdleTime * 1000 / i / 508 % 100;
+
+        Send(GUI, (char*)&idlemsg, idlemsg.size(), (char*)&rdymsg, rdymsg.size());
+        if (rdymsg.mh.type != Constants::MSG::RDY) {
+            bwprintf(COM2, "Clock Client - Expected MSG::RDY but received a different response type");
+        }
     }
 }
