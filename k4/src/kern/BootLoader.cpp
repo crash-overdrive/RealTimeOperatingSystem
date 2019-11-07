@@ -4,6 +4,7 @@
 #include "user/client/ClockClient.hpp"
 #include "user/client/IdleTask.hpp"
 #include "user/client/SensorData.hpp"
+#include "user/client/SwitchSetup.hpp"
 #include "user/client/Test.hpp"
 #include "user/server/ClockServer.hpp"
 #include "user/server/GUIServer.hpp"
@@ -82,7 +83,9 @@ void bootLoader() {
     int guitid = tid;
     // bwprintf(COM2, "BootLoader - Created GUI Server with tid: %d\n\r", tid);
 
-    // tid = Create(8, sensorData);
+    tid = Create(8, sensorData);
+
+    tid = Create(7, switchSetup);
 
     tid = Create(9, clockClient);
 

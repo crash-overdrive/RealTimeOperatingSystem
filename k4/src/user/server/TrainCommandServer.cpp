@@ -187,9 +187,10 @@ void trainCommandServer() {
 
                     swmsg.sw = switchNumber;
                     swmsg.state = switchDirection;
+                    Delay(CLOCK_SERVER, 1);
                     Reply(marklinCourier, (char*)&swmsg, swmsg.size());
 
-                    Delay(CLOCK_SERVER, 10);
+                    Delay(CLOCK_SERVER, 15);
                     Receive(&tid, (char*)&msg, Constants::TrainCommandServer::MAX_SEND_MESSAGE_SIZE);
 
                     swmsg.sw = 0;
