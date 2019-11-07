@@ -3,6 +3,7 @@
 #include "io/bwio.hpp"
 #include "io/ts7200.h"
 #include "io/UART.hpp"
+#include "user/courier/TermTCSCourier.hpp"
 #include "user/courier/UART2RXCourier.hpp"
 #include "user/courier/UART2TXCourier.hpp"
 #include "user/message/MessageHeader.hpp"
@@ -18,11 +19,12 @@ void terminalServer() {
     RegisterAs("TERM");
     int TXC = Create(6, uart2txCourier);
     int RXC = Create(5, uart2rxCourier);
+    int TCS = Create(6, termTCSCourier); // 24
     bool txcBlocked = false;
     int tid, result;
     char msg[Constants::TerminalServer::MSG_SIZE];
 
-    MessageHeader *mh;
+    MessageHeader *mh = (MessageHeader *)&msg;
     CharMessage txmsg;
     txmsg.mh.type = Constants::MSG::TX;
     TextMessage *outmsg = (TextMessage *)&msg;
@@ -43,7 +45,6 @@ void terminalServer() {
         }
 
         // Check the type of the message received
-        mh = (MessageHeader *)&msg;
         if (mh->type == Constants::MSG::RDY) {
             // Send a character any are buffered
             if (!outbuf.empty()) {
@@ -53,6 +54,8 @@ void terminalServer() {
             } else {
                 txcBlocked = true;
             }
+        } else if (mh->type == Constants::MSG::REQUEST) {
+            // Reply will be sent when input is finished entering
         } else if (mh->type == Constants::MSG::TEXT) {
             // Atomically buffer the message
             for (int i = 0; i < outmsg->msglen; ++i) {
@@ -68,26 +71,47 @@ void terminalServer() {
         } else if (mh->type == Constants::MSG::RX) {
             if (rxmsg->ch == Constants::TrainCommandServer::ENTER) {
                 inmsg.msg[inmsg.msglen++] = 0;
-                outbuf.push('\n');
-                outbuf.push('\r');
+                outbuf.push('\033');
+                outbuf.push('[');
+                outbuf.push('2');
+                outbuf.push('1');
+                outbuf.push(';');
+                outbuf.push('5');
+                outbuf.push('f');
+                for (int i = 0; i < 40; i++) {
+                    outbuf.push(' ');
+                }
+                outbuf.push('\033');
+                outbuf.push('[');
+                outbuf.push('2');
+                outbuf.push('1');
+                outbuf.push(';');
+                outbuf.push('5');
+                outbuf.push('f');
+
+                Reply(TCS, (char* )&inmsg, inmsg.size());
                 // TODO(sgaweda): Create courier which communicates with train control server
                 inmsg.msglen = 0;
-            } else if (rxmsg->ch == Constants::TrainCommandServer::BACKSPACE && inmsg.msglen > 0) {
-                inmsg.msglen--;
-                outbuf.push('\033');
-                outbuf.push('[');
-                outbuf.push('1');
-                outbuf.push('D');
-                outbuf.push(' ');
-                outbuf.push('\033');
-                outbuf.push('[');
-                outbuf.push('1');
-                outbuf.push('D');
+            } else if (rxmsg->ch == Constants::TrainCommandServer::BACKSPACE) {
+                if (inmsg.msglen > 0) {
+                    inmsg.msglen--;
+                    outbuf.push('\033');
+                    outbuf.push('[');
+                    outbuf.push('1');
+                    outbuf.push('D');
+                    outbuf.push(' ');
+                    outbuf.push('\033');
+                    outbuf.push('[');
+                    outbuf.push('1');
+                    outbuf.push('D');
+                }
             } else if (rxmsg->ch == 0) {
                 // Do nothing
             } else {
-                inmsg.msg[inmsg.msglen++] = rxmsg->ch;
-                outbuf.push(rxmsg->ch);
+                if (inmsg.msglen < 40) {
+                    inmsg.msg[inmsg.msglen++] = rxmsg->ch;
+                    outbuf.push(rxmsg->ch);
+                }
             }
 
             // Send a character if possible

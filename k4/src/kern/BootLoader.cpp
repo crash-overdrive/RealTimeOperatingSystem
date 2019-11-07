@@ -70,7 +70,7 @@ void bootLoader() {
     // bwprintf(COM2, "BootLoader - Created UART2TX Server with tid: %d\n\r", tid);
     Constants::UART2TXServer::TID = tid;
 
-    tid = Create(8, trainCommandServer);
+    tid = Create(6, trainCommandServer);
     int tcstid = tid;
     // bwprintf(COM2, "BootLoader - Created Train Controller with tid: %d\n\r", tid);
 
@@ -98,8 +98,8 @@ void bootLoader() {
 
     // Send(tstid, (char*)&textmsg, textmsg.size(), "reply", 6);
 
-    tid = Create(10, testTCStr);
-    tid = Create(10, testTCSsw);
+    // tid = Create(10, testTCStr);
+    // tid = Create(10, testTCSsw);
 
     // TRMessage trmsg;
     // trmsg.train = 1;

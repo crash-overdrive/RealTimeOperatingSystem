@@ -178,6 +178,7 @@ namespace Constants {
     };
 
     enum MSG {
+        // NIL,
         RDY,
         CHAR,
         TX,

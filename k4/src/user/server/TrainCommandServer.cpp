@@ -141,7 +141,7 @@ void trainCommandServer() {
                 Delay(CLOCK_SERVER, 5);
                 Receive(&tid, (char*)&msg, Constants::TrainCommandServer::MAX_SEND_MESSAGE_SIZE);
 
-                trmsg.speed = trainNumber;
+                trmsg.speed = trainSpeed;
                 Reply(marklinCourier, (char*)&trmsg, trmsg.size());
             }
 
