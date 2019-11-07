@@ -1,22 +1,23 @@
+#include "Constants.hpp"
+#include "io/bwio.hpp"
 #include "kern/BootLoader.hpp"
-#include "user/syscall/UserSyscall.hpp"
 #include "user/client/ClockClient.hpp"
 #include "user/client/IdleTask.hpp"
-#include "user/server/TrainCommandServer.hpp"
-#include "user/server/NameServer.hpp"
+#include "user/client/SensorData.hpp"
 #include "user/server/ClockServer.hpp"
+#include "user/server/GUIServer.hpp"
+#include "user/server/MarklinServer.hpp"
+#include "user/server/NameServer.hpp"
+#include "user/server/TerminalServer.hpp"
+#include "user/server/TrainCommandServer.hpp"
 #include "user/server/UART1RXServer.hpp"
 #include "user/server/UART1TXServer.hpp"
 #include "user/server/UART2RXServer.hpp"
 #include "user/server/UART2TXServer.hpp"
-#include "user/server/MarklinServer.hpp"
-#include "user/server/TerminalServer.hpp"
-#include "io/bwio.hpp"
-#include "Constants.hpp"
-#include "string.h"
+#include "user/syscall/UserSyscall.hpp"
 
-#include "user/message/TextMessage.hpp"
-#include "user/message/TRMessage.hpp"
+// #include "user/message/TextMessage.hpp"
+// #include "user/message/TRMessage.hpp"
 
 namespace Constants {
     namespace NameServer {
@@ -57,7 +58,7 @@ void bootLoader() {
     // bwprintf(COM2, "BootLoader - Created UART2TX Server with tid: %d\n\r", tid);
     Constants::UART1TXServer::TID = tid;
 
-    tid = Create(4, marklinServer);
+    tid = Create(5, marklinServer);
     int mstid = tid;
 
     tid = Create(5, uart2rxServer);
@@ -75,9 +76,13 @@ void bootLoader() {
     int tstid = tid;
     // bwprintf(COM2, "BootLoader - Created Terminal Server with tid: %d\n\r", tid);
 
+    tid = Create(7, guiServer);
+    int guitid = tid;
+    // bwprintf(COM2, "BootLoader - Created GUI Server with tid: %d\n\r", tid);
+
     // tid = Create(8, sensorData);
 
-    tid = Create(7, clockClient);
+    tid = Create(8, clockClient);
 
     // Create the system's idle task
     tid = Create(Constants::NUM_PRIORITIES-1, idleTask);

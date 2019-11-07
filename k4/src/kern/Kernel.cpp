@@ -12,16 +12,69 @@ extern "C" int* kernelExit(int stackPointer);
 
 Kernel::Kernel(): uart1(UART1_BASE), uart2(UART2_BASE) {}
 
+void Kernel::drawGUI() {
+    bwprintf(COM2, Constants::VT100::MOVE_CURSOR_TO_HOME);
+    bwprintf(COM2, Constants::VT100::CLEAR_SCREEN);
+    bwprintf(COM2, "╔══════════════╦═════════════╦══════════════════════════════════════════════════════════╗\r\n"
+                   "║ %sTime%s MM:SS.S ║ %sIdle%s PP.PP%% ║ S-OS                                                     ║\r\n"
+                   "╠══════════════╩═════════════╩══════════════════════════════════════════════════════════╣\r\n"
+                   "║ %sSwitches%s                                                                              ║\r\n"
+                   "║   1   2   3   4   5   6   7   8   9  10  12  13  14  15  16  17  18 153 154 155 156   ║\r\n"
+                   "║                                                                                       ║\r\n"
+                   "╠═══════════════════════════════════════════════════════════════════════════════════════╣\r\n"
+                   "║ %sSensors%s                                                                               ║\r\n"
+                   "║   [ ]                                                                                 ║\r\n"
+                   "╠═══════════════════════════════════════════════════════════════════════════════════════╣\r\n"
+                   "║ %sSensor Predictions%s                                                                    ║\r\n"
+                   "║                                                                                       ║\r\n"
+                   "║   Next                                                                                ║\r\n"
+                   "║   Time Pred                                                                           ║\r\n"
+                   "║   Dist Pred                                                                           ║\r\n"
+                   "║                                                                                       ║\r\n"
+                   "║   Last                                                                                ║\r\n"
+                   "║   Time Real                                                                           ║\r\n"
+                   "║   Dist Real                                                                           ║\r\n"
+                   "╠═══════════════════════════════════════════════════════════════════════════════════════║\r\n"
+                   "║ >                                                                                     ║\r\n"
+                   "║                                                                                       ║\r\n"
+                   "╠═══════════════════════════════════════════════════════════════════════════════════════╣\r\n"
+                   "║ %sMessage Log%s                                                                           ║\r\n"
+                   "║                                                                                       ║\r\n"
+                   "║                                                                                       ║\r\n"
+                   "║                                                                                       ║\r\n"
+                   "║                                                                                       ║\r\n"
+                   "╚═══════════════════════════════════════════════════════════════════════════════════════╝\r\n",
+                   Constants::VT100::SET_UNDERSCORE, Constants::VT100::UNSET_UNDERSCORE,
+                   Constants::VT100::SET_UNDERSCORE, Constants::VT100::UNSET_UNDERSCORE,
+                   Constants::VT100::SET_UNDERSCORE, Constants::VT100::UNSET_UNDERSCORE,
+                   Constants::VT100::SET_UNDERSCORE, Constants::VT100::UNSET_UNDERSCORE,
+                   Constants::VT100::SET_UNDERSCORE, Constants::VT100::UNSET_UNDERSCORE,
+                   Constants::VT100::SET_UNDERSCORE, Constants::VT100::UNSET_UNDERSCORE);
+    // These are for checking print positions, leave here for regression testing
+    // bwprintf(COM2, Constants::VT100::MOVE_CURSOR_POS_TO_TIME);
+    // bwprintf(COM2, "99:88.7");
+    // bwprintf(COM2, Constants::VT100::MOVE_CURSOR_POS_TO_IDLE);
+    // bwprintf(COM2, "98.21");
+    // bwprintf(COM2, Constants::VT100::MOVE_CURSOR_POS_TO_SENSOR);
+    // bwprintf(COM2, "[ C13 B14 A8 ]");
+    // bwprintf(COM2, Constants::VT100::MOVE_CURSOR_POS_TO_MSGLOG);
+    // bwprintf(COM2, "Everything is fine");
+    bwprintf(COM2, Constants::VT100::MOVE_CURSOR_POS_TO_CONSOLE);
+}
+
 void Kernel::initialize() {
     // Setup comm
     uart1.setConfig(BPF8, OFF, ON, OFF);
 	uart2.setConfig(BPF8, OFF, OFF, OFF);
+    while(!uart1.isRXEmpty()) {
+        uart1.getc();
+    }
     uart1.enableRXInterrupt();
     uart2.enableRXInterrupt();
     // uart2.enableTXInterrupt();
 
     // Draw GUI
-    // drawGUI();
+    drawGUI();
 
     // Setup TaskDescriptors
     for (int i = 0; i < Constants::NUM_TASKS; ++i) {

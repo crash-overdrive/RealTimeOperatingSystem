@@ -2,6 +2,7 @@
 #define RING_BUFFER_HPP
 
 #include "io/bwio.hpp"
+#include "user/syscall/UserSyscall.hpp"
 
 namespace DataStructures {
 
@@ -30,7 +31,7 @@ class RingBuffer {
         int push(T item) {
 
             if(isFull) {
-                bwprintf(COM2, "Ring Buffer - Tried to push to a full RingBuffer\n\r");
+                bwprintf(COM2, "Ring Buffer - TID %d tried to push to a full RingBuffer\n\r", MyTid());
                 return 1;
             }
 
@@ -60,6 +61,18 @@ class RingBuffer {
             tail = (tail + 1) % maxSize;
 
             return val;
+
+        }
+
+        T *peekLast() {
+
+            if (empty()) {
+
+                return nullptr;
+
+            }
+
+            return &buffer[head % maxSize];
 
         }
 

@@ -11,7 +11,7 @@ namespace Constants {
     const int RECEIVE_QUEUE_LENGTH = 32;
     const int REPLY_QUEUE_LENGTH = NUM_TASKS;
     const int TD_STACK_SIZE = 32768;
-    const int MAX_MSGLEN = 128;
+    const int MAX_MSGLEN = 512;
 
     namespace TrainCommandServer {
         const int MAX_SEND_MESSAGE_SIZE = 10;
@@ -26,8 +26,8 @@ namespace Constants {
     }
 
     namespace SensorData {
-        const int NUMBER_OF_SENSOR_BANKS = 10;
-        const int NUMBER_OF_SENSORS = 80;
+        const int NUM_SENSOR_BANKS = 10;
+        const int NUM_SENSORS_DISPLAYED = 10;
     }
 
     namespace MarklinConsole {
@@ -106,6 +106,30 @@ namespace Constants {
         const int CMD_SIZE = 1024;
     }
 
+    // namespace GUIServer {
+    //     enum STYLE {
+    //         A,
+    //         B,
+    //         C,
+    //     };
+    // }
+
+    namespace VT100 {
+        const char CLEAR_SCREEN[] = "\033[2J";
+        const char SAVE_CURSOR_AND_ATTRS[] = "\0337";
+        const char RESTORE_CURSOR_AND_ATTRS[] = "\0338";
+        const char MOVE_CURSOR_TO_HOME[] = "\033[H";
+        const char MOVE_CURSOR_POS_TO_TIME[] = "\033[2;8f";
+        const char MOVE_CURSOR_POS_TO_IDLE[] = "\033[2;23f";
+        // const char MOVE_CURSOR_POS_TO_SWITCH[] = "\033[9;4f"; THIS CAN'T BE HARDCODED
+        const char MOVE_CURSOR_POS_TO_SENSOR[] = "\033[9;5f";
+        const char MOVE_CURSOR_POS_TO_CONSOLE[] = "\033[21;5f";
+        const char MOVE_CURSOR_POS_TO_FEEDBACK[] = "\033[22;5f";
+        const char MOVE_CURSOR_POS_TO_MSGLOG[] = "\033[25;5f";
+        const char SET_UNDERSCORE[] = "\033[4m";
+        const char UNSET_UNDERSCORE[] = "\033[24m";
+        const char UNSET_BLINK[] = "\033[25m";
+    }
 
     namespace RockPaperScissorServer {
         extern int TID;
@@ -163,6 +187,11 @@ namespace Constants {
         TR,
         RV,
         SW,
+        SENSOR,
+        SWITCH,
+        TRAIN,
+        TIME,
+        IDLE,
     };
 };
 

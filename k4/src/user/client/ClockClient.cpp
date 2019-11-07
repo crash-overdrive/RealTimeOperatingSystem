@@ -43,10 +43,10 @@ void clockClient() {
     FOREVER {
         int time = Delay(clockServerTid, 10);
         SystemTime sysTime = calculateSystemTime(time);
-        char buffer[50];
-        int length = format(buffer, "\033[s\033[H%d:%d.%d\033[u", sysTime.minutes, sysTime.seconds, sysTime.tenthOfASecond);
-        for (int i = 0; i < length; ++i) {
-            Putc(UART2_TX, UART2, buffer[i]);
-        }
+        // char buffer[50];
+        // int length = format(buffer, "\033[s\033[H%d:%d.%d\033[u", sysTime.minutes, sysTime.seconds, sysTime.tenthOfASecond);
+        // for (int i = 0; i < length; ++i) {
+        //     Putc(UART2_TX, UART2, buffer[i]);
+        // }
     }
 }

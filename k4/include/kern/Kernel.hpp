@@ -44,6 +44,7 @@ class Kernel {
         unsigned int timeSpentInIdleInLastTick = 0;
 
         void initialize();
+        void drawGUI();
 
         // Sets the active task to the task descriptor of the next scheduled task.
         void schedule();
