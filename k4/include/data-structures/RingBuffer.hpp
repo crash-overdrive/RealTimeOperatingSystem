@@ -52,7 +52,7 @@ class RingBuffer {
             if(empty()) {
 
                 return T();
-                
+
             }
 
             //Read data and advance the tail, there is now a space in the RingBuffer
@@ -72,7 +72,7 @@ class RingBuffer {
 
             }
 
-            return &buffer[head % maxSize];
+            return &buffer[(head - 1) % maxSize];
 
         }
 
@@ -97,9 +97,9 @@ class RingBuffer {
         }
 
         unsigned int capacity() const {
-            
+
             return maxSize;
-        
+
         }
 
         unsigned int size() const {

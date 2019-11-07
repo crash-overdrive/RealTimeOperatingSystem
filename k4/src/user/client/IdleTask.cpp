@@ -27,10 +27,10 @@ void idleTask() {
                 timeSpentInIdleFor50Ticks += idleTime;
             }
         }
-        char buffer[50];
-        int length = format(buffer, "\033[s\033[0;10H%d.%d%%\033[u", timeSpentInIdleFor50Ticks * 10 / i / 508 , timeSpentInIdleFor50Ticks * 10 / i % 508);
-        for (int j = 0; j < length; ++j) {
-            Putc(UART2_TX, 1, buffer[j]);
-        }
+        // char buffer[50];
+        // int length = format(buffer, "\033[s\033[0;10H%d.%d%%\033[u", timeSpentInIdleFor50Ticks * 10 / i / 508 , timeSpentInIdleFor50Ticks * 10 / i % 508);
+        // for (int j = 0; j < length; ++j) {
+        //     Putc(UART2_TX, 1, buffer[j]);
+        // }
     }
 }
