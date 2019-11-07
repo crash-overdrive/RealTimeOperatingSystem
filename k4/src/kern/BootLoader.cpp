@@ -2,23 +2,22 @@
 #include "io/bwio.hpp"
 #include "kern/BootLoader.hpp"
 #include "user/client/ClockClient.hpp"
-#include "user/client/ClockNotifier.hpp"
+#include "user/client/IdleTask.hpp"
 #include "user/client/SensorData.hpp"
-#include "user/client/Test.hpp"
-#include "user/client/TrainController.hpp"
 #include "user/server/ClockServer.hpp"
 #include "user/server/GUIServer.hpp"
 #include "user/server/MarklinServer.hpp"
 #include "user/server/NameServer.hpp"
+#include "user/server/TerminalServer.hpp"
+#include "user/server/TrainCommandServer.hpp"
 #include "user/server/UART1RXServer.hpp"
 #include "user/server/UART1TXServer.hpp"
 #include "user/server/UART2RXServer.hpp"
 #include "user/server/UART2TXServer.hpp"
-#include "user/server/TerminalServer.hpp"
 #include "user/syscall/UserSyscall.hpp"
 
-#include "user/message/TextMessage.hpp"
-#include "user/message/TRMessage.hpp"
+// #include "user/message/TextMessage.hpp"
+// #include "user/message/TRMessage.hpp"
 
 namespace Constants {
     namespace NameServer {
@@ -42,19 +41,6 @@ namespace Constants {
 }
 void bootLoader() {
     int tid;
-    // tid = Create(2, daughterClient);
-
-    // tid = Create(1, nameServer);
-    // tid = Create(2, rockPaperScissorServer);
-    // tid = Create(3, rockPaperScissorClient);
-    // tid = Create(3, rockPaperScissorClient);
-    // tid = Create(3, rockPaperScissorClient);
-    // tid = Create(3, rockPaperScissorClient);
-    // tid = Create(3, rockPaperScissorClient);
-    // tid = Create(3, rockPaperScissorClient);
-
-    // tid = Create(1, receiveClient);
-    // tid = Create(4, sendClient);
 
     tid = Create(2, nameServer);
     Constants::NameServer::TID = tid;
@@ -83,7 +69,7 @@ void bootLoader() {
     // bwprintf(COM2, "BootLoader - Created UART2TX Server with tid: %d\n\r", tid);
     Constants::UART2TXServer::TID = tid;
 
-    tid = Create(7, trainController);
+    // tid = Create(7, trainCommandServer);
     // bwprintf(COM2, "BootLoader - Created Train Controller with tid: %d\n\r", tid);
 
     tid = Create(7, terminalServer);
@@ -96,10 +82,10 @@ void bootLoader() {
 
     // tid = Create(8, sensorData);
 
-    // tid = Create(3, clockClient);
-    // tid = Create(4, clockClient);
-    // tid = Create(5, clockClient);
     tid = Create(8, clockClient);
+
+    // Create the system's idle task
+    tid = Create(Constants::NUM_PRIORITIES-1, idleTask);
 
     // TextMessage textmsg;
     // char msg[17] = "this is a test\r\n";
@@ -117,46 +103,5 @@ void bootLoader() {
     // Send(mstid, (char*)&trmsg, trmsg.size(), "reply", 6);
     // bwprintf(COM2, "Bootloader - Exiting");
 
-    // tid = Create(3, clockClient);
-    // tid = Create(4, clockClient);
-    // tid = Create(5, clockClient);
-    // tid = Create(6, clockClient);
-
-    // int sendTid;
-
-    // char sendMessage[2];
-    // char replyMessage[8];
-
-    // int t;
-    // int n;
-
-    // Receive(&sendTid, sendMessage, 2);
-    // t = 10;
-    // n = 20;
-    // memcpy(replyMessage, &t, sizeof(t));
-    // memcpy(replyMessage+4, &n, sizeof(n));
-    // Reply(sendTid, replyMessage, 8);
-
-    // Receive(&sendTid, sendMessage, 2);
-    // t = 23;
-    // n = 9;
-    // memcpy(replyMessage, &t, sizeof(t));
-    // memcpy(replyMessage+4, &n, sizeof(n));
-    // Reply(sendTid, replyMessage, 8);
-
-    // Receive(&sendTid, sendMessage, 2);
-    // t = 33;
-    // n = 6;
-    // memcpy(replyMessage, &t, sizeof(t));
-    // memcpy(replyMessage+4, &n, sizeof(n));
-    // Reply(sendTid, replyMessage, 8);
-
-    // Receive(&sendTid, sendMessage, 2);
-    // t = 71;
-    // n = 3;
-    // memcpy(replyMessage, &t, sizeof(t));
-    // memcpy(replyMessage+4, &n, sizeof(n));
-    // Reply(sendTid, replyMessage, 8);
-    
     Exit();
 }

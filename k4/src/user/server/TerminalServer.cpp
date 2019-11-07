@@ -3,8 +3,8 @@
 #include "io/bwio.hpp"
 #include "io/ts7200.h"
 #include "io/UART.hpp"
-#include "user/client/UART2RXCourier.hpp"
-#include "user/client/UART2TXCourier.hpp"
+#include "user/courier/UART2RXCourier.hpp"
+#include "user/courier/UART2TXCourier.hpp"
 #include "user/message/MessageHeader.hpp"
 #include "user/message/TextMessage.hpp"
 #include "user/message/ThinMessage.hpp"
@@ -66,7 +66,7 @@ void terminalServer() {
             }
             Reply(tid, (char*)&rdymsg, rdymsg.size());
         } else if (mh->type == Constants::MSG::RX) {
-            if (rxmsg->ch == Constants::TrainController::ENTER) {
+            if (rxmsg->ch == Constants::TrainCommandServer::ENTER) {
                 inmsg.msg[inmsg.msglen++] = 0;
                 outbuf.push('\n');
                 outbuf.push('\r');
@@ -74,7 +74,7 @@ void terminalServer() {
                 // bwprintf(COM2, inmsg.msg);
                 // TODO(sgaweda): Create courier which communicates with train control server
                 inmsg.msglen = 0;
-            } else if (rxmsg->ch == Constants::TrainController::BACKSPACE && inmsg.msglen > 0) {
+            } else if (rxmsg->ch == Constants::TrainCommandServer::BACKSPACE && inmsg.msglen > 0) {
                 inmsg.msglen--;
                 outbuf.push('\033');
                 outbuf.push('[');

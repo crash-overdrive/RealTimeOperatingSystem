@@ -1,7 +1,7 @@
 #include "Constants.hpp"
 #include "io/bwio.hpp"
 #include "io/ts7200.h"
-#include "user/client/UART1RXNotifier.hpp"
+#include "user/notifier/UART1RXNotifier.hpp"
 #include "user/syscall/UserSyscall.hpp"
 
 

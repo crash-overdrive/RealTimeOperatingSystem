@@ -11,7 +11,7 @@
 
 #define FOREVER for (;;)
 
-char *BORDER_CHARS[1] = "═║╔╗╚╝╠╣╦╩╬";
+char *BORDER_CHARS = "═║╔╗╚╝╠╣╦╩╬";
 
 int GUI::insertSetDisplayAttrs(char *str, int index, int attr) {
     str[index++] = '\033';

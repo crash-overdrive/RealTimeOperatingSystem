@@ -3,7 +3,7 @@
 #include "io/bwio.hpp"
 #include "io/ts7200.h"
 #include "io/UART.hpp"
-#include "user/client/UART2TXNotifier.hpp"
+#include "user/notifier/UART2TXNotifier.hpp"
 #include "user/server/UART2TXServer.hpp"
 #include "user/syscall/UserSyscall.hpp"
 
