@@ -1,25 +1,21 @@
+#include "Constants.hpp"
+#include "io/bwio.hpp"
 #include "kern/BootLoader.hpp"
-#include "user/syscall/UserSyscall.hpp"
-#include "user/client/TimingClient.hpp"
-#include "user/client/RockPaperScissorClient.hpp"
-#include "user/client/ForkClient.hpp"
 #include "user/client/ClockClient.hpp"
 #include "user/client/ClockNotifier.hpp"
-#include "user/client/TrainController.hpp"
 #include "user/client/SensorData.hpp"
 #include "user/client/Test.hpp"
-#include "user/server/RockPaperScissorServer.hpp"
-#include "user/server/NameServer.hpp"
+#include "user/client/TrainController.hpp"
 #include "user/server/ClockServer.hpp"
+#include "user/server/GUIServer.hpp"
+#include "user/server/MarklinServer.hpp"
+#include "user/server/NameServer.hpp"
 #include "user/server/UART1RXServer.hpp"
 #include "user/server/UART1TXServer.hpp"
 #include "user/server/UART2RXServer.hpp"
 #include "user/server/UART2TXServer.hpp"
-#include "user/server/MarklinServer.hpp"
 #include "user/server/TerminalServer.hpp"
-#include "io/bwio.hpp"
-#include "Constants.hpp"
-#include "string.h"
+#include "user/syscall/UserSyscall.hpp"
 
 #include "user/message/TextMessage.hpp"
 #include "user/message/TRMessage.hpp"
@@ -76,7 +72,7 @@ void bootLoader() {
     // bwprintf(COM2, "BootLoader - Created UART2TX Server with tid: %d\n\r", tid);
     Constants::UART1TXServer::TID = tid;
 
-    tid = Create(4, marklinServer);
+    tid = Create(5, marklinServer);
     int mstid = tid;
 
     tid = Create(5, uart2rxServer);
@@ -94,12 +90,16 @@ void bootLoader() {
     int tstid = tid;
     // bwprintf(COM2, "BootLoader - Created Terminal Server with tid: %d\n\r", tid);
 
+    tid = Create(7, guiServer);
+    int guitid = tid;
+    // bwprintf(COM2, "BootLoader - Created GUI Server with tid: %d\n\r", tid);
+
     // tid = Create(8, sensorData);
 
     // tid = Create(3, clockClient);
     // tid = Create(4, clockClient);
     // tid = Create(5, clockClient);
-    tid = Create(7, clockClient);
+    tid = Create(8, clockClient);
 
     // TextMessage textmsg;
     // char msg[17] = "this is a test\r\n";
@@ -110,11 +110,11 @@ void bootLoader() {
 
     // Send(tstid, (char*)&textmsg, textmsg.size(), "reply", 6);
 
-    TRMessage trmsg;
-    trmsg.train = 1;
-    trmsg.speed = 10;
-    trmsg.headlights = true;
-    Send(mstid, (char*)&trmsg, trmsg.size(), "reply", 6);
+    // TRMessage trmsg;
+    // trmsg.train = 1;
+    // trmsg.speed = 10;
+    // trmsg.headlights = true;
+    // Send(mstid, (char*)&trmsg, trmsg.size(), "reply", 6);
     // bwprintf(COM2, "Bootloader - Exiting");
 
     // tid = Create(3, clockClient);

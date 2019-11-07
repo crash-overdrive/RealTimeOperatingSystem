@@ -42,6 +42,6 @@ void clockClient() {
     FOREVER {
         int time = Delay(clockServerTid, 10);
         SystemTime sysTime = calculateSystemTime(time);
-        printf(UART2_TX, UART2, "\033[s\033[H%d:%d.%d\033[u", sysTime.minutes, sysTime.seconds, sysTime.tenthOfASecond);
+        // printf(UART2_TX, UART2, "\033[s\033[H%d:%d.%d\033[u", sysTime.minutes, sysTime.seconds, sysTime.tenthOfASecond);
     }
 }
