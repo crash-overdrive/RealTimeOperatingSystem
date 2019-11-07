@@ -16,16 +16,13 @@ void termTCSCourier() {
     ThinMessage rdymsg(Constants::MSG::REQUEST);
 
     FOREVER {
-        // bwprintf(COM2, "\r\nWUT?\r\n");
         // Get string to print to terminal
         result = Send(TERM, (char *)&rdymsg, rdymsg.size(), (char*)&tm, tm.maxSize());
         if (result < 0) {
             bwprintf(COM2, "Term->TCS Courier - Send to Terminal Server failed\r\n");
         }
-        // bwprintf(COM1, "CRY:(");
         if (tm.mh.type != Constants::MSG::TEXT) {
             bwprintf(COM2, "Term->TCS Courier - Expected TEXT message type but received unexpected message type %d\r\n", tm.mh.type);
-            // bwprintf(COM1, "<%s>", tm.mh.type);
         }
 
         // Send send string to terminal

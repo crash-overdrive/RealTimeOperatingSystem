@@ -6,6 +6,7 @@
 #include "user/message/IdleMessage.hpp"
 #include "user/message/MessageHeader.hpp"
 #include "user/message/SensorMessage.hpp"
+#include "user/message/SWMessage.hpp"
 #include "user/message/TextMessage.hpp"
 #include "user/message/TimeMessage.hpp"
 #include "user/message/ThinMessage.hpp"
@@ -105,7 +106,21 @@ void GUI::drawSensors(char *msg) {
 }
 
 void GUI::drawSwitch(char *msg) {
-    // TODO: implement me
+    char posstr[8] = {0};
+    SWMessage *sw = (SWMessage *)msg;
+    int xpos = 6;
+    int ypos = 1;
+    if (sw->sw >= 153) {
+        ypos += (sw->sw - 152 + 18) * 4;
+    } else {
+        ypos += sw->sw * 4;
+    }
+    format(posstr, Constants::VT100::MOVE_CURSOR_POS, xpos, ypos);
+
+    drawmsg.msglen = 0;
+    drawmsg.msglen += format(drawmsg.msg, "%s%s%c%s", Constants::VT100::SAVE_CURSOR_AND_ATTRS, posstr, sw->state, Constants::VT100::RESTORE_CURSOR_AND_ATTRS);
+    drawmsg.msg[drawmsg.msglen] = 0;
+    Reply(termCourier, (char*)&drawmsg, drawmsg.size());
 }
 
 void GUI::drawTrain(char *msg) {
@@ -184,7 +199,10 @@ void guiServer() {
                 Reply(tid, (char*)&rdymsg, rdymsg.size());
                 tsBlocked = false;
                 break;
-            case Constants::MSG::SWITCH:
+            case Constants::MSG::SW:
+                if (tsBlocked != true) {
+                    bwprintf(COM2, "GUI Server - Courier unexpectedly blocked!");
+                }
                 gui.drawSwitch(msg);
                 Reply(tid, (char*)&rdymsg, rdymsg.size());
                 tsBlocked = false;

@@ -1,6 +1,7 @@
 #include "Constants.hpp"
 #include "io/bwio.hpp"
 #include "io/ts7200.h"
+#include "user/courier/TCSGUICourier.hpp"
 #include "user/courier/TCSMarklinCourier.hpp"
 #include "user/message/RVMessage.hpp"
 #include "user/message/SWMessage.hpp"
@@ -35,6 +36,7 @@ void trainCommandServer() {
     // int manualTrainControlTid = Create(0, trainMarklinCourier);
     // int automaticTrainControlTid1 = Create(0, trainMarklinCourier);
     int marklinCourier = Create(7, tcsMarklinCourier);
+    int guiCourier = Create(7, tcsGUICourier);
 
     FOREVER {
         result = Receive(&tid, (char*)&msg, Constants::TrainCommandServer::MAX_SEND_MESSAGE_SIZE);
@@ -192,6 +194,8 @@ void trainCommandServer() {
 
                     swmsg.sw = 0;
                     Reply(marklinCourier, (char*)&swmsg, swmsg.size());
+                    swmsg.sw = switchNumber;
+                    Reply(guiCourier, (char*)&swmsg, swmsg.size());
                 } else {
                     Reply(tid, &Constants::Server::ERR, 1);
                 }

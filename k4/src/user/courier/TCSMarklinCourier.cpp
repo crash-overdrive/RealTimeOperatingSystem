@@ -14,7 +14,6 @@ void tcsMarklinCourier() {
     int TCS = WhoIs("TCS");
     int result;
 
-    // TextMessage tm;
     char msg[128];
     MessageHeader *mh = (MessageHeader *)msg;
     SWMessage *swmsg = (SWMessage *)msg;
@@ -33,7 +32,7 @@ void tcsMarklinCourier() {
         } else if (mh->type == Constants::MSG::SW) {
             result = Send(MARKLIN, (char*)swmsg, swmsg->size(), (char *)&rdymsg, rdymsg.size());
         } else {
-            bwprintf(COM2, "TCS->Marklin Courier - Expected TEXT message type but received unexpected message type\r\n");
+            bwprintf(COM2, "TCS->Marklin Courier - Expected TR or SW message type but received unexpected message type\r\n");
         }
 
         if (result < 0) {

@@ -190,7 +190,7 @@ namespace Constants {
         RV,
         SW,
         SENSOR,
-        SWITCH,
+        // SWITCH,
         TRAIN,
         TIME,
         IDLE,
