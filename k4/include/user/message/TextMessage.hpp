@@ -13,6 +13,7 @@ public:
     TextMessage();
 
     int size();
+    int maxSize();
 };
 
 #endif

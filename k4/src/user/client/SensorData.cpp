@@ -118,7 +118,7 @@ void sensorData() {
     DataStructures::RingBuffer<Sensor, Constants::SensorData::NUM_SENSORS_DISPLAYED> sensorHistory;
     // int sensorBankValues[Constants::SensorData::NUM_SENSOR_BANKS] = {0};
 
-    result = Send(MARKLIN, (char*)&reset, reset.size(), (char*)&data, data.size());
+    result = Send(MARKLIN, (char*)&reset, reset.size(), (char*)&data, data.maxSize());
     if (result < 0) {
         bwprintf(COM2, "Reset request send to Marklin server failed\r\n");
     }
@@ -128,7 +128,7 @@ void sensorData() {
         //   Furthermore, even if we want a delay, this actually isn't a good way to do it because it's 100ms from when we get here, but we need to send to other servers
         //   and the delay from sending to those servers will likely skew this to be more than 100ms!
         Delay(CLOCK_SERVER, 10);
-        result = Send(MARKLIN, (char*)&request, request.size(), (char*)&data, data.size());
+        result = Send(MARKLIN, (char*)&request, request.size(), (char*)&data, data.maxSize());
         if (result < 0) {
             bwprintf(COM2, "Data request send to Marklin server failed\r\n");
         }

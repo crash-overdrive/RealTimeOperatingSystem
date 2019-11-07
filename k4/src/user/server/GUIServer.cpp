@@ -6,6 +6,7 @@
 #include "user/message/MessageHeader.hpp"
 #include "user/message/SensorMessage.hpp"
 #include "user/message/TextMessage.hpp"
+#include "user/message/TimeMessage.hpp"
 #include "user/message/ThinMessage.hpp"
 #include "user/server/GUIServer.hpp"
 #include "user/syscall/UserSyscall.hpp"
@@ -46,7 +47,19 @@ int GUI::insertForceCursorPos(char *str, int index, int row, int col) {
 }
 
 void GUI::drawTime(char *msg) {
-    // TODO: implement me
+    TimeMessage *tm = (TimeMessage *)msg;
+    drawmsg.msglen = 0;
+    drawmsg.msglen += format(drawmsg.msg, "%s%s", Constants::VT100::SAVE_CURSOR_AND_ATTRS, Constants::VT100::MOVE_CURSOR_POS_TO_TIME);
+    if (tm->m / 10 == 0) {
+        drawmsg.msg[drawmsg.msglen++] = '0';
+    }
+    drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%d:", tm->m);
+    if (tm->s / 10 == 0) {
+        drawmsg.msg[drawmsg.msglen++] = '0';
+    }
+    drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%d.%d%s", tm->s, tm->ms, Constants::VT100::RESTORE_CURSOR_AND_ATTRS);
+    drawmsg.msg[drawmsg.msglen] = 0;
+    Reply(termCourier, (char*)&drawmsg, drawmsg.size());
 }
 
 void GUI::drawIdle(char *msg) {
@@ -101,7 +114,7 @@ void GUI::init() {
     //     bwprintf(COM2, "GUI Server - Invalid GUI style!");
     //     break;
     // }
-    termCourier = Create(6, guiTermCourier);
+    termCourier = Create(7, guiTermCourier);
     // drawingBase = true;
 }
 
@@ -109,13 +122,14 @@ void guiServer() {
     RegisterAs("GUI");
     GUI gui;
     gui.init();
-    int baseDrawCount = 0;
 
     int result, tid;
     char msg[128];
     MessageHeader *mh = (MessageHeader *)msg;
     SensorMessage *sm = (SensorMessage *)msg;
     ThinMessage rdymsg(Constants::MSG::RDY);
+
+    bool tsBlocked = false;
 
     FOREVER {
         result = Receive(&tid, msg, 128);
@@ -126,26 +140,39 @@ void guiServer() {
         switch (mh->type) {
             case Constants::MSG::RDY:
                 // TODO(sgaweda): reply only when ready to draw!
+                tsBlocked = true;
                 break;
-            case Constants::MSG::TIME:
+            case Constants::MSG::TIME: {
+                if (tsBlocked != true) {
+                    bwprintf(COM2, "GUI Server - Courier unexpectedly blocked!");
+                }
+                TimeMessage *tm = (TimeMessage *)msg;
                 gui.drawTime(msg);
                 Reply(tid, (char*)&rdymsg, rdymsg.size());
-                break;
+                tsBlocked = false;
+                break;}
             case Constants::MSG::IDLE:
                 gui.drawIdle(msg);
                 Reply(tid, (char*)&rdymsg, rdymsg.size());
+                tsBlocked = false;
                 break;
             case Constants::MSG::SENSOR:
+                if (tsBlocked != true) {
+                    bwprintf(COM2, "GUI Server - Courier unexpectedly blocked!");
+                }
                 gui.drawSensors(msg);
                 Reply(tid, (char*)&rdymsg, rdymsg.size());
+                tsBlocked = false;
                 break;
             case Constants::MSG::SWITCH:
                 gui.drawSwitch(msg);
                 Reply(tid, (char*)&rdymsg, rdymsg.size());
+                tsBlocked = false;
                 break;
-            case Constants::MSG::TRAIN:
+            case Constants::MSG::TRAIN: // TODO(sgaweda): This case will remain unimplemented for now
                 gui.drawTrain(msg);
                 Reply(tid, (char*)&rdymsg, rdymsg.size());
+                tsBlocked = false;
                 break;
             default:
                 bwprintf(COM2, "GUI Server - Unrecognized message type received");

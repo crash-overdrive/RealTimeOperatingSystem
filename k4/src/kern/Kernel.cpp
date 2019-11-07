@@ -69,6 +69,9 @@ void Kernel::initialize() {
     while(!uart1.isRXEmpty()) {
         uart1.getc();
     }
+    while(!uart2.isRXEmpty()) {
+        uart2.getc();
+    }
     uart1.enableRXInterrupt();
     uart2.enableRXInterrupt();
     // uart2.enableTXInterrupt();

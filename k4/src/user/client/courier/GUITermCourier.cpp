@@ -17,7 +17,7 @@ void guiTermCourier() {
 
     FOREVER {
         // Get string to print to terminal
-        result = Send(GUI, (char *)&rdymsg, rdymsg.size(), (char*)&tm, tm.size());
+        result = Send(GUI, (char *)&rdymsg, rdymsg.size(), (char*)&tm, tm.maxSize());
         if (result < 0) {
             bwprintf(COM2, "GUI->Term Courier - Send to GUI Server failed\r\n");
         }

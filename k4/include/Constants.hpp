@@ -4,7 +4,7 @@
 #include <string.h>
 
 namespace Constants {
-    const int NUM_PRIORITIES = 10;
+    const int NUM_PRIORITIES = 12;
     const int Q_LENGTH = 10;
     const int NUM_TASKS = 128;
     const int EXIT_Q_LENGTH = NUM_TASKS;
@@ -41,12 +41,12 @@ namespace Constants {
         const char REQUEST_5_SENSOR_DATA = (char)133;
         const char SET_RESET_ON_FOR_SENSORS = (char)192;
     }
-    
+
     namespace Server {
         const char ACK = 'A';
         const char ERR = 'E';
     }
-    
+
     namespace NameServer {
         extern int TID;
         const char REGISTER_AS = 'r';
