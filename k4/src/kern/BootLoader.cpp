@@ -1,5 +1,6 @@
 #include "Constants.hpp"
 #include "io/bwio.hpp"
+#include "io/ts7200.h"
 #include "kern/BootLoader.hpp"
 #include "user/client/ClockClient.hpp"
 #include "user/client/IdleTask.hpp"
@@ -51,6 +52,7 @@ void bootLoader() {
     tid = Create(1, clockServer);
     // bwprintf(COM2, "BootLoader - Created Clock Server with tid: %d\n\r", tid);
     Constants::ClockServer::TID = tid;
+    int ctid = tid;
 
     tid = Create(3, uart1rxServer);
     // bwprintf(COM2, "BootLoader - Created UART1RX Server with tid: %d\n\r", tid);
@@ -83,14 +85,38 @@ void bootLoader() {
     int guitid = tid;
     // bwprintf(COM2, "BootLoader - Created GUI Server with tid: %d\n\r", tid);
 
-    tid = Create(8, sensorData);
-
     tid = Create(7, switchSetup);
+
+    tid = Create(8, sensorData);
 
     tid = Create(9, clockClient);
 
     // Create the system's idle task
     tid = Create(Constants::NUM_PRIORITIES-1, idleTask);
+
+    //
+    // for (int i = 1; i <= 18; ++i) {
+    //     Putc(tid, UART1, 34);
+    //     Delay(ctid, 20);
+    //     Putc(tid, UART1, i);
+    //     Delay(ctid, 20);
+    // }
+    // Putc(tid, UART1, 34);
+    // Delay(ctid, 20);
+    // Putc(tid, UART1, 153);
+    // Delay(ctid, 20);
+    // Putc(tid, UART1, 34);
+    // Delay(ctid, 20);
+    // Putc(tid, UART1, 154);
+    // Delay(ctid, 20);
+    // Putc(tid, UART1, 34);
+    // Delay(ctid, 20);
+    // Putc(tid, UART1, 155);
+    // Delay(ctid, 20);
+    // Putc(tid, UART1, 34);
+    // Delay(ctid, 20);
+    // Putc(tid, UART1, 156);
+    // Delay(ctid, 20);
 
     // TextMessage textmsg;
     // char msg[17] = "this is a test\r\n";

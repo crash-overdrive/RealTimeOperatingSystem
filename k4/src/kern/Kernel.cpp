@@ -79,6 +79,12 @@ void Kernel::initialize() {
     // Draw GUI
     drawGUI();
 
+    // Setup Switches
+    // for (int i = 1; i <= 18; ++i) {
+    //     uart1.putc(34);
+    //     uart1.putc(i);
+    // }
+
     // Setup TaskDescriptors
     for (int i = 0; i < Constants::NUM_TASKS; ++i) {
         // Set all task ids to -1 so lookup can be performed safely
