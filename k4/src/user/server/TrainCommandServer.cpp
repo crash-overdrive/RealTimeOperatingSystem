@@ -1,7 +1,7 @@
 #include "Constants.hpp"
 #include "io/bwio.hpp"
 #include "io/ts7200.h"
-#include "user/courier/ReverseTrainMarklinCourier.hpp"
+#include "user/courier/TrainMarklinCourier.hpp"
 #include "user/message/TRMessage.hpp"
 #include "user/message/RVMessage.hpp"
 #include "user/message/SWMessage.hpp"
@@ -22,8 +22,9 @@ void trainCommandServer() {
 
     trmsg.headlights = true;
 
-    // int courierTid = Create(0, trainMarklinCourier);
-    int courierTid = Create(0, reverseTrainMarklinCourier);
+    int switchCourierTid = Create(0, trainMarklinCourier);
+    int automaticTrainControlTid1 = Create(0, trainMarklinCourier);
+    int manualTrainControlTid = Create(0, trainMarklinCourier);
 
     FOREVER {
         int sendTid;

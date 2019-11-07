@@ -10,8 +10,6 @@ kernelExit:
     // store kernel state on kernel stack
     // r4-r12, lr, cpsr
     stmfd sp!, {r4-r12, lr}
-    mrs r12, cpsr
-    stmfd sp!, {r12}
 
     // Pop off the sentinal value for IRQ
     ldmfd r0!, {r3}
@@ -19,7 +17,7 @@ kernelExit:
     ldmfd r0!, {r1, r2}
     mov lr, r1
     msr spsr, r2
-    
+
     // ENTER SYSTEM MODE
     msr cpsr_c, #0b10011111
 
@@ -36,7 +34,7 @@ kernelExit:
 
     // Go back to user mode
     movs pc, lr
-    
+
 
 .globl context_switch_enter
 .type context_switch_enter, %function
@@ -45,13 +43,13 @@ context_switch_enter:
     // ENTER SYSTEM MODE
     msr cpsr_c, #0b10011111
 
-    // Save user state (r0-r12, lr) on user stack  
+    // Save user state (r0-r12, lr) on user stack
     // sp is decremented appropriately and saved into the task descriptor
     stmfd sp!, {r0-r12, lr}
 
     // Save value of user stackPointer in r0 because this is what we will return
     mov r0, sp
-    
+
     // ENTER SUPERVISOR MODE
     msr cpsr_c, #0b10010011
 
@@ -69,13 +67,7 @@ context_switch_enter:
     stmfd r0!, {r3}
 
     // Retrieve Kernal State from Kernal Stack
-    ldmfd sp!, {r12}
-    msr cpsr, r12
-    ldmfd sp!, {r4-r12, lr}
-
-    // Jump back to kernel code in Kernel.cpp
-    mov pc, lr
-
+    ldmfd sp!, {r4-r12, pc}
 
 .globl handle_interrupt
 .type handle_interrupt, %function
@@ -94,9 +86,6 @@ handle_interrupt:
     // ENTER INTERRUPT MODE
     msr cpsr_c, #0b11010010
 
-    // ENTER SUPERVISOR MODE
-    @ msr cpsr_c, #0b11010011
-
     // save pc of the user process in r1, which is gonna be in lr_irq
     sub r1, lr, #4
 
@@ -114,9 +103,4 @@ handle_interrupt:
     msr cpsr_c, #0b11010011
 
     // Retrieve Kernal State from Kernal Stack
-    ldmfd sp!, {r12}
-    msr cpsr, r12
-    ldmfd sp!, {r4-r12, lr}
-
-    // Jump back to kernel code in Kernel.cpp
-    mov pc, lr
+    ldmfd sp!, {r4-r12, pc}

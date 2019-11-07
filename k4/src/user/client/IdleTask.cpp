@@ -16,7 +16,7 @@ void idleTask() {
     *(int *)(TIMER2_BASE + CRTL_OFFSET) = ENABLE_MASK | MODE_MASK | CLKSEL_MASK;
     int UART2_TX = WhoIs("UART2TX");
     FOREVER {
-        int timeSpentInIdleFor50Ticks = 0;
+        int timeSpentInIdleFor10Ticks = 0;
         int idleTimePrevious = 0;
         int i = 0;
         for (; i < 10; ) {
@@ -24,11 +24,11 @@ void idleTask() {
             if (idleTime != idleTimePrevious) {
                 ++i;
                 idleTimePrevious = idleTime;
-                timeSpentInIdleFor50Ticks += idleTime;
+                timeSpentInIdleFor10Ticks += idleTime;
             }
         }
         char buffer[50];
-        int length = format(buffer, "\033[s\033[0;10H%d.%d%%\033[u", timeSpentInIdleFor50Ticks * 10 / i / 508 , timeSpentInIdleFor50Ticks * 10 / i % 508);
+        int length = format(buffer, "\033[s\033[0;10H%d.%d%%\033[u", timeSpentInIdleFor10Ticks * 10 / i / 508 , timeSpentInIdleFor10Ticks * 10 / i % 508);
         for (int j = 0; j < length; ++j) {
             Putc(UART2_TX, 1, buffer[j]);
         }
