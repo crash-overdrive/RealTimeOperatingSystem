@@ -76,13 +76,13 @@ void bootLoader() {
     int tstid = tid;
     // bwprintf(COM2, "BootLoader - Created Terminal Server with tid: %d\n\r", tid);
 
-    tid = Create(7, guiServer);
+    tid = Create(8, guiServer);
     int guitid = tid;
     // bwprintf(COM2, "BootLoader - Created GUI Server with tid: %d\n\r", tid);
 
     // tid = Create(8, sensorData);
 
-    tid = Create(8, clockClient);
+    tid = Create(9, clockClient);
 
     // Create the system's idle task
     tid = Create(Constants::NUM_PRIORITIES-1, idleTask);

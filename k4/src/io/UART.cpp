@@ -1,5 +1,6 @@
-#include "io/UART.hpp"
+#include "io/bwio.hpp"
 #include "io/ts7200.h"
+#include "io/UART.hpp"
 
 UART::UART(int base) : base{base} {}
 

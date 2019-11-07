@@ -70,8 +70,6 @@ void terminalServer() {
                 inmsg.msg[inmsg.msglen++] = 0;
                 outbuf.push('\n');
                 outbuf.push('\r');
-                // bwprintf(COM2, "TS - inmsg.msg is about to print\r\n");
-                // bwprintf(COM2, inmsg.msg);
                 // TODO(sgaweda): Create courier which communicates with train control server
                 inmsg.msglen = 0;
             } else if (rxmsg->ch == Constants::TrainCommandServer::BACKSPACE && inmsg.msglen > 0) {

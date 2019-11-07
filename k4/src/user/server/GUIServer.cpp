@@ -1,10 +1,13 @@
 #include "Constants.hpp"
 #include "io/bwio.hpp"
-#include "io/term.hpp"
+#include "io/StringFormat.hpp"
+#include "io/VT100.hpp"
 #include "user/client/courier/GUITermCourier.hpp"
+#include "user/message/IdleMessage.hpp"
 #include "user/message/MessageHeader.hpp"
 #include "user/message/SensorMessage.hpp"
 #include "user/message/TextMessage.hpp"
+#include "user/message/TimeMessage.hpp"
 #include "user/message/ThinMessage.hpp"
 #include "user/server/GUIServer.hpp"
 #include "user/syscall/UserSyscall.hpp"
@@ -13,12 +16,15 @@
 
 char *BORDER_CHARS = "═║╔╗╚╝╠╣╦╩╬";
 
-int GUI::insertSetDisplayAttrs(char *str, int index, int attr) {
-    str[index++] = '\033';
-    str[index++] = '[';
-    // Logic for inserting attr
-    str[index++] = 'm';
-    return index;
+int GUI::insertSetDisplayAttrs(char *str, int attr) {
+    char attrstr[6] = {0};
+    format(attrstr, Constants::VT100::SET_ATTR, attr);
+    return format(str, "%s", attrstr);
+    // str[index++] = '\033';
+    // str[index++] = '[';
+    // // Logic for inserting attr
+    // str[index++] = 'm';
+    // return index;
 }
 
 int GUI::insertSaveCursorAndAttrs(char *str, int index) {
@@ -45,30 +51,61 @@ int GUI::insertForceCursorPos(char *str, int index, int row, int col) {
 }
 
 void GUI::drawTime(char *msg) {
-    // TODO: implement me
+    TimeMessage *tm = (TimeMessage *)msg;
+    drawmsg.msglen = 0;
+    drawmsg.msglen += format(drawmsg.msg, "%s%s", Constants::VT100::SAVE_CURSOR_AND_ATTRS, Constants::VT100::MOVE_CURSOR_POS_TO_TIME);
+    if (tm->m / 10 == 0) {
+        drawmsg.msg[drawmsg.msglen++] = '0';
+    }
+    drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%d:", tm->m);
+    if (tm->s / 10 == 0) {
+        drawmsg.msg[drawmsg.msglen++] = '0';
+    }
+    drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%d.%d%s", tm->s, tm->ms, Constants::VT100::RESTORE_CURSOR_AND_ATTRS);
+    drawmsg.msg[drawmsg.msglen] = 0;
+    Reply(termCourier, (char*)&drawmsg, drawmsg.size());
 }
 
 void GUI::drawIdle(char *msg) {
-    // TODO: implement me
+    IdleMessage *im = (IdleMessage *)msg;
+    drawmsg.msglen = 0;
+    drawmsg.msglen += format(drawmsg.msg, "%s%s", Constants::VT100::SAVE_CURSOR_AND_ATTRS, Constants::VT100::MOVE_CURSOR_POS_TO_IDLE);
+    if (im->integer >= 80) {
+        drawmsg.msglen += insertSetDisplayAttrs(&drawmsg.msg[drawmsg.msglen], FG_GREEN);
+    } else if (im->integer >= 50) {
+        drawmsg.msglen += insertSetDisplayAttrs(&drawmsg.msg[drawmsg.msglen], FG_YELLOW);
+    } else {
+        drawmsg.msglen += insertSetDisplayAttrs(&drawmsg.msg[drawmsg.msglen], FG_RED);
+    }
+    if (im->integer / 10 == 0) {
+        drawmsg.msg[drawmsg.msglen++] = '0';
+    }
+    drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%d.", im->integer);
+    if (im->fractional / 10 == 0) {
+        drawmsg.msg[drawmsg.msglen++] = '0';
+    }
+    drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%d%s", im->fractional, Constants::VT100::RESTORE_CURSOR_AND_ATTRS);
+    Reply(termCourier, (char*)&drawmsg, drawmsg.size());
 }
 
 void GUI::drawSensors(char *msg) {
     SensorMessage *sm = (SensorMessage *)msg;
-    drawmsg.msg[0] = '\033';
-    drawmsg.msg[1] = '[';
-    drawmsg.msg[2] = '9';
-    drawmsg.msg[3] = ';';
-    drawmsg.msg[4] = '5';
-    drawmsg.msg[5] = 'f';
-    drawmsg.msg[6] = '[';
+
+    drawmsg.msglen = 0;
+    drawmsg.msglen += format(drawmsg.msg, "%s%s[ ", Constants::VT100::SAVE_CURSOR_AND_ATTRS, Constants::VT100::MOVE_CURSOR_POS_TO_SENSOR);
     // This is a tiny bit hacky because the sensor message should probably provide length, but that's a problem for another day
     // TODO(sgaweda): Fix this another day!
-    for (int i = 0; i < 10; i++) {
-        drawmsg.msg[7+i*2] = sm->sensorData[i].bank;
-        drawmsg.msg[8+i*2] = sm->sensorData[i].number + '0';
+    for (int i = 0; i < 10; ++i) {
+        // We check here to see if the bank isn't a valid bank
+        if (sm->sensorData[i].bank > 0) {
+            drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%c%d ", sm->sensorData[i].bank, sm->sensorData[i].number);
+        }
     }
-    drawmsg.msg[27] = ']';
-    drawmsg.msglen = 27;
+    drawmsg.msg[drawmsg.msglen++] = ']';
+    while(drawmsg.msglen < 53) {
+        drawmsg.msg[drawmsg.msglen++] = ' ';
+    }
+    drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%s", Constants::VT100::RESTORE_CURSOR_AND_ATTRS);
     Reply(termCourier, (char*)&drawmsg, drawmsg.size());
 }
 
@@ -99,7 +136,7 @@ void GUI::init() {
     //     bwprintf(COM2, "GUI Server - Invalid GUI style!");
     //     break;
     // }
-    termCourier = Create(6, guiTermCourier);
+    termCourier = Create(7, guiTermCourier);
     // drawingBase = true;
 }
 
@@ -107,13 +144,14 @@ void guiServer() {
     RegisterAs("GUI");
     GUI gui;
     gui.init();
-    int baseDrawCount = 0;
 
     int result, tid;
     char msg[128];
     MessageHeader *mh = (MessageHeader *)msg;
     SensorMessage *sm = (SensorMessage *)msg;
     ThinMessage rdymsg(Constants::MSG::RDY);
+
+    bool tsBlocked = false;
 
     FOREVER {
         result = Receive(&tid, msg, 128);
@@ -124,26 +162,42 @@ void guiServer() {
         switch (mh->type) {
             case Constants::MSG::RDY:
                 // TODO(sgaweda): reply only when ready to draw!
+                tsBlocked = true;
                 break;
-            case Constants::MSG::TIME:
+            case Constants::MSG::TIME: {
+                if (tsBlocked != true) {
+                    bwprintf(COM2, "GUI Server - Courier unexpectedly blocked!");
+                }
+                TimeMessage *tm = (TimeMessage *)msg;
                 gui.drawTime(msg);
                 Reply(tid, (char*)&rdymsg, rdymsg.size());
-                break;
+                tsBlocked = false;
+                break;}
             case Constants::MSG::IDLE:
+                if (tsBlocked != true) {
+                    bwprintf(COM2, "GUI Server - Courier unexpectedly blocked!");
+                }
                 gui.drawIdle(msg);
                 Reply(tid, (char*)&rdymsg, rdymsg.size());
+                tsBlocked = false;
                 break;
             case Constants::MSG::SENSOR:
+                if (tsBlocked != true) {
+                    bwprintf(COM2, "GUI Server - Courier unexpectedly blocked!");
+                }
                 gui.drawSensors(msg);
                 Reply(tid, (char*)&rdymsg, rdymsg.size());
+                tsBlocked = false;
                 break;
             case Constants::MSG::SWITCH:
                 gui.drawSwitch(msg);
                 Reply(tid, (char*)&rdymsg, rdymsg.size());
+                tsBlocked = false;
                 break;
-            case Constants::MSG::TRAIN:
+            case Constants::MSG::TRAIN: // TODO(sgaweda): This case will remain unimplemented for now
                 gui.drawTrain(msg);
                 Reply(tid, (char*)&rdymsg, rdymsg.size());
+                tsBlocked = false;
                 break;
             default:
                 bwprintf(COM2, "GUI Server - Unrecognized message type received");

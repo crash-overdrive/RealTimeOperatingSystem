@@ -16,7 +16,7 @@ public:
     int termCourier;
     TextMessage drawmsg;
 
-    int insertSetDisplayAttrs(char *str, int index, int attr);
+    int insertSetDisplayAttrs(char *str, int attr);
     int insertSaveCursorAndAttrs(char *str, int index);
     int insertRestorCursorAndAttrs(char *str, int index);
     int insertForceCursorPos(char *str, int index, int row, int col);

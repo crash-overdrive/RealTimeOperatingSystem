@@ -118,7 +118,7 @@ void sensorData() {
     DataStructures::RingBuffer<Sensor, Constants::SensorData::NUM_SENSORS_DISPLAYED> sensorHistory;
     // int sensorBankValues[Constants::SensorData::NUM_SENSOR_BANKS] = {0};
 
-    result = Send(MARKLIN, (char*)&reset, reset.size(), (char*)&data, data.size());
+    result = Send(MARKLIN, (char*)&reset, reset.size(), (char*)&data, data.maxSize());
     if (result < 0) {
         bwprintf(COM2, "Reset request send to Marklin server failed\r\n");
     }
@@ -128,7 +128,7 @@ void sensorData() {
         //   Furthermore, even if we want a delay, this actually isn't a good way to do it because it's 100ms from when we get here, but we need to send to other servers
         //   and the delay from sending to those servers will likely skew this to be more than 100ms!
         Delay(CLOCK_SERVER, 10);
-        result = Send(MARKLIN, (char*)&request, request.size(), (char*)&data, data.size());
+        result = Send(MARKLIN, (char*)&request, request.size(), (char*)&data, data.maxSize());
         if (result < 0) {
             bwprintf(COM2, "Data request send to Marklin server failed\r\n");
         }
@@ -137,10 +137,8 @@ void sensorData() {
             for (int bank = 0; bank < Constants::SensorData::NUM_SENSOR_BANKS; ++bank) {
                 // Only process the data bank if it was triggered
                 if (data.msg[bank] > 0) {
-                    // bwprintf(COM2, "SD - SENSOR CAUGHT %d,%d! ", (int)bank, (int)data.msg[bank]);
                     for (int bit = 0; bit < 8; ++bit) {
                         if ((int)data.msg[bank] & (128>>bit)) {
-                            // bwprintf(COM2, "SD - CHECK %d, %d, %d ", (int)data.msg[bank], 128>>bit, (int)data.msg[bank] & (128>>bit));
                             char sensorBank = getSensorBank(bank);
                             char sensorNumber = getSensorNumber(bank, bit);
                             // Only add if not the most recent sensor reading
@@ -150,10 +148,8 @@ void sensorData() {
                                     sensorHistory.pop();
                                 }
                                 sensorHistory.push(Sensor(sensorBank, sensorNumber));
-                                // bwprintf(COM2, "SD - pushed sensor data! %d, %c, %d\r\n", sensorHistory.size(), sensorHistory.peekLast()->bank, sensorHistory.peekLast()->number);
                             } else if (sensorHistory.empty()) {
                                 sensorHistory.push(Sensor(sensorBank, sensorNumber));
-                                // bwprintf(COM2, "SD - pushed sensor data! %d, %c, %d\r\n", sensorHistory.size(), sensorHistory.peekLast()->bank, sensorHistory.peekLast()->number);
                             }
                         }
                     }
