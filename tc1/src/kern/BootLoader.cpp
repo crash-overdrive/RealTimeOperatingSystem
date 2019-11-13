@@ -85,9 +85,11 @@ void bootLoader() {
     // int guitid = tid;
     // bwprintf(COM2, "BootLoader - Created GUI Server with tid: %d\n\r", tid);
 
-    tid = Create(7, switchSetup);
+    tid = Create(5, switchSetup);
 
-    tid = Create(8, sensorData);
+    // TODO(sgaweda): Remove this when we are sure that Sensor Data should be created by Marklin Server
+    // tid = Create(8, sensorData);
+    // bwprintf(COM2, "BootLoader - Sensor Data client created\r\n");
 
     tid = Create(9, clockClient);
 

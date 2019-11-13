@@ -186,6 +186,8 @@ namespace Constants {
         TEXT,
         RESET,
         REQUEST,
+        GO,
+        STOP,
         TR,
         RV,
         SW,

@@ -49,7 +49,7 @@ void sensorData() {
 
     result = Send(MARKLIN, (char*)&reset, reset.size(), (char*)&data, data.maxSize());
     if (result < 0) {
-        bwprintf(COM2, "Reset request send to Marklin server failed\r\n");
+        bwprintf(COM2, "Sendor Data Client - Reset request send to Marklin server failed\r\n");
     }
 
     FOREVER {
@@ -59,7 +59,7 @@ void sensorData() {
         Delay(CLOCK_SERVER, 10);
         result = Send(MARKLIN, (char*)&request, request.size(), (char*)&data, data.maxSize());
         if (result < 0) {
-            bwprintf(COM2, "Data request send to Marklin server failed\r\n");
+            bwprintf(COM2, "Sensor Data Client - Data request send to Marklin server failed\r\n");
         }
 
         if (mh->type == Constants::MSG::TEXT) {
