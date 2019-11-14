@@ -74,6 +74,7 @@ void Kernel::initialize() {
     }
     uart1.enableRXInterrupt();
     uart2.enableRXInterrupt();
+    uart1.enableMISInterrupt();
     // uart2.enableTXInterrupt();
 
     // Draw GUI
@@ -153,12 +154,12 @@ void Kernel::handle(int* stackPointer)  {
         } else if (vic2Status & TC3UI_MASK) {
             *(int *)(TIMER3_BASE + CLR_OFFSET) = 1;
             handleInterrupt(timer3BlockedQueue);
-        } else if (vic1Status & UART1_RX_INTR1_MASK) {
-            uart1.disableRXInterrupt();
-            handleInterrupt(uart1RXBlockedQueue);
-        } else if (vic1Status & UART1_TX_INTR1_MASK) {
-            uart1.disableTXInterrupt();
-            handleInterrupt(uart1TXBlockedQueue);
+        // } else if (vic1Status & UART1_RX_INTR1_MASK) {
+        //     uart1.disableRXInterrupt();
+        //     handleInterrupt(uart1RXBlockedQueue);
+        // } else if (vic1Status & UART1_TX_INTR1_MASK) {
+        //     uart1.disableTXInterrupt();
+        //     handleInterrupt(uart1TXBlockedQueue);
         } else if (vic1Status & UART2_RX_INTR2_MASK) {
             uart2.disableRXInterrupt();
             handleInterrupt(uart2RXBlockedQueue);
@@ -166,20 +167,38 @@ void Kernel::handle(int* stackPointer)  {
             uart2.disableTXInterrupt();
             handleInterrupt(uart2TXBlockedQueue);
         // This is here as an artefact of exploration
-        // } else if (vic2Status & INT_UART2_MASK) {
-        //     if (uart2.isRXInterrupt()) {
-        //         // bwprintf(COM2, "RX_INT\r\n");
-        //         uart2.disableRXInterrupt();
-        //         uart2.clearRXInterrupt();
-        //         handleInterrupt(uart2RXBlockedQueue);
-        //     } else if (uart2.isTXInterrupt()) {
-        //         uart2.disableTXInterrupt();
-        //         uart2.clearTXInterrupt();
-        //         // if (uart2.isMISInterrupt()) {
-        //         //     bwprintf(COM2, "YEAH MIS\r\n");
-        //         // }
-        //         handleInterrupt(uart2TXBlockedQueue);
-        //     }
+        } else if (vic2Status & INT_UART1_MASK) {
+            if (uart1.isRXInterrupt()) {
+                // bwprintf(COM2, "Kernel - UART1 RX INT\r\n");
+                uart1.disableRXInterrupt();
+                uart1.clearRXInterrupt();
+                handleInterrupt(uart1RXBlockedQueue);
+            } else if (uart1.isTXInterrupt()) {
+                // bwprintf(COM2, "Kernel - UART1 TX INT\r\n");
+                uart1.disableTXInterrupt();
+                uart1.clearTXInterrupt();
+                if (uart1.isMISInterrupt()) {
+                    // bwprintf(COM2, "Kernel - Captured MIS up\r\n");
+                    if (uart1.isClearToSend()) {
+                        // bwprintf(COM2, "Kernel - Captured CTS up\r\n");
+                        handleInterrupt(uart1TXBlockedQueue);
+                    } else {
+                        // bwprintf(COM2, "Kernel - Captured CTS down\r\n");
+                    }
+                    uart1.clearMISInterrupt();
+                } else {
+                    // Transition to waiting for MIS
+                }
+            } else if (uart1.isMISInterrupt()) {
+                // bwprintf(COM2, "Kernel - Captured MIS up\r\n");
+                if (uart1.isClearToSend()) {
+                    // bwprintf(COM2, "Kernel - Captured CTS up\r\n");
+                    handleInterrupt(uart1TXBlockedQueue);
+                } else {
+                    // bwprintf(COM2, "Kernel - Captured CTS down\r\n");
+                }
+                uart1.clearMISInterrupt();
+            }
         } else {
             bwprintf(COM2, "Kernel - ERROR: Kernel interrupted with unknown interrupt\n\r");
             TRAP

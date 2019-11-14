@@ -49,7 +49,7 @@ void marklinServer() {
 
     FOREVER {
         result = Receive(&tid, msg, Constants::TerminalServer::MSG_SIZE);
-        Delay(CLOCK, 10);
+        // Delay(CLOCK, 10);
         if (result < 0) {
             bwprintf(COM2, "Marklin Server - Receive generated negative value!");
         }

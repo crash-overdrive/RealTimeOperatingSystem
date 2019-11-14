@@ -153,6 +153,14 @@ namespace Constants {
         UART2TX_BLOCKED,
     };
 
+    enum TXState {
+        WAITING_TX,
+        WAITING_MIS,
+        WAITING_CTS_DOWN,
+        WAITING_CTS_UP,
+        CTS_QUIRK,
+    };
+
     enum SWI {
         CREATE = 2,
         MY_TID,

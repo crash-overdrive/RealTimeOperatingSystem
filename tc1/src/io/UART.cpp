@@ -61,9 +61,16 @@ void UART::disableTXInterrupt() {
     *(int *)(base + UART_CTRL_OFFSET) = flags & ~TIEN_MASK;
 }
 
-bool UART::isMISInterrupt() {
-    volatile bool m = *(int *)(base + UART_INTR_OFFSET) & MIS_MASK;
-    return m;
+void UART::enableMISInterrupt() {
+    volatile int flags;
+    flags = *(int *)(base + UART_CTRL_OFFSET);
+    *(int *)(base + UART_CTRL_OFFSET) = flags | MSIEN_MASK;
+}
+
+void UART::disableMISInterrupt() {
+    volatile int flags;
+    flags = *(int *)(base + UART_CTRL_OFFSET);
+    *(int *)(base + UART_CTRL_OFFSET) = flags & ~MSIEN_MASK;
 }
 
 bool UART::isRXInterrupt() {
@@ -88,6 +95,17 @@ void UART::clearTXInterrupt() {
     *(int *)(base + UART_INTR_OFFSET) = flags & ~TIS_MASK;
 }
 
+bool UART::isMISInterrupt() {
+    volatile bool m = *(int *)(base + UART_INTR_OFFSET) & MIS_MASK;
+    return m;
+}
+
+void UART::clearMISInterrupt() {
+    volatile int flags;
+    flags = *(int *)(base + UART_INTR_OFFSET);
+    *(int *)(base + UART_INTR_OFFSET) = flags & ~MIS_MASK;
+}
+
 bool UART::isRXEmpty() {
     volatile bool empty = *(int *)(base + UART_FLAG_OFFSET) & RXFE_MASK;
     return empty;
@@ -107,6 +125,11 @@ bool UART::isTXFull() {
     volatile bool full = *(int *)(base + UART_FLAG_OFFSET) & TXFF_MASK;
     return full;
 }
+
+// bool UART::isModemCTSChanged() {
+//     volatile bool ctsChanged = *(int *)(base + UART_FLAG_OFFSET) & CTS_MASK;
+//     return true;
+// }
 
 bool UART::isClearToSend() {
     volatile bool cts = *(int *)(base + UART_FLAG_OFFSET) & CTS_MASK;

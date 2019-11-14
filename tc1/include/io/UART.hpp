@@ -15,15 +15,20 @@ public:
     void disableRXInterrupt();
     void enableTXInterrupt();
     void disableTXInterrupt();
-    bool isMISInterrupt();
+    void enableMISInterrupt();
+    void disableMISInterrupt();
+
     bool isRXInterrupt();
     void clearRXInterrupt();
     bool isTXInterrupt();
     void clearTXInterrupt();
+    bool isMISInterrupt();
+    void clearMISInterrupt();
     bool isRXEmpty();
     bool isRXFull();
     bool isTXEmpty();
     bool isTXFull();
+    bool isModemCTSChanged();
     bool isClearToSend();
     char getc();
     void putc(char c);

@@ -34,6 +34,7 @@ class Kernel {
 
         UART uart1;
         UART uart2;
+        Constants::TXState txState = Constants::TXState::WAITING_TX;
 
         TaskDescriptor* activeTask = nullptr;
 
