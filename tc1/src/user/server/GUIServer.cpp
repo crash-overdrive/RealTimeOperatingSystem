@@ -88,18 +88,18 @@ void GUI::drawSensors(char *msg) {
     SensorMessage *sm = (SensorMessage *)msg;
 
     drawmsg.msglen = 0;
-    drawmsg.msglen += format(drawmsg.msg, "%s%s[ ", Constants::VT100::SAVE_CURSOR_AND_ATTRS, Constants::VT100::MOVE_CURSOR_POS_TO_SENSOR);
+    drawmsg.msglen += format(drawmsg.msg, "%s%s", Constants::VT100::SAVE_CURSOR_AND_ATTRS, Constants::VT100::MOVE_CURSOR_POS_TO_SENSOR);
     // This is a tiny bit hacky because the sensor message should probably provide length, but that's a problem for another day
     // TODO(sgaweda): Fix this another day!
-    for (int i = 0; i < 10; ++i) {
+    for (int i = 9; i >= 0; --i) {
         // We check here to see if the bank isn't a valid bank
         if (sm->sensorData[i].bank > 0) {
-            drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%c%d ", sm->sensorData[i].bank, sm->sensorData[i].number);
+            if (sm->sensorData[i].number / 10 == 0) {
+                drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%c0%d ", sm->sensorData[i].bank, sm->sensorData[i].number);
+            } else {
+                drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%c%d ", sm->sensorData[i].bank, sm->sensorData[i].number);
+            }
         }
-    }
-    drawmsg.msg[drawmsg.msglen++] = ']';
-    while(drawmsg.msglen < 53) {
-        drawmsg.msg[drawmsg.msglen++] = ' ';
     }
     drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%s", Constants::VT100::RESTORE_CURSOR_AND_ATTRS);
     Reply(termCourier, (char*)&drawmsg, drawmsg.size());

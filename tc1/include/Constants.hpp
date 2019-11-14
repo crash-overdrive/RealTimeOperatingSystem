@@ -122,7 +122,7 @@ namespace Constants {
         const char MOVE_CURSOR_TO_HOME[] = "\033[H";
         const char MOVE_CURSOR_POS_TO_TIME[] = "\033[2;8f";
         const char MOVE_CURSOR_POS_TO_IDLE[] = "\033[2;23f";
-        const char MOVE_CURSOR_POS_TO_SENSOR[] = "\033[9;5f";
+        const char MOVE_CURSOR_POS_TO_SENSOR[] = "\033[9;7f";
         const char MOVE_CURSOR_POS_TO_CONSOLE[] = "\033[21;5f";
         const char MOVE_CURSOR_POS_TO_FEEDBACK[] = "\033[22;5f";
         const char MOVE_CURSOR_POS_TO_MSGLOG[] = "\033[25;5f";
