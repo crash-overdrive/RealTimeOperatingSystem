@@ -45,8 +45,11 @@ void marklinServer() {
     // TODO(sgaweda): make this a proper constant
     DataStructures::RingBuffer<char, 16> outbuf;
 
+    int CLOCK = WhoIs("CLOCK SERVER");
+
     FOREVER {
         result = Receive(&tid, msg, Constants::TerminalServer::MSG_SIZE);
+        Delay(CLOCK, 10);
         if (result < 0) {
             bwprintf(COM2, "Marklin Server - Receive generated negative value!");
         }
@@ -70,6 +73,17 @@ void marklinServer() {
             for (int i = 0; i < outmsg->msglen; ++i) {
                 outbuf.push(outmsg->msg[i]);
             }
+
+            // Send a character if possible
+            if (!outbuf.empty() && txcBlocked && !reading) {
+                txmsg.ch = outbuf.pop();
+                Reply(TXC, (char*)&txmsg, txmsg.size());
+                txcBlocked = false;
+            }
+
+            Reply(tid, (char*)&rdymsg, rdymsg.size());
+        } else if (mh->type == Constants::MSG::GO) {
+            outbuf.push(Constants::MarklinConsole::GO);
 
             // Send a character if possible
             if (!outbuf.empty() && txcBlocked && !reading) {
