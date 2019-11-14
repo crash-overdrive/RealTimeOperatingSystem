@@ -169,33 +169,30 @@ void Kernel::handle(int* stackPointer)  {
         // This is here as an artefact of exploration
         } else if (vic2Status & INT_UART1_MASK) {
             if (uart1.isRXInterrupt()) {
-                // bwprintf(COM2, "Kernel - UART1 RX INT\r\n");
                 uart1.disableRXInterrupt();
                 uart1.clearRXInterrupt();
                 handleInterrupt(uart1RXBlockedQueue);
             } else if (uart1.isTXInterrupt()) {
-                // bwprintf(COM2, "Kernel - UART1 TX INT\r\n");
                 uart1.disableTXInterrupt();
                 uart1.clearTXInterrupt();
                 if (uart1.isMISInterrupt()) {
-                    // bwprintf(COM2, "Kernel - Captured MIS up\r\n");
                     if (uart1.isClearToSend()) {
-                        // bwprintf(COM2, "Kernel - Captured CTS up\r\n");
+                        bwprintf(COM2, "Kernel - CTS quirk observed!\r\n");
                         handleInterrupt(uart1TXBlockedQueue);
                     } else {
-                        // bwprintf(COM2, "Kernel - Captured CTS down\r\n");
+                        bwprintf(COM2, "Kernel - Does this ever occur?\r\n");
+                        // Transition to waiting for CTS_UP
                     }
                     uart1.clearMISInterrupt();
                 } else {
                     // Transition to waiting for MIS
                 }
             } else if (uart1.isMISInterrupt()) {
-                // bwprintf(COM2, "Kernel - Captured MIS up\r\n");
+                // Transition to waiting for CTS_DOWN
                 if (uart1.isClearToSend()) {
-                    // bwprintf(COM2, "Kernel - Captured CTS up\r\n");
                     handleInterrupt(uart1TXBlockedQueue);
                 } else {
-                    // bwprintf(COM2, "Kernel - Captured CTS down\r\n");
+                    // Transition to waiting for CTS_UP
                 }
                 uart1.clearMISInterrupt();
             }

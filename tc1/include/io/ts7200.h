@@ -86,6 +86,14 @@
 
 #define UART_MDMCTL_OFFSET	0x100
 #define UART_MDMSTS_OFFSET	0x104
+	#define DCTS_MASK	0x1		// Delta CTSn
+	#define DDSR_MASK	0x2		// Delta DSRn
+	#define TERI_MASK	0x4		// Trailing Edge Ring Indicator
+	#define DDCD_MASK	0x8		// Delta DCDn
+	#define ICTS_MASK	0x10	// Inverse CTSn
+	#define IDSR_MASK	0x20	// Inverse DSRn
+	#define IRI_MASK	0x40	// Inverse RI
+	#define IDCD_MASK	0x80	// Inverse DCDn
 #define UART_HDLCCTL_OFFSET	0x20c
 #define UART_HDLCAMV_OFFSET	0x210
 #define UART_HDLCAM_OFFSET	0x214

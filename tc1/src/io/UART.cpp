@@ -126,14 +126,14 @@ bool UART::isTXFull() {
     return full;
 }
 
-// bool UART::isModemCTSChanged() {
-//     volatile bool ctsChanged = *(int *)(base + UART_FLAG_OFFSET) & CTS_MASK;
-//     return true;
-// }
+bool UART::isModemCTSChanged() {
+    volatile bool ctsChanged = *(int *)(base + UART_MDMSTS_OFFSET) & DCTS_MASK;
+    return ctsChanged;
+}
 
 bool UART::isClearToSend() {
     volatile bool cts = *(int *)(base + UART_FLAG_OFFSET) & CTS_MASK;
-    return true;
+    return cts;
 }
 
 char UART::getc() {
