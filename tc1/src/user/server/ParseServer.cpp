@@ -132,8 +132,6 @@ void parseServer() {
                 trmsg.speed = (char)speed;
 
                 Reply(tid, (char*)&rdymsg, rdymsg.size());
-                // TODO: send this command by replying to CS courier
-                // bwprintf(COM2, "TRAIN COMMAND PARSED!");
                 Reply(commandCourier, (char*)&trmsg, trmsg.size());
             } else if (cmd->msg[index] == 'r' && cmd->msg[index + 1] == 'v') {
                 int train = 0;
@@ -172,8 +170,6 @@ void parseServer() {
                 rvmsg.train = (char)train;
 
                 Reply(tid, (char*)&rdymsg, rdymsg.size());
-                // TODO: send this command by replying to CS courier
-                // bwprintf(COM2, "REVERSE COMMAND PARSED!");
                 Reply(commandCourier, (char*)&rvmsg, rvmsg.size());
             } else if (cmd->msg[index] == 's' && cmd->msg[index + 1] == 'w') {
                 int sw = 0;
@@ -230,8 +226,6 @@ void parseServer() {
                 swmsg.state = state;
 
                 Reply(tid, (char*)&rdymsg, rdymsg.size());
-                // TODO: send this command by replying to CS courier
-                // bwprintf(COM2, "SWITCH COMMAND PARSED!");
                 Reply(commandCourier, (char*)&swmsg, swmsg.size());
             } else if (cmd->msg[index] == 'q') {
                 index += 1;
