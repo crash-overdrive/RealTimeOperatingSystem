@@ -10,8 +10,8 @@
 #define FOREVER for (;;)
 
 void tcsGUICourier() {
-    int GUI = WhoIs("GUI");
     int TCS = WhoIs("TCS");
+    int GUI = WhoIs("GUI");
     int result;
 
     char msg[128];
@@ -26,7 +26,7 @@ void tcsGUICourier() {
             bwprintf(COM2, "TCS->GUI Courier - Send to TCS Server failed\r\n");
         }
         if (mh->type != Constants::MSG::SW) {
-            bwprintf(COM2, "TCS->GUI Courier - Expected SW message type but received unexpected message type\r\n");
+            bwprintf(COM2, "TCS->GUI Courier - Expected SW message type but received unexpected message type %d\r\n", mh->type);
         }
 
         result = Send(GUI, (char*)swmsg, swmsg->size(), (char *)&rdymsg, rdymsg.size());
@@ -34,7 +34,7 @@ void tcsGUICourier() {
             bwprintf(COM2, "TCS->GUI Courier - Send to GUI Server failed\r\n");
         }
         if (rdymsg.mh.type != Constants::MSG::RDY) {
-            bwprintf(COM2, "TCS->GUI Courier - Expected RDY message type but received unexpected message type\r\n");
+            bwprintf(COM2, "TCS->GUI Courier - Expected RDY message type but received unexpected message type %d\r\n", rdymsg.mh.type);
         }
     }
 }

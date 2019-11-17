@@ -64,6 +64,9 @@ void marklinServer() {
                     reading = true;
                 }
                 Reply(tid, (char *)&txmsg, txmsg.size());
+                if (txmsg.ch == 33 || txmsg.ch == 34) {
+                    Delay(tid, 15);
+                }
                 txcBlocked = false;
             } else {
                 txcBlocked = true;
@@ -119,13 +122,15 @@ void marklinServer() {
             Reply(tid, (char*)&rdymsg, rdymsg.size());
         } else if (mh->type == Constants::MSG::SW) {
             if (swmsg->sw == 0) {
-                outbuf.push(32);
+                // outbuf.push(32);
             } else if (swmsg->state == 'c' || swmsg->state == 'C') {
                 outbuf.push(34);
                 outbuf.push(swmsg->sw);
+                outbuf.push(32);
             } else if (swmsg->state == 's' || swmsg->state == 'S') {
                 outbuf.push(33);
                 outbuf.push(swmsg->sw);
+                outbuf.push(32);
             } else {
                 bwprintf(COM2, "Marklin Server - Received invalid track state!");
             }

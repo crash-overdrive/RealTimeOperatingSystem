@@ -158,7 +158,8 @@ void guiServer() {
     int result, tid;
     char msg[128];
     MessageHeader *mh = (MessageHeader *)msg;
-    SensorMessage *sm = (SensorMessage *)msg;
+    // SensorMessage *sm = (SensorMessage *)msg;
+    // TimeMessage *tm = (TimeMessage *)msg;
     ThinMessage rdymsg(Constants::MSG::RDY);
 
     bool tsBlocked = false;
@@ -174,15 +175,14 @@ void guiServer() {
                 // TODO(sgaweda): reply only when ready to draw!
                 tsBlocked = true;
                 break;
-            case Constants::MSG::TIME: {
+            case Constants::MSG::TIME:
                 if (tsBlocked != true) {
                     bwprintf(COM2, "GUI Server - Courier unexpectedly blocked!");
                 }
-                TimeMessage *tm = (TimeMessage *)msg;
                 gui.drawTime(msg);
                 Reply(tid, (char*)&rdymsg, rdymsg.size());
                 tsBlocked = false;
-                break;}
+                break;
             case Constants::MSG::IDLE:
                 if (tsBlocked != true) {
                     bwprintf(COM2, "GUI Server - Courier unexpectedly blocked!");
@@ -204,6 +204,7 @@ void guiServer() {
                     bwprintf(COM2, "GUI Server - Courier unexpectedly blocked!");
                 }
                 gui.drawSwitch(msg);
+                bwprintf(COM2, "GUIS - sending rdy to TCS Courier %d\r\n", rdymsg.mh.type);
                 Reply(tid, (char*)&rdymsg, rdymsg.size());
                 tsBlocked = false;
                 break;

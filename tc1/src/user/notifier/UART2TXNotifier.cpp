@@ -25,8 +25,8 @@ void uart2txNotifier() {
 
         rplen = Send(uart2tx_tid, msg, 1, reply, 1);
 
-        if (rplen == 1 && reply[0] == Constants::Server::ERR) {
-            bwprintf(COM2, "UART2TX Notifier - ERR: %d\n\r", reply[0]);
+        if (rplen == 1 && reply[0] == Constants::Server::ERROR) {
+            bwprintf(COM2, "UART2TX Notifier - ERROR: %d\n\r", reply[0]);
         } else if (!(rplen == 1 && reply[0] == Constants::Server::ACK)) {
             bwprintf(COM2, "UART2TX Notifier - Recieved bad reply: %d\n\r", reply[0]);
         }

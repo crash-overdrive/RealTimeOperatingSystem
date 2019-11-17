@@ -30,8 +30,8 @@ void uart1txNotifier() {
         //     bwprintf(COM1, "We have a problem");
         // }
 
-        if (rplen == 1 && reply[0] == Constants::Server::ERR) {
-            bwprintf(COM2, "UART1TX Notifier - ERR: %d\n\r", reply[0]);
+        if (rplen == 1 && reply[0] == Constants::Server::ERROR) {
+            bwprintf(COM2, "UART1TX Notifier - ERROR: %d\n\r", reply[0]);
         } else if (!(rplen == 1 && reply[0] == Constants::Server::ACK)) {
             bwprintf(COM2, "UART1TX Notifier - Recieved bad reply: %d\n\r", reply[0]);
         }

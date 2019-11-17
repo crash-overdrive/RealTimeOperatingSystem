@@ -11,8 +11,9 @@
 #include "user/server/GUIServer.hpp"
 #include "user/server/MarklinServer.hpp"
 #include "user/server/NameServer.hpp"
+#include "user/server/ParseServer.hpp"
 #include "user/server/TerminalServer.hpp"
-#include "user/server/TrainCommandServer.hpp"
+#include "user/server/CommandServer.hpp"
 #include "user/server/UART1RXServer.hpp"
 #include "user/server/UART1TXServer.hpp"
 #include "user/server/UART2RXServer.hpp"
@@ -73,7 +74,8 @@ void bootLoader() {
     // bwprintf(COM2, "BootLoader - Created UART2TX Server with tid: %d\n\r", tid);
     Constants::UART2TXServer::TID = tid;
 
-    tid = Create(6, trainCommandServer);
+    tid = Create(7, parseServer);
+    tid = Create(7, commandServer);
     // int tcstid = tid;
     // bwprintf(COM2, "BootLoader - Created Train Controller with tid: %d\n\r", tid);
 
@@ -85,7 +87,7 @@ void bootLoader() {
     // int guitid = tid;
     // bwprintf(COM2, "BootLoader - Created GUI Server with tid: %d\n\r", tid);
 
-    tid = Create(5, switchSetup);
+    tid = Create(7, switchSetup);
 
     // TODO(sgaweda): Remove this when we are sure that Sensor Data should be created by Marklin Server
     // tid = Create(8, sensorData);
