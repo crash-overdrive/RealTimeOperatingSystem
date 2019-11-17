@@ -1,7 +1,10 @@
 #include "Constants.hpp"
 #include "io/bwio.hpp"
 #include "user/courier/TermParseCourier.hpp"
+#include "user/message/RVMessage.hpp"
+#include "user/message/SWMessage.hpp"
 #include "user/message/ThinMessage.hpp"
+#include "user/message/TRMessage.hpp"
 #include "user/syscall/UserSyscall.hpp"
 
 #define FOREVER for (;;)
@@ -11,8 +14,11 @@ void parseCSCourier() {
     int CS = WhoIs("CS");
     int result;
 
-    char cmd[10];
+    char cmd[16];
     MessageHeader *mh = (MessageHeader *)&cmd;
+    RVMessage *rvmsg = (RVMessage *)&cmd;
+    SWMessage *swmsg = (SWMessage *)&cmd;
+    TRMessage *trmsg = (TRMessage *)&cmd;
     ThinMessage rdymsg(Constants::MSG::RDY);
 
     FOREVER {
@@ -21,12 +27,18 @@ void parseCSCourier() {
         if (result < 0) {
             bwprintf(COM2, "Parse->CS Courier - Send to Parse Server failed\r\n");
         }
-        if (mh->type != Constants::MSG::TR && mh->type != Constants::RV && mh->type != Constants::SW) {
+
+        // Send command message to command server
+        if (mh->type == Constants::MSG::TR) {
+            result = Send(CS, (char*)trmsg, trmsg->size(), (char *)&rdymsg, rdymsg.size());
+        } else if (mh->type == Constants::RV) {
+            result = Send(CS, (char*)rvmsg, rvmsg->size(), (char *)&rdymsg, rdymsg.size());
+        } else if (mh->type == Constants::SW) {
+            result = Send(CS, (char*)swmsg, swmsg->size(), (char *)&rdymsg, rdymsg.size());
+        } else {
             bwprintf(COM2, "Parse->CS Courier - Expected SW message but received unexpected message type %d\r\n", mh->type);
         }
 
-        // Send command message to command server
-        result = Send(CS, cmd, 10, (char *)&rdymsg, rdymsg.size());
         if (result < 0) {
             bwprintf(COM2, "Parse->CS Courier - Send to Command Server failed\r\n");
         }

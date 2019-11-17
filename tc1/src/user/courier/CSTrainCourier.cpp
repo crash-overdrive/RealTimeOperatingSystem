@@ -2,7 +2,9 @@
 #include "io/bwio.hpp"
 #include "user/courier/TermParseCourier.hpp"
 #include "user/message/MessageHeader.hpp"
+#include "user/message/RVMessage.hpp"
 #include "user/message/ThinMessage.hpp"
+#include "user/message/TRMessage.hpp"
 #include "user/syscall/UserSyscall.hpp"
 
 #define FOREVER for (;;)
@@ -12,8 +14,10 @@ void csTrainCourier() {
     // int TRAIN = WhoIs("TRAIN");
     int result;
 
-    char trainmsg[10];
+    char trainmsg[16];
     MessageHeader *mh = (MessageHeader *)&trainmsg;
+    RVMessage *rvmsg = (RVMessage *)&trainmsg;
+    TRMessage *trmsg = (TRMessage *)&trainmsg;
     ThinMessage rdymsg(Constants::MSG::RDY);
 
     FOREVER {
@@ -22,12 +26,15 @@ void csTrainCourier() {
         if (result < 0) {
             bwprintf(COM2, "CS->Train Courier - Send to Command Server failed\r\n");
         }
-        if (mh->type != Constants::MSG::TR && mh->type != Constants::MSG::RV) {
+        if (mh->type == Constants::MSG::TR) {
+            // result = Send(TRAIN, (char*)trmsg, trmsg->size(), (char *)&rdymsg, rdymsg.size());
+        } else if (mh->type == Constants::MSG::RV) {
+            // result = Send(TRAIN, (char*)rvmsg, rvmsg->size(), (char *)&rdymsg, rdymsg.size());
+        } else {
             bwprintf(COM2, "CS->Train Courier - Expected TR or RV message but received unexpected message type %d\r\n", mh->type);
         }
 
         // Send train message to train server
-        // result = Send(TRAIN, trainmsg, 10, (char *)&rdymsg, rdymsg.size());
         // if (result < 0) {
         //     bwprintf(COM2, "CS->Train Courier - Send to Train Server failed\r\n");
         // }
