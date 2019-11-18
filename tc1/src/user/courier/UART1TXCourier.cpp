@@ -13,16 +13,14 @@
 void uart1txCourier() {
     const int UART1TX = WhoIs("UART1TX");
     const int MARKLIN = WhoIs("MARKLIN");
-    MessageHeader * mh;
-    ThinMessage readymsg;
-    readymsg.mh.type = Constants::MSG::RDY;
+    ThinMessage rdymsg(Constants::MSG::RDY);
     CharMessage txmsg;
+    MessageHeader *mh = (MessageHeader *)&txmsg;
     int result;
 
     FOREVER {
         // Get character from marklin server
-        Send(MARKLIN, (char*)&readymsg, readymsg.size(), (char*)&txmsg, txmsg.size());
-        mh = (MessageHeader *)&txmsg;
+        Send(MARKLIN, (char*)&rdymsg, rdymsg.size(), (char*)&txmsg, txmsg.size());
         if (mh->type != Constants::MSG::TX) {
             bwprintf(COM2, "UART1TXCourier - Expected MSG::TX but received unexpected msg type");
         }

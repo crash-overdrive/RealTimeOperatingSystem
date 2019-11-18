@@ -24,7 +24,8 @@ void marklinServer() {
     int RXC = Create(5, uart1rxCourier);
     int SENSOR = Create(8, sensorData);
     bool reading = false;
-    bool txcBlocked = false;
+    bool switching = false;
+    bool txcReady = false;
     int tid, result;
     char msg[Constants::TerminalServer::MSG_SIZE];
 
@@ -43,7 +44,7 @@ void marklinServer() {
     SWMessage *swmsg = (SWMessage *)&msg;
 
     // TODO(sgaweda): make this a proper constant
-    DataStructures::RingBuffer<char, 16> outbuf;
+    DataStructures::RingBuffer<char, 64> outbuf;
 
     int CLOCK = WhoIs("CLOCK SERVER");
 
@@ -63,13 +64,13 @@ void marklinServer() {
                 if (txmsg.ch == Constants::MarklinConsole::REQUEST_5_SENSOR_DATA) {
                     reading = true;
                 }
-                Reply(tid, (char *)&txmsg, txmsg.size());
-                if (txmsg.ch == 33 || txmsg.ch == 34) {
-                    Delay(tid, 15);
+                if (txmsg.ch == 32) {
+                    Delay(CLOCK, 15);
                 }
-                txcBlocked = false;
+                Reply(TXC, (char *)&txmsg, txmsg.size());
+                txcReady = false;
             } else {
-                txcBlocked = true;
+                txcReady = true;
             }
         } else if (mh->type == Constants::MSG::TEXT) {
             // Atomically buffer the message
@@ -78,10 +79,10 @@ void marklinServer() {
             }
 
             // Send a character if possible
-            if (!outbuf.empty() && txcBlocked && !reading) {
+            if (!outbuf.empty() && txcReady && !reading) {
                 txmsg.ch = outbuf.pop();
                 Reply(TXC, (char*)&txmsg, txmsg.size());
-                txcBlocked = false;
+                txcReady = false;
             }
 
             Reply(tid, (char*)&rdymsg, rdymsg.size());
@@ -89,10 +90,10 @@ void marklinServer() {
             outbuf.push(Constants::MarklinConsole::GO);
 
             // Send a character if possible
-            if (!outbuf.empty() && txcBlocked && !reading) {
+            if (!outbuf.empty() && txcReady && !reading) {
                 txmsg.ch = outbuf.pop();
                 Reply(TXC, (char*)&txmsg, txmsg.size());
-                txcBlocked = false;
+                txcReady = false;
             }
 
             Reply(tid, (char*)&rdymsg, rdymsg.size());
@@ -101,10 +102,10 @@ void marklinServer() {
             outbuf.push(trmsg->train);
 
             // Send a character if possible
-            if (!outbuf.empty() && txcBlocked && !reading) {
+            if (!outbuf.empty() && txcReady && !reading) {
                 txmsg.ch = outbuf.pop();
                 Reply(TXC, (char*)&txmsg, txmsg.size());
-                txcBlocked = false;
+                txcReady = false;
             }
 
             Reply(tid, (char*)&rdymsg, rdymsg.size());
@@ -113,10 +114,10 @@ void marklinServer() {
             outbuf.push(rvmsg->train);
 
             // Send a character if possible
-            if (!outbuf.empty() && txcBlocked && !reading) {
+            if (!outbuf.empty() && txcReady && !reading) {
                 txmsg.ch = outbuf.pop();
                 Reply(TXC, (char*)&txmsg, txmsg.size());
-                txcBlocked = false;
+                txcReady = false;
             }
 
             Reply(tid, (char*)&rdymsg, rdymsg.size());
@@ -136,10 +137,10 @@ void marklinServer() {
             }
 
             // Send a character if possible
-            if (!outbuf.empty() && txcBlocked && !reading) {
+            if (!outbuf.empty() && txcReady && !reading) {
                 txmsg.ch = outbuf.pop();
                 Reply(TXC, (char*)&txmsg, txmsg.size());
-                txcBlocked = false;
+                txcReady = false;
             }
 
             Reply(tid, (char*)&rdymsg, rdymsg.size());
@@ -159,10 +160,10 @@ void marklinServer() {
             outbuf.push(Constants::MarklinConsole::SET_RESET_ON_FOR_SENSORS);
 
             // Send a character if possible
-            if (!outbuf.empty() && txcBlocked && !reading) {
+            if (!outbuf.empty() && txcReady && !reading) {
                 txmsg.ch = outbuf.pop();
                 Reply(TXC, (char*)&txmsg, txmsg.size());
-                txcBlocked = false;
+                txcReady = false;
             }
 
             // Let sensor client know we're ready for input
@@ -171,10 +172,10 @@ void marklinServer() {
             outbuf.push(Constants::MarklinConsole::REQUEST_5_SENSOR_DATA);
 
             // Send a character if possible
-            if (!outbuf.empty() && txcBlocked && !reading) {
+            if (!outbuf.empty() && txcReady && !reading) {
                 txmsg.ch = outbuf.pop();
                 Reply(TXC, (char*)&txmsg, txmsg.size());
-                txcBlocked = false;
+                txcReady = false;
             }
 
             // Reply to sensor client will occur when all sensor banks have been read

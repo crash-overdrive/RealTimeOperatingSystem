@@ -1,5 +1,4 @@
 #include "Constants.hpp"
-#include "data-structures/RingBuffer.hpp"
 #include "io/bwio.hpp"
 #include "io/ts7200.h"
 #include "user/courier/CSSwitchCourier.hpp"
@@ -48,7 +47,6 @@ void commandServer() {
             Reply(trainCourier, msg, rvmsg->size());
             Reply(tid, (char *)&rdymsg, rdymsg.size());
         } else if (mh->type == Constants::MSG::SW) {
-            bwprintf(COM2, "CS - SWITCH COMMAND RECEIVED!");
             Reply(switchCourier, msg, swmsg->size());
             Reply(tid, (char *)&rdymsg, rdymsg.size());
         } else {

@@ -9,7 +9,7 @@
 
 void csSwitchCourier() {
     int CS = WhoIs("CS");
-    // int SWITCH = WhoIs("SWITCH");
+    int SWITCH = WhoIs("SWITCH");
     int result;
 
     SWMessage swmsg;
@@ -26,12 +26,12 @@ void csSwitchCourier() {
         }
 
         // Send switch message to switch server
-        // result = Send(SWITCH, (char*)&swmsg, swmsg.size(), (char *)&rdymsg, rdymsg.size());
-        // if (result < 0) {
-        //     bwprintf(COM2, "CS->Switch Courier - Send to Switch Server failed\r\n");
-        // }
-        // if (rdymsg.mh.type != Constants::MSG::RDY) {
-        //     bwprintf(COM2, "CS->Switch Courier - Expected RDY message type but received unexpected message type %d\r\n", rdymsg.mh.type);
-        // }
+        result = Send(SWITCH, (char*)&swmsg, swmsg.size(), (char *)&rdymsg, rdymsg.size());
+        if (result < 0) {
+            bwprintf(COM2, "CS->Switch Courier - Send to Switch Server failed\r\n");
+        }
+        if (rdymsg.mh.type != Constants::MSG::RDY) {
+            bwprintf(COM2, "CS->Switch Courier - Expected RDY message type but received unexpected message type %d\r\n", rdymsg.mh.type);
+        }
     }
 }

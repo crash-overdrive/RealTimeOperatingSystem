@@ -39,10 +39,6 @@ int parseInt(char *str, int index, int* ret) {
 
 void parseServer() {
     RegisterAs("PARSE");
-    // int trainSpeeds[Constants::TrainCommandServer::NUM_TRAINS] = {0};
-    // char switchOrientations[Constants::TrainCommandServer::NUM_SENSORS];
-
-    // const int CLOCK_SERVER = WhoIs("CLOCK SERVER");
 
     int result, tid;
     char msg[128];
@@ -225,8 +221,8 @@ void parseServer() {
                 swmsg.sw = (char)sw;
                 swmsg.state = state;
 
-                Reply(tid, (char*)&rdymsg, rdymsg.size());
                 Reply(commandCourier, (char*)&swmsg, swmsg.size());
+                Reply(tid, (char*)&rdymsg, rdymsg.size());
             } else if (cmd->msg[index] == 'q') {
                 index += 1;
 
