@@ -11,7 +11,7 @@
 
 void csTrainCourier() {
     int CS = WhoIs("CS");
-    // int TRAIN = WhoIs("TRAIN");
+    int TRAIN = WhoIs("TRAIN");
     int result;
 
     char trainmsg[16];
@@ -27,19 +27,19 @@ void csTrainCourier() {
             bwprintf(COM2, "CS->Train Courier - Send to Command Server failed\r\n");
         }
         if (mh->type == Constants::MSG::TR) {
-            // result = Send(TRAIN, (char*)trmsg, trmsg->size(), (char *)&rdymsg, rdymsg.size());
+            result = Send(TRAIN, (char*)trmsg, trmsg->size(), (char *)&rdymsg, rdymsg.size());
         } else if (mh->type == Constants::MSG::RV) {
-            // result = Send(TRAIN, (char*)rvmsg, rvmsg->size(), (char *)&rdymsg, rdymsg.size());
+            result = Send(TRAIN, (char*)rvmsg, rvmsg->size(), (char *)&rdymsg, rdymsg.size());
         } else {
             bwprintf(COM2, "CS->Train Courier - Expected TR or RV message but received unexpected message type %d\r\n", mh->type);
         }
 
         // Send train message to train server
-        // if (result < 0) {
-        //     bwprintf(COM2, "CS->Train Courier - Send to Train Server failed\r\n");
-        // }
-        // if (rdymsg.mh.type != Constants::MSG::RDY) {
-        //     bwprintf(COM2, "CS->Train Courier - Expected RDY message type but received unexpected message type %d\r\n", rdymsg.mh.type);
-        // }
+        if (result < 0) {
+            bwprintf(COM2, "CS->Train Courier - Send to Train Server failed\r\n");
+        }
+        if (rdymsg.mh.type != Constants::MSG::RDY) {
+            bwprintf(COM2, "CS->Train Courier - Expected RDY message type but received unexpected message type %d\r\n", rdymsg.mh.type);
+        }
     }
 }

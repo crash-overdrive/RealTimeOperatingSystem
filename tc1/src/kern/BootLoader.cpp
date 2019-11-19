@@ -14,6 +14,7 @@
 #include "user/server/NameServer.hpp"
 #include "user/server/ParseServer.hpp"
 #include "user/server/SwitchServer.hpp"
+#include "user/server/TrainServer.hpp"
 #include "user/server/TerminalServer.hpp"
 #include "user/server/UART1RXServer.hpp"
 #include "user/server/UART1TXServer.hpp"
@@ -78,6 +79,7 @@ void bootLoader() {
     tid = Create(7, parseServer);
     tid = Create(7, commandServer);
     tid = Create(5, switchServer);
+    tid = Create(5, trainServer);
     // int tcstid = tid;
     // bwprintf(COM2, "BootLoader - Created Train Controller with tid: %d\n\r", tid);
 

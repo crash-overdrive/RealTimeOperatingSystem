@@ -39,11 +39,9 @@ void commandServer() {
         if (mh->type == Constants::MSG::RDY) {
             // Do nothing since commands should be coming from lower priority tasks! Otherwise we'd need to track which couriers are ready
         } else if (mh->type == Constants::MSG::TR) {
-            bwprintf(COM2, "CS - TRAIN COMMAND RECEIVED!");
             Reply(trainCourier, msg, trmsg->size());
             Reply(tid, (char *)&rdymsg, rdymsg.size());
         } else if (mh->type == Constants::MSG::RV) {
-            bwprintf(COM2, "CS - REVERSE COMMAND RECEIVED!");
             Reply(trainCourier, msg, rvmsg->size());
             Reply(tid, (char *)&rdymsg, rdymsg.size());
         } else if (mh->type == Constants::MSG::SW) {

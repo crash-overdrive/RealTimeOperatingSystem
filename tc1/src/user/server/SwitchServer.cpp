@@ -29,7 +29,7 @@ void switchServer() {
     DataStructures::RingBuffer<SWMessage, 32> swbuf;
 
     FOREVER {
-        result = Receive(&tid, (char*)&msg, Constants::TrainCommandServer::MAX_SEND_MESSAGE_SIZE);
+        result = Receive(&tid, (char*)&msg, 16);
         if(result < 0) {
             // TODO: handle empty message
         }
