@@ -97,7 +97,7 @@ void bootLoader() {
     // tid = Create(8, sensorData);
     // bwprintf(COM2, "BootLoader - Sensor Data client created\r\n");
 
-    tid = Create(9, clockClient);
+    tid = Create(8, clockClient);
 
     // Create the system's idle task
     tid = Create(Constants::NUM_PRIORITIES-1, idleTask);

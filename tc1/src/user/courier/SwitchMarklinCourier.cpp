@@ -22,7 +22,7 @@ void switchMarklinCourier() {
             bwprintf(COM2, "Switch->Marklin Courier - Send to Switch Server failed\r\n");
         }
         if (swmsg.mh.type != Constants::MSG::SW) {
-            bwprintf(COM2, "Switch->Marklin Courier - Expected SW message type but received unexpected message type %d\r\n", swmsg.mh.type);
+            bwprintf(COM2, "Switch->Marklin Courier - Expected SW message type but received unexpected message type %d %d %d\r\n", swmsg.mh.type, swmsg.sw, swmsg.state);
         }
 
         // Send switch command to marklin server

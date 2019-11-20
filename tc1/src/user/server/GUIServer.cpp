@@ -170,6 +170,7 @@ void guiServer() {
             // TODO: handle receive error
         }
 
+        // All couriers sending messages to this server should be priority 8 (except the terminal server)
         switch (mh->type) {
             case Constants::MSG::RDY:
                 // TODO(sgaweda): reply only when ready to draw!
@@ -204,7 +205,7 @@ void guiServer() {
                     bwprintf(COM2, "GUI Server - Courier unexpectedly blocked!");
                 }
                 gui.drawSwitch(msg);
-                bwprintf(COM2, "GUIS - sending rdy to TCS Courier %d\r\n", rdymsg.mh.type);
+                // bwprintf(COM2, "GUIS - sending rdy to TCS Courier %d\r\n", rdymsg.mh.type);
                 Reply(tid, (char*)&rdymsg, rdymsg.size());
                 tsBlocked = false;
                 break;
