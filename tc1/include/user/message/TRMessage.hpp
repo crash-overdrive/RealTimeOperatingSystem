@@ -12,6 +12,7 @@ public:
     bool headlights;
 
     TRMessage();
+    TRMessage(char tr, char s);
 
     int size();
 };

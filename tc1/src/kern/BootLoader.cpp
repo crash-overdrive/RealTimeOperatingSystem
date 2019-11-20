@@ -5,14 +5,17 @@
 #include "user/client/ClockClient.hpp"
 #include "user/client/IdleTask.hpp"
 #include "user/client/SensorData.hpp"
-#include "user/client/SwitchSetup.hpp"
 #include "user/client/Test.hpp"
+#include "user/client/TrackInit.hpp"
 #include "user/server/ClockServer.hpp"
+#include "user/server/CommandServer.hpp"
 #include "user/server/GUIServer.hpp"
 #include "user/server/MarklinServer.hpp"
 #include "user/server/NameServer.hpp"
+#include "user/server/ParseServer.hpp"
+#include "user/server/SwitchServer.hpp"
+#include "user/server/TrainServer.hpp"
 #include "user/server/TerminalServer.hpp"
-#include "user/server/TrainCommandServer.hpp"
 #include "user/server/UART1RXServer.hpp"
 #include "user/server/UART1TXServer.hpp"
 #include "user/server/UART2RXServer.hpp"
@@ -73,7 +76,10 @@ void bootLoader() {
     // bwprintf(COM2, "BootLoader - Created UART2TX Server with tid: %d\n\r", tid);
     Constants::UART2TXServer::TID = tid;
 
-    tid = Create(6, trainCommandServer);
+    tid = Create(7, parseServer);
+    tid = Create(7, commandServer);
+    tid = Create(5, switchServer);
+    tid = Create(5, trainServer);
     // int tcstid = tid;
     // bwprintf(COM2, "BootLoader - Created Train Controller with tid: %d\n\r", tid);
 
@@ -85,13 +91,13 @@ void bootLoader() {
     // int guitid = tid;
     // bwprintf(COM2, "BootLoader - Created GUI Server with tid: %d\n\r", tid);
 
-    tid = Create(5, switchSetup);
+    tid = Create(7, trackInit);
 
     // TODO(sgaweda): Remove this when we are sure that Sensor Data should be created by Marklin Server
     // tid = Create(8, sensorData);
     // bwprintf(COM2, "BootLoader - Sensor Data client created\r\n");
 
-    tid = Create(9, clockClient);
+    tid = Create(8, clockClient);
 
     // Create the system's idle task
     tid = Create(Constants::NUM_PRIORITIES-1, idleTask);

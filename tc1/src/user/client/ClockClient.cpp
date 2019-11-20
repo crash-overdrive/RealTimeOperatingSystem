@@ -29,7 +29,7 @@ void clockClient() {
 
         Send(GUI, (char*)&timemsg, timemsg.size(), (char*)&rdymsg, rdymsg.size());
         if (rdymsg.mh.type != Constants::MSG::RDY) {
-            bwprintf(COM2, "Clock Client - Expected MSG::RDY but received a different response type");
+            bwprintf(COM2, "Clock Client - Expected MSG::RDY but received response type %d", rdymsg.mh.type);
         }
     }
 }

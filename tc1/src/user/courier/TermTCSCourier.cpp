@@ -30,7 +30,7 @@ void termTCSCourier() {
         if (result < 0) {
             bwprintf(COM2, "Term->TCS Courier - Send to Train Control Server failed\r\n");
         }
-        if (((char *)&rdymsg)[0] == Constants::Server::ERR) {
+        if (((char *)&rdymsg)[0] == Constants::Server::ERROR) {
             // TODO: ERROR HANDLE? IGNORE? THIS MAY BE ENOUGH
         } else if (rdymsg.mh.type != Constants::MSG::RDY) {
             bwprintf(COM2, "Term->TCS Courier - Expected RDY message type but received unexpected message type\r\n");

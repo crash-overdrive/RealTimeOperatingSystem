@@ -9,8 +9,8 @@
 
 #define FOREVER for (;;)
 
-void tcsGUICourier() {
-    int TCS = WhoIs("TCS");
+void switchGUICourier() {
+    int SWITCH = WhoIs("SWITCH");
     int GUI = WhoIs("GUI");
     int result;
 
@@ -21,20 +21,20 @@ void tcsGUICourier() {
 
     FOREVER {
         // Get string to print to terminal
-        result = Send(TCS, (char *)&rdymsg, rdymsg.size(), (char*)&msg, 128);
+        result = Send(SWITCH, (char *)&rdymsg, rdymsg.size(), (char*)&msg, 128);
         if (result < 0) {
-            bwprintf(COM2, "TCS->GUI Courier - Send to TCS Server failed\r\n");
+            bwprintf(COM2, "Switch->GUI Courier - Send to Switch Server failed\r\n");
         }
         if (mh->type != Constants::MSG::SW) {
-            bwprintf(COM2, "TCS->GUI Courier - Expected SW message type but received unexpected message type %d\r\n", mh->type);
+            bwprintf(COM2, "Switch->GUI Courier - Expected SW message type but received unexpected message type %d\r\n", mh->type);
         }
 
         result = Send(GUI, (char*)swmsg, swmsg->size(), (char *)&rdymsg, rdymsg.size());
         if (result < 0) {
-            bwprintf(COM2, "TCS->GUI Courier - Send to GUI Server failed\r\n");
+            bwprintf(COM2, "Switch->GUI Courier - Send to GUI Server failed\r\n");
         }
         if (rdymsg.mh.type != Constants::MSG::RDY) {
-            bwprintf(COM2, "TCS->GUI Courier - Expected RDY message type but received unexpected message type %d\r\n", rdymsg.mh.type);
+            bwprintf(COM2, "Switch->GUI Courier - Expected RDY message type but received unexpected message type %d\r\n", rdymsg.mh.type);
         }
     }
 }

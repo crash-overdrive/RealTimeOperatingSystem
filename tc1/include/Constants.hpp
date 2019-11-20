@@ -44,7 +44,7 @@ namespace Constants {
 
     namespace Server {
         const char ACK = 'A';
-        const char ERR = 'E';
+        const char ERROR = 'E';
     }
 
     namespace NameServer {
@@ -188,6 +188,7 @@ namespace Constants {
     enum MSG {
         // NIL,
         RDY,
+        ERR,
         CHAR,
         TX,
         RX,
@@ -196,6 +197,7 @@ namespace Constants {
         REQUEST,
         GO,
         STOP,
+        TRACK,
         TR,
         RV,
         SW,

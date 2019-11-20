@@ -34,18 +34,12 @@ void uart1txServer() {
 
         if (tid == notifierTid) {
             // We've been notified that uart1 is ready for transmission so flush as much of buffer as possible
-
-            // bwprintf(COM2, "N");
             blocked = false;
             reply[0] = Constants::Server::ACK;
             result = Reply(tid, reply, 1);
             if (result < 0) {
                 bwprintf(COM2, "UART1TXServer - An error was returned from Reply");
             }
-
-            // while (!uart1.isClearToSend()) {
-            //     // This is a trap
-            // }
 
             // While uart1 can transmit, push characters
             if (uart1.isTXEmpty() &&  !txbuf.empty()) {
@@ -66,10 +60,6 @@ void uart1txServer() {
                 Reply(tid, reply, 1);
             }
         } else {
-            // while (!uart1.isClearToSend()) {
-            //     // This is a trap
-            // }
-
             // Request is coming from the kernel, so put the received character on the tx buffer
             if (!txbuf.full()) {
                 txbuf.push(msg[0]);
@@ -90,8 +80,6 @@ void uart1txServer() {
             // if (uart1.isTXFull() && !txbuf.empty()) {
             //     uart1.enableTXInterrupt();
             // }
-
-            // bwprintf(COM2, "bs %d", txbuf.size());
         }
     }
 }

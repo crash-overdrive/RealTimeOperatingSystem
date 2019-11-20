@@ -3,7 +3,8 @@
 #include "io/bwio.hpp"
 #include "io/ts7200.h"
 #include "io/UART.hpp"
-#include "user/courier/TermTCSCourier.hpp"
+// #include "user/courier/TermTCSCourier.hpp"
+#include "user/courier/TermParseCourier.hpp"
 #include "user/courier/UART2RXCourier.hpp"
 #include "user/courier/UART2TXCourier.hpp"
 #include "user/message/MessageHeader.hpp"
@@ -19,7 +20,8 @@ void terminalServer() {
     RegisterAs("TERM");
     int TXC = Create(6, uart2txCourier);
     int RXC = Create(5, uart2rxCourier);
-    int TCS = Create(6, termTCSCourier); // 24
+    // int TCS = Create(6, termTCSCourier); // 24
+    int PARSE = Create(6, termParseCourier);
     bool txcBlocked = false;
     int tid, result;
     char msg[Constants::TerminalServer::MSG_SIZE];
@@ -89,7 +91,7 @@ void terminalServer() {
                 outbuf.push('5');
                 outbuf.push('f');
 
-                Reply(TCS, (char* )&inmsg, inmsg.size());
+                Reply(PARSE, (char* )&inmsg, inmsg.size());
                 // TODO(sgaweda): Create courier which communicates with train control server
                 inmsg.msglen = 0;
             } else if (rxmsg->ch == Constants::TrainCommandServer::BACKSPACE) {

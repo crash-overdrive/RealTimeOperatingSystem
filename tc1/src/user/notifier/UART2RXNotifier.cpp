@@ -27,8 +27,8 @@ void uart2rxNotifier() {
 
         // This should not be reading this, whois should identify what the correct server is at the top of the notifier
         rplen = Send(uart2rx_tid, msg, 1, reply, 1);
-        if (rplen == 1 && reply[0] == Constants::Server::ERR) {
-            bwprintf(COM2, "UART1R Notifier - ERR: %d\n\r", reply[0]);
+        if (rplen == 1 && reply[0] == Constants::Server::ERROR) {
+            bwprintf(COM2, "UART1R Notifier - ERROR: %d\n\r", reply[0]);
         } else if (!(rplen == 1 && reply[0] == Constants::Server::ACK)) {
             bwprintf(COM2, "UART1R Notifier - Recieved bad reply: %d\n\r", reply[0]);
         }

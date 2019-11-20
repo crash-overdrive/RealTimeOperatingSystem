@@ -5,7 +5,7 @@
 #include "user/notifier/ClockNotifier.hpp"
 #include "user/client/SensorData.hpp"
 #include "user/client/Test.hpp"
-#include "user/server/TrainCommandServer.hpp"
+#include "user/server/CommandServer.hpp"
 #include "user/server/NameServer.hpp"
 #include "user/server/ClockServer.hpp"
 #include "user/server/UART1RXServer.hpp"
