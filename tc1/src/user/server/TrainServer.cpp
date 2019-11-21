@@ -97,9 +97,9 @@ void TrainServer::attributeSensors() {
 
 void TrainServer::updatePredictions() {
     for (int i = 0; i < spmsg->count; ++i) {
-        int train = getTrainIndex(spmsg->predictions[i*2].train);
-        trains[train].nextSensor[0] = spmsg->predictions[i*2].sensor;
-        trains[train].nextSensor[1] = spmsg->predictions[i*2+1].sensor;
+        int train = spmsg->predictions[i].train;
+        trains[train].nextSensor[0] = spmsg->predictions[i].nextSensor[0];
+        trains[train].nextSensor[1] = spmsg->predictions[i].nextSensor[1];
     }
 }
 
@@ -116,10 +116,10 @@ void TrainServer::init() {
     navCourierReady = false;
 
     // TODO: initialize expected sensors pragmatically (by giving train starting position and direction)
-    trains[T1].nextSensor[0] = Sensor('B', 11);
-    trains[T1].nextSensor[1] = Sensor('B', 7);
-    trains[T24].nextSensor[0] = Sensor('B', 12);
-    trains[T24].nextSensor[1] = Sensor('B', 8);
+    // trains[T1].nextSensor[0] = Sensor('B', 11);
+    // trains[T1].nextSensor[1] = Sensor('B', 7);
+    // trains[T24].nextSensor[0] = Sensor('B', 12);
+    // trains[T24].nextSensor[1] = Sensor('B', 8);
 }
 
 void trainServer() {

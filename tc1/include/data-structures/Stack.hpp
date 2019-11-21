@@ -50,6 +50,14 @@ class Stack {
             }
         }
 
+        T peekSecond() {
+            if (head >=2 ) {
+                return buffer[head-2];
+            } else {
+                return T();
+            }
+        }
+
         void reset() {
             head = 0;
         }
