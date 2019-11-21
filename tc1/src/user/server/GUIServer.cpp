@@ -95,10 +95,18 @@ void GUI::drawSensors(char *msg) {
     for (int i = 9; i >= 0; --i) {
         // We check here to see if the bank isn't a valid bank
         if (sm->sensorData[i].sensor.bank > 0) {
-            if (sm->sensorData[i].train == 1) {
+            if (sm->sensorData[i].train == 0) {
+                drawmsg.msglen += insertSetDisplayAttrs(&drawmsg.msg[drawmsg.msglen], FG_GREEN);
+            } else if (sm->sensorData[i].train == 1) {
+                drawmsg.msglen += insertSetDisplayAttrs(&drawmsg.msg[drawmsg.msglen], FG_MAGENTA);
+            } else if (sm->sensorData[i].train == 2) {
+                drawmsg.msglen += insertSetDisplayAttrs(&drawmsg.msg[drawmsg.msglen], FG_YELLOW);
+            } else if (sm->sensorData[i].train == 3) {
                 drawmsg.msglen += insertSetDisplayAttrs(&drawmsg.msg[drawmsg.msglen], FG_RED);
-            } else {
+            } else if (sm->sensorData[i].train == 4) {
                 drawmsg.msglen += insertSetDisplayAttrs(&drawmsg.msg[drawmsg.msglen], FG_BLUE);
+            } else {
+                drawmsg.msglen += insertSetDisplayAttrs(&drawmsg.msg[drawmsg.msglen], FG_CYAN);
             }
             if (sm->sensorData[i].sensor.number / 10 == 0) {
                 drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%c0%d ", sm->sensorData[i].sensor.bank, sm->sensorData[i].sensor.number);

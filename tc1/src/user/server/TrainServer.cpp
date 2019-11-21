@@ -116,10 +116,17 @@ void TrainServer::init() {
     navCourierReady = false;
 
     // TODO: initialize expected sensors pragmatically (by giving train starting position and direction)
+    // This is here for testing out sensor attribution
     // trains[T1].nextSensor[0] = Sensor('B', 11);
-    // trains[T1].nextSensor[1] = Sensor('B', 7);
+    // trains[T1].nextSensor[1] = Sensor('B', 9);
     // trains[T24].nextSensor[0] = Sensor('B', 12);
-    // trains[T24].nextSensor[1] = Sensor('B', 8);
+    // trains[T24].nextSensor[1] = Sensor('B', 10);
+    // trains[T58].nextSensor[0] = Sensor('A', 11);
+    // trains[T58].nextSensor[1] = Sensor('B', 7);
+    // trains[T74].nextSensor[0] = Sensor('A', 12);
+    // trains[T74].nextSensor[1] = Sensor('B', 8);
+    // trains[T78].nextSensor[0] = Sensor('A', 10);
+    // trains[T78].nextSensor[1] = Sensor('A', 9);
 }
 
 void trainServer() {
