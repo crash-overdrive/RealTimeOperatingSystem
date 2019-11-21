@@ -173,12 +173,12 @@ void trainServer() {
         } else if (mh->type == Constants::MSG::SENSOR_DIFF) {
             ts.attributeSensors();
             Reply(ts.navCourier, (char *)&ts.samsg, ts.samsg.size());
-            // TODO: add actual navCourierReady checks
             ts.navCourierReady = false;
             Reply(tid, (char *)&ts.samsg, ts.samsg.size());
             ts.samsg.count = 0; // Reset the state of the attribution
         } else if (mh->type == Constants::MSG::SENSOR_PRED) {
             ts.updatePredictions();
+            // This is updated, but since this communication chain is dependent, do not actually need to track this
             ts.navCourierReady = true;
         } else {
             bwprintf(COM2, "Train Server - Unrecognized message type received %d", mh->type);

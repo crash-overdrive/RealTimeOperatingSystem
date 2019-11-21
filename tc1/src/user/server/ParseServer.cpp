@@ -2,10 +2,13 @@
 #include "io/bwio.hpp"
 #include "io/ts7200.h"
 #include "user/courier/ParseCSCourier.hpp"
+#include "user/message/DTMessage.hpp"
 #include "user/message/RVMessage.hpp"
+#include "user/message/RTMessage.hpp"
 #include "user/message/SWMessage.hpp"
 #include "user/message/TextMessage.hpp"
 #include "user/message/ThinMessage.hpp"
+#include "user/message/TPMessage.hpp"
 #include "user/message/TRMessage.hpp"
 #include "user/server/ParseServer.hpp"
 #include "user/syscall/UserSyscall.hpp"
@@ -37,6 +40,17 @@ int parseInt(char *str, int index, int* ret) {
     return count;
 }
 
+int parseAlphaNum(char *src, char *dest, int index) {
+    int count = 0;
+    char c = src[index];
+    while ((c >= '0' && c <= '9') || c >= 'A' && c <= 'z') {
+        dest[index + count] = c;
+        count++;
+        c = src[index + count];
+    }
+    return count;
+}
+
 void parseServer() {
     RegisterAs("PARSE");
 
@@ -48,6 +62,9 @@ void parseServer() {
     TRMessage trmsg;
     RVMessage rvmsg;
     SWMessage swmsg;
+    RTMessage rtmsg;
+    DTMessage dtmsg;
+    TPMessage tpmsg;
 
     ThinMessage rdymsg(Constants::MSG::RDY);
     ThinMessage errmsg(Constants::MSG::ERR);
@@ -222,6 +239,190 @@ void parseServer() {
                 swmsg.state = state;
 
                 Reply(commandCourier, (char*)&swmsg, swmsg.size());
+                Reply(tid, (char*)&rdymsg, rdymsg.size());
+            } else if (cmd->msg[index] == 'r' && cmd->msg[index] == 't') {
+                // rt tr src dest
+                int train = 0;
+
+                index += 2;
+
+                // Consume whitespace
+                result = parseWhitespace(cmd->msg, index);
+                if (result < 1) {
+                    Reply(tid, (char*)&errmsg, errmsg.size());
+                    continue;
+                }
+                index += result;
+
+                // Get the train number
+                result = parseInt(cmd->msg, index, &train);
+                if (result <= 0) {
+                    Reply(tid, (char*)&errmsg, errmsg.size());
+                    continue;
+                }
+                index += result;
+                // Check that train is valid
+                if (train < 1 || train > 80) {
+                    Reply(tid, (char*)&errmsg, errmsg.size());
+                    continue;
+                }
+
+                rtmsg.train = train;
+
+                // Consume whitespace
+                result = parseWhitespace(cmd->msg, index);
+                if (result < 1) {
+                    Reply(tid, (char*)&errmsg, errmsg.size());
+                    continue;
+                }
+                index += result;
+
+                // Get the src
+                // TODO: build a trie to check input
+                result = parseAlphaNum(cmd->msg, rtmsg.src, index);
+                if (result < 1) {
+                    Reply(tid, (char*)&errmsg, errmsg.size());
+                    continue;
+                }
+                index += result;
+
+                // Consume whitespace
+                result = parseWhitespace(cmd->msg, index);
+                if (result < 1) {
+                    Reply(tid, (char*)&errmsg, errmsg.size());
+                    continue;
+                }
+                index += result;
+
+                // Get the dest
+                result = parseAlphaNum(cmd->msg, rtmsg.dest, index);
+                if (result < 1) {
+                    Reply(tid, (char*)&errmsg, errmsg.size());
+                    continue;
+                }
+                index += result;
+
+                // Consume whitespace
+                index += parseWhitespace(cmd->msg, index);
+                // Check that we've reached the end of input
+                if (cmd->msg[index] != '\0') {
+                    Reply(tid, (char*)&errmsg, errmsg.size());
+                    continue;
+                }
+
+                Reply(commandCourier, (char*)&rtmsg, rtmsg.size());
+                Reply(tid, (char*)&rdymsg, rdymsg.size());
+            } else if (cmd->msg[index] == 'd' && cmd->msg[index] == 't') {
+                // dt tr dest
+                int train = 0;
+
+                index += 2;
+
+                // Consume whitespace
+                result = parseWhitespace(cmd->msg, index);
+                if (result < 1) {
+                    Reply(tid, (char*)&errmsg, errmsg.size());
+                    continue;
+                }
+                index += result;
+
+                // Get the train number
+                result = parseInt(cmd->msg, index, &train);
+                if (result <= 0) {
+                    Reply(tid, (char*)&errmsg, errmsg.size());
+                    continue;
+                }
+                index += result;
+                // Check that train is valid
+                if (train < 1 || train > 80) {
+                    Reply(tid, (char*)&errmsg, errmsg.size());
+                    continue;
+                }
+
+                dtmsg.train = train;
+
+                // Consume whitespace
+                result = parseWhitespace(cmd->msg, index);
+                if (result < 1) {
+                    Reply(tid, (char*)&errmsg, errmsg.size());
+                    continue;
+                }
+                index += result;
+
+                // Get the dest
+                // TODO: build a trie to check input
+                result = parseAlphaNum(cmd->msg, dtmsg.dest, index);
+                if (result < 1) {
+                    Reply(tid, (char*)&errmsg, errmsg.size());
+                    continue;
+                }
+                index += result;
+
+                // Consume whitespace
+                index += parseWhitespace(cmd->msg, index);
+                // Check that we've reached the end of input
+                if (cmd->msg[index] != '\0') {
+                    Reply(tid, (char*)&errmsg, errmsg.size());
+                    continue;
+                }
+
+                Reply(commandCourier, (char*)&dtmsg, dtmsg.size());
+                Reply(tid, (char*)&rdymsg, rdymsg.size());
+            } else if (cmd->msg[index] == 't' && cmd->msg[index] == 'p') {
+                // tp tr src
+                int train = 0;
+
+                index += 2;
+
+                // Consume whitespace
+                result = parseWhitespace(cmd->msg, index);
+                if (result < 1) {
+                    Reply(tid, (char*)&errmsg, errmsg.size());
+                    continue;
+                }
+                index += result;
+
+                // Get the train number
+                result = parseInt(cmd->msg, index, &train);
+                if (result <= 0) {
+                    Reply(tid, (char*)&errmsg, errmsg.size());
+                    continue;
+                }
+                index += result;
+                // Check that train is valid
+                if (train < 1 || train > 80) {
+                    Reply(tid, (char*)&errmsg, errmsg.size());
+                    continue;
+                }
+
+                tpmsg.train = train;
+
+                // Consume whitespace
+                result = parseWhitespace(cmd->msg, index);
+                if (result < 1) {
+                    Reply(tid, (char*)&errmsg, errmsg.size());
+                    continue;
+                }
+                index += result;
+
+                // Get the dest
+                // TODO: build a trie to check input
+                result = parseAlphaNum(cmd->msg, tpmsg.src, index);
+                if (result < 1) {
+                    Reply(tid, (char*)&errmsg, errmsg.size());
+                    continue;
+                }
+                index += result;
+
+                // Consume whitespace
+                index += parseWhitespace(cmd->msg, index);
+                // Check that we've reached the end of input
+                if (cmd->msg[index] != '\0') {
+                    Reply(tid, (char*)&errmsg, errmsg.size());
+                    continue;
+                }
+
+                Reply(commandCourier, (char*)&tpmsg, tpmsg.size());
                 Reply(tid, (char*)&rdymsg, rdymsg.size());
             } else if (cmd->msg[index] == 'q') {
                 index += 1;
