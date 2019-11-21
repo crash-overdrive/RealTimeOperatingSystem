@@ -3,6 +3,7 @@
 #include "io/bwio.hpp"
 #include "io/ts7200.h"
 #include "user/courier/TrainMarklinCourier.hpp"
+#include "user/courier/TrainNavCourier.hpp"
 #include "user/message/RVMessage.hpp"
 #include "user/message/SensorAttrMessage.hpp"
 #include "user/message/SensorDiffMessage.hpp"
@@ -94,6 +95,14 @@ void TrainServer::attributeSensors() {
     }
 }
 
+void TrainServer::updatePredictions() {
+    for (int i = 0; i < spmsg->count; ++i) {
+        int train = getTrainIndex(spmsg->predictions[i*2].train);
+        trains[train].nextSensor[0] = spmsg->predictions[i*2].sensor;
+        trains[train].nextSensor[1] = spmsg->predictions[i*2+1].sensor;
+    }
+}
+
 void TrainServer::init() {
     trains[T1] = Train(1);
     trains[T24] = Train(24);
@@ -103,6 +112,8 @@ void TrainServer::init() {
     // TODO: init train estimates
     marklinCourier = Create(5, trainMarklinCourier);
     marklinCourierReady = false;
+    navCourier = Create(5, trainNavCourier);
+    navCourierReady = false;
 
     // TODO: initialize expected sensors pragmatically (by giving train starting position and direction)
     trains[T1].nextSensor[0] = Sensor('B', 11);
@@ -161,8 +172,14 @@ void trainServer() {
             Reply(tid, (char *)&rdymsg, rdymsg.size());
         } else if (mh->type == Constants::MSG::SENSOR_DIFF) {
             ts.attributeSensors();
+            Reply(ts.navCourier, (char *)&ts.samsg, ts.samsg.size());
+            // TODO: add actual navCourierReady checks
+            ts.navCourierReady = false;
             Reply(tid, (char *)&ts.samsg, ts.samsg.size());
             ts.samsg.count = 0; // Reset the state of the attribution
+        } else if (mh->type == Constants::MSG::SENSOR_PRED) {
+            ts.updatePredictions();
+            ts.navCourierReady = true;
         } else {
             bwprintf(COM2, "Train Server - Unrecognized message type received %d", mh->type);
         }

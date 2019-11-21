@@ -86,7 +86,6 @@ void SensorServer::sendGUI() {
 void SensorServer::init() {
     trainCourier = Create(5, sensorTrainCourier);
     guiCourier = Create(8, sensorGUICourier);
-    // guiCourier = 100;
     trainCourierReady = false;
     guiCourierReady = false;
 }
@@ -113,7 +112,6 @@ void sensorServer() {
                 sds.guiCourierReady = true;
                 sds.sendGUI();
             }
-            // TODO: do stuff after we're ready
         } else if (sds.mh->type == Constants::MSG::TEXT) {
             // Sensor Data has arrived from the Marklin server
             sds.processData();

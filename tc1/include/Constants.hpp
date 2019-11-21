@@ -204,7 +204,7 @@ namespace Constants {
         SENSOR,
         SENSOR_DIFF,
         SENSOR_ATTR,
-        // SWITCH,
+        SENSOR_PRED,
         TRAIN,
         TIME,
         IDLE,

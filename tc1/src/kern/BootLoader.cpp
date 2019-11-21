@@ -4,6 +4,7 @@
 #include "kern/BootLoader.hpp"
 #include "user/client/ClockClient.hpp"
 #include "user/client/IdleTask.hpp"
+#include "user/client/NavigationServer.hpp"
 #include "user/client/Test.hpp"
 #include "user/client/TrackInit.hpp"
 #include "user/server/ClockServer.hpp"
@@ -11,6 +12,7 @@
 #include "user/server/GUIServer.hpp"
 #include "user/server/MarklinServer.hpp"
 #include "user/server/NameServer.hpp"
+// #include "user/server/NavigationServer.hpp"
 #include "user/server/ParseServer.hpp"
 #include "user/server/SensorServer.hpp"
 #include "user/server/SwitchServer.hpp"
@@ -78,6 +80,7 @@ void bootLoader() {
 
     tid = Create(7, parseServer);
     tid = Create(7, commandServer);
+    tid = Create(5, navigationServer);
     tid = Create(5, switchServer);
     tid = Create(5, trainServer);
     tid = Create(5, sensorServer);
