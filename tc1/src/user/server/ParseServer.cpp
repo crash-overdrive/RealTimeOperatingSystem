@@ -2,6 +2,7 @@
 #include "io/bwio.hpp"
 #include "io/ts7200.h"
 #include "user/courier/ParseCSCourier.hpp"
+#include "user/courier/ParseNavCourier.hpp"
 #include "user/message/DTMessage.hpp"
 #include "user/message/RVMessage.hpp"
 #include "user/message/RTMessage.hpp"
@@ -69,6 +70,7 @@ void parseServer() {
     ThinMessage rdymsg(Constants::MSG::RDY);
     ThinMessage errmsg(Constants::MSG::ERR);
 
+    int navCourier = Create(5, parseNavCourier);
     int commandCourier = Create(7, parseCSCourier);
 
     FOREVER {
@@ -79,6 +81,7 @@ void parseServer() {
 
         if (mh->type == Constants::MSG::RDY) {
             // RDY is received from the command server
+            // RDY is also received from the nav server
         } else if (mh->type == Constants::MSG::TEXT) {
             // char* commandToken = strtok(cmd->msg, Constants::TrainCommandServer::DELIMITER);
             int index = 0;
@@ -240,7 +243,7 @@ void parseServer() {
 
                 Reply(commandCourier, (char*)&swmsg, swmsg.size());
                 Reply(tid, (char*)&rdymsg, rdymsg.size());
-            } else if (cmd->msg[index] == 'r' && cmd->msg[index] == 't') {
+            } else if (cmd->msg[index] == 'r' && cmd->msg[index + 1] == 't') {
                 // rt tr src dest
                 int train = 0;
 
@@ -310,9 +313,9 @@ void parseServer() {
                     continue;
                 }
 
-                Reply(commandCourier, (char*)&rtmsg, rtmsg.size());
+                Reply(navCourier, (char*)&rtmsg, rtmsg.size());
                 Reply(tid, (char*)&rdymsg, rdymsg.size());
-            } else if (cmd->msg[index] == 'd' && cmd->msg[index] == 't') {
+            } else if (cmd->msg[index] == 'd' && cmd->msg[index + 1] == 't') {
                 // dt tr dest
                 int train = 0;
 
@@ -366,9 +369,9 @@ void parseServer() {
                     continue;
                 }
 
-                Reply(commandCourier, (char*)&dtmsg, dtmsg.size());
+                Reply(navCourier, (char*)&dtmsg, dtmsg.size());
                 Reply(tid, (char*)&rdymsg, rdymsg.size());
-            } else if (cmd->msg[index] == 't' && cmd->msg[index] == 'p') {
+            } else if (cmd->msg[index] == 't' && cmd->msg[index + 1] == 'p') {
                 // tp tr src
                 int train = 0;
 
@@ -422,7 +425,7 @@ void parseServer() {
                     continue;
                 }
 
-                Reply(commandCourier, (char*)&tpmsg, tpmsg.size());
+                Reply(navCourier, (char*)&tpmsg, tpmsg.size());
                 Reply(tid, (char*)&rdymsg, rdymsg.size());
             } else if (cmd->msg[index] == 'q') {
                 index += 1;

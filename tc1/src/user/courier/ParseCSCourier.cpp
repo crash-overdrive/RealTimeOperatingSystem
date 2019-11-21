@@ -1,6 +1,6 @@
 #include "Constants.hpp"
 #include "io/bwio.hpp"
-#include "user/courier/TermParseCourier.hpp"
+#include "user/courier/ParseCSCourier.hpp"
 #include "user/message/RVMessage.hpp"
 #include "user/message/SWMessage.hpp"
 #include "user/message/ThinMessage.hpp"
@@ -36,7 +36,7 @@ void parseCSCourier() {
         } else if (mh->type == Constants::SW) {
             result = Send(CS, (char*)swmsg, swmsg->size(), (char *)&rdymsg, rdymsg.size());
         } else {
-            bwprintf(COM2, "Parse->CS Courier - Expected SW message but received unexpected message type %d\r\n", mh->type);
+            bwprintf(COM2, "Parse->CS Courier - Expected TR, RV, or SW message but received unexpected message type %d\r\n", mh->type);
         }
 
         if (result < 0) {

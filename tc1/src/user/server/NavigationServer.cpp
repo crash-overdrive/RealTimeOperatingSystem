@@ -6,8 +6,11 @@
 #include "io/bwio.hpp"
 #include "io/StringFormat.hpp"
 #include "user/message/MessageHeader.hpp"
+#include "user/message/DTMessage.hpp"
+#include "user/message/RTMessage.hpp"
 #include "user/message/SensorAttrMessage.hpp"
 #include "user/message/SensorPredMessage.hpp"
+#include "user/message/TPMessage.hpp"
 #include "user/message/ThinMessage.hpp"
 #include "user/server/NavigationServer.hpp"
 #include "user/syscall/UserSyscall.hpp"
@@ -223,8 +226,9 @@ void navigationServer() {
         if (mh->type == Constants::MSG::RDY) {
             // TODO: Implement me
 
-        } else if (mh->type == 100) {
+        } else if (mh->type == Constants::MSG::RT) {
             // TODO: Get src, dest and train from the message
+            // bwprintf(COM2, "Nav - RT Rec");
             int srcIndex = -1;
             int destIndex = -1;
             int train;
@@ -309,6 +313,11 @@ void navigationServer() {
             //         }
             //     }
             // }
+        } else if (mh->type == Constants::MSG::DT) {
+            // bwprintf(COM2, "Nav - DT Rec");
+            // Once we have information it should be possible to change destination
+        } else if (mh->type == Constants::MSG::TP) {
+            // Placeholder, super low priority to implement this
         } else if (mh->type == Constants::MSG::SENSOR_ATTR) {
             for (int i = 0; i < samsg->count; ++i) {
                 if (sensorLists[samsg->sensorAttrs[i].train].peek() == samsg->sensorAttrs[i].sensor) {
