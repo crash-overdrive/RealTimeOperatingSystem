@@ -10,6 +10,7 @@
 #include "user/message/TextMessage.hpp"
 #include "user/message/TimeMessage.hpp"
 #include "user/message/ThinMessage.hpp"
+#include "user/model/Train.hpp"
 #include "user/server/GUIServer.hpp"
 #include "user/syscall/UserSyscall.hpp"
 
@@ -93,11 +94,16 @@ void GUI::drawSensors(char *msg) {
     // TODO(sgaweda): Fix this another day!
     for (int i = 9; i >= 0; --i) {
         // We check here to see if the bank isn't a valid bank
-        if (sm->sensorData[i].bank > 0) {
-            if (sm->sensorData[i].number / 10 == 0) {
-                drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%c0%d ", sm->sensorData[i].bank, sm->sensorData[i].number);
+        if (sm->sensorData[i].sensor.bank > 0) {
+            if (sm->sensorData[i].train == 1) {
+                drawmsg.msglen += insertSetDisplayAttrs(&drawmsg.msg[drawmsg.msglen], FG_RED);
             } else {
-                drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%c%d ", sm->sensorData[i].bank, sm->sensorData[i].number);
+                drawmsg.msglen += insertSetDisplayAttrs(&drawmsg.msg[drawmsg.msglen], FG_BLUE);
+            }
+            if (sm->sensorData[i].sensor.number / 10 == 0) {
+                drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%c0%d ", sm->sensorData[i].sensor.bank, sm->sensorData[i].sensor.number);
+            } else {
+                drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%c%d ", sm->sensorData[i].sensor.bank, sm->sensorData[i].sensor.number);
             }
         }
     }
@@ -205,7 +211,6 @@ void guiServer() {
                     bwprintf(COM2, "GUI Server - Courier unexpectedly blocked!");
                 }
                 gui.drawSwitch(msg);
-                // bwprintf(COM2, "GUIS - sending rdy to TCS Courier %d\r\n", rdymsg.mh.type);
                 Reply(tid, (char*)&rdymsg, rdymsg.size());
                 tsBlocked = false;
                 break;

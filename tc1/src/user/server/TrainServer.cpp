@@ -4,6 +4,8 @@
 #include "io/ts7200.h"
 #include "user/courier/TrainMarklinCourier.hpp"
 #include "user/message/RVMessage.hpp"
+#include "user/message/SensorAttrMessage.hpp"
+#include "user/message/SensorDiffMessage.hpp"
 #include "user/message/ThinMessage.hpp"
 #include "user/message/TRMessage.hpp"
 #include "user/model/Train.hpp"
@@ -65,6 +67,33 @@ void TrainServer::setTrainSpeed(int train, char s) {
     trains[train].speed = s;
 }
 
+void TrainServer::attributeSensors() {
+    for (int i = 0; i < sdmsg->count; ++i) {
+        for (int j = 0; j < 5; ++j) {
+            if (sdmsg->sensors[i] == trains[j].nextSensor[0]) {
+                // handle first sensor attr
+                samsg.sensorAttrs[samsg.count].sensor = sdmsg->sensors[i];
+                samsg.sensorAttrs[samsg.count].train = j;
+                samsg.count++;
+                // TODO: update the expected sensors for first match
+                trains[j].nextSensor[0].bank = 0;
+                trains[j].nextSensor[0].number = 0;
+                break;
+            } else if (sdmsg->sensors[i] == trains[j].nextSensor[1]) {
+                samsg.sensorAttrs[samsg.count].sensor = sdmsg->sensors[i];
+                samsg.sensorAttrs[samsg.count].train = j;
+                samsg.count++;
+                // TODO: update the expected sensors for second match
+                trains[j].nextSensor[0].bank = 0;
+                trains[j].nextSensor[0].number = 0;
+                trains[j].nextSensor[1].bank = 0;
+                trains[j].nextSensor[1].number = 0;
+                break;
+            }
+        }
+    }
+}
+
 void TrainServer::init() {
     trains[T1] = Train(1);
     trains[T24] = Train(24);
@@ -74,6 +103,12 @@ void TrainServer::init() {
     // TODO: init train estimates
     marklinCourier = Create(5, trainMarklinCourier);
     marklinCourierReady = false;
+
+    // TODO: initialize expected sensors pragmatically (by giving train starting position and direction)
+    trains[T1].nextSensor[0] = Sensor('B', 11);
+    trains[T1].nextSensor[1] = Sensor('B', 7);
+    trains[T24].nextSensor[0] = Sensor('B', 12);
+    trains[T24].nextSensor[1] = Sensor('B', 8);
 }
 
 void trainServer() {
@@ -83,18 +118,15 @@ void trainServer() {
     ts.init();
 
     int result, tid;
-    char msg[16];
-    MessageHeader *mh = (MessageHeader*)&msg;
-    RVMessage *rvmsg = (RVMessage *)&msg;
-    TRMessage *trmsg = (TRMessage *)&msg;
+    MessageHeader *mh = (MessageHeader*)&ts.msg;
+    RVMessage *rvmsg = (RVMessage *)&ts.msg;
+    TRMessage *trmsg = (TRMessage *)&ts.msg;
 
     ThinMessage rdymsg(Constants::MSG::RDY);
     ThinMessage errmsg(Constants::MSG::ERR);
 
-
-
     FOREVER {
-        result = Receive(&tid, (char*)&msg, 16);
+        result = Receive(&tid, (char*)&ts.msg, 128);
         if(result < 0) {
             // TODO: handle empty message
         }
@@ -106,12 +138,12 @@ void trainServer() {
             } else {
                 *trmsg = ts.popTRMessage(index);
                 ts.setTrainSpeed(index, trmsg->speed);
-                Reply(ts.marklinCourier, msg, trmsg->size());
+                Reply(ts.marklinCourier, ts.msg, trmsg->size());
             }
         } else if (mh->type == Constants::MSG::TR) {
             if (ts.marklinCourierReady) {
                 ts.setTrainSpeed(trmsg->train, trmsg->speed);
-                Reply(ts.marklinCourier, msg, trmsg->size());
+                Reply(ts.marklinCourier, ts.msg, trmsg->size());
                 ts.marklinCourierReady = false;
             } else {
                 ts.queueTrainSpeed(trmsg->train, trmsg->speed);
@@ -121,12 +153,16 @@ void trainServer() {
             ts.queueReverse(rvmsg->train);
             if (ts.marklinCourierReady) {
                 *trmsg = ts.popTRMessage(ts.getTrainIndex(rvmsg->train));
-                Reply(ts.marklinCourier, msg, trmsg->size());
+                Reply(ts.marklinCourier, ts.msg, trmsg->size());
                 ts.marklinCourierReady = false;
             } else {
                 ts.queueReverse(rvmsg->train);
             }
             Reply(tid, (char *)&rdymsg, rdymsg.size());
+        } else if (mh->type == Constants::MSG::SENSOR_DIFF) {
+            ts.attributeSensors();
+            Reply(tid, (char *)&ts.samsg, ts.samsg.size());
+            ts.samsg.count = 0; // Reset the state of the attribution
         } else {
             bwprintf(COM2, "Train Server - Unrecognized message type received %d", mh->type);
         }

@@ -8,7 +8,7 @@ class SensorMessage {
 public:
     MessageHeader mh;
 
-    Sensor sensorData[10];
+    SensorAttr sensorData[10];
 
     SensorMessage();
 

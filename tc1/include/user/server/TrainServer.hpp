@@ -7,16 +7,12 @@
 
 void trainServer();
 
-enum TRINDEX {
-    T1 = 0,
-    T24,
-    T58,
-    T74,
-    T78,
-};
-
 class TrainServer {
 public:
+    char msg[128];
+    SensorAttrMessage samsg;
+    SensorDiffMessage *sdmsg = (SensorDiffMessage *)&msg;
+
     Train trains[5];
     DataStructures::RingBuffer<TRMessage, 32> trbuf[5];
     int marklinCourier;
@@ -30,6 +26,8 @@ public:
     void setTrainSpeed(char tr, char s);
     void setTrainSpeed(int train, char s);
     TRMessage popTRMessage(int i);
+    void attributeSensors();
+    void sendSensorAttr();
 };
 
 #endif

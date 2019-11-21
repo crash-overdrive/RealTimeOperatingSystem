@@ -3,6 +3,14 @@
 
 #include "user/model/Sensor.hpp"
 
+enum TRINDEX {
+    T1 = 0,
+    T24,
+    T58,
+    T74,
+    T78,
+};
+
 class Train {
 public:
     char number;

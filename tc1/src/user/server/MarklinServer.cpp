@@ -4,6 +4,7 @@
 #include "io/ts7200.h"
 #include "io/UART.hpp"
 #include "user/client/SensorData.hpp"
+#include "user/courier/MarklinSensorCourier.hpp"
 #include "user/courier/UART1RXCourier.hpp"
 #include "user/courier/UART1TXCourier.hpp"
 #include "user/message/MessageHeader.hpp"
@@ -20,9 +21,9 @@
 
 void marklinServer() {
     RegisterAs("MARKLIN");
-    int TXC = Create(6, uart1txCourier);
-    int RXC = Create(5, uart1rxCourier);
-    int SENSOR = Create(8, sensorData);
+    int TXC = Create(5, uart1txCourier);
+    int RXC = Create(4, uart1rxCourier);
+    int sensorCourier = Create(5, marklinSensorCourier);
     bool reading = false;
     bool switching = false;
     bool txcReady = false;
@@ -50,7 +51,6 @@ void marklinServer() {
 
     FOREVER {
         result = Receive(&tid, msg, Constants::TerminalServer::MSG_SIZE);
-        // Delay(CLOCK, 10);
         if (result < 0) {
             bwprintf(COM2, "Marklin Server - Receive generated negative value!");
         }
@@ -149,7 +149,7 @@ void marklinServer() {
 
             // If we've read all the data reply to the sensor client
             if (inmsg.msglen == 10) {
-                Reply(SENSOR, (char*)&inmsg, inmsg.size());
+                Reply(sensorCourier, (char*)&inmsg, inmsg.size());
                 inmsg.msglen = 0;
                 reading = false;
             }

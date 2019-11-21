@@ -5,11 +5,12 @@
 SensorMessage::SensorMessage() : mh(Constants::MSG::SENSOR) {
     // Initialize these to be zero!
     for (int i = 0; i < 10; ++i) {
-        sensorData[i].bank = 0;
-        sensorData[i].number = 0;
+        sensorData[i].sensor.bank = 0;
+        sensorData[i].sensor.number = 0;
+        sensorData[i].train = 0;
     }
 }
 
 int SensorMessage::size() {
-    return sizeof(MessageHeader) + 4 - sizeof(MessageHeader) % 4 + sizeof(Sensor)*10;
+    return sizeof(MessageHeader) + 4 - sizeof(MessageHeader) % 4 + sizeof(SensorAttr)*10;
 }

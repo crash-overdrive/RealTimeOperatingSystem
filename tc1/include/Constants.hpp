@@ -202,6 +202,8 @@ namespace Constants {
         RV,
         SW,
         SENSOR,
+        SENSOR_DIFF,
+        SENSOR_ATTR,
         // SWITCH,
         TRAIN,
         TIME,

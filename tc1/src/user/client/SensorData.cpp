@@ -87,8 +87,8 @@ void sensorData() {
 
             for (unsigned int i = 0; i < sensorHistory.size(); ++i) {
                 Sensor sensor = sensorHistory.pop();
-                sensormsg.sensorData[i].bank = sensor.bank;
-                sensormsg.sensorData[i].number = sensor.number;
+                sensormsg.sensorData[i].sensor.bank = sensor.bank;
+                sensormsg.sensorData[i].sensor.number = sensor.number;
                 sensorHistory.push(sensor);
             }
 

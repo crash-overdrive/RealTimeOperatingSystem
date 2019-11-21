@@ -4,7 +4,6 @@
 #include "kern/BootLoader.hpp"
 #include "user/client/ClockClient.hpp"
 #include "user/client/IdleTask.hpp"
-#include "user/client/SensorData.hpp"
 #include "user/client/Test.hpp"
 #include "user/client/TrackInit.hpp"
 #include "user/server/ClockServer.hpp"
@@ -13,6 +12,7 @@
 #include "user/server/MarklinServer.hpp"
 #include "user/server/NameServer.hpp"
 #include "user/server/ParseServer.hpp"
+#include "user/server/SensorServer.hpp"
 #include "user/server/SwitchServer.hpp"
 #include "user/server/TrainServer.hpp"
 #include "user/server/TerminalServer.hpp"
@@ -80,8 +80,7 @@ void bootLoader() {
     tid = Create(7, commandServer);
     tid = Create(5, switchServer);
     tid = Create(5, trainServer);
-    // int tcstid = tid;
-    // bwprintf(COM2, "BootLoader - Created Train Controller with tid: %d\n\r", tid);
+    tid = Create(5, sensorServer);
 
     tid = Create(7, terminalServer);
     // int tstid = tid;
@@ -93,32 +92,11 @@ void bootLoader() {
 
     tid = Create(7, trackInit);
 
-    // TODO(sgaweda): Remove this when we are sure that Sensor Data should be created by Marklin Server
-    // tid = Create(8, sensorData);
-    // bwprintf(COM2, "BootLoader - Sensor Data client created\r\n");
-
     tid = Create(8, clockClient);
 
     // Create the system's idle task
     tid = Create(Constants::NUM_PRIORITIES-1, idleTask);
 
-    // TextMessage textmsg;
-    // char msg[17] = "this is a test\r\n";
-    // for (int i = 0; i < 17; ++i) {
-    //     textmsg.msg[i] = msg[i];
-    // }
-    // textmsg.msglen = 17;
-
-    // Send(tstid, (char*)&textmsg, textmsg.size(), "reply", 6);
-
-    // tid = Create(10, testTCStr);
-    // tid = Create(10, testTCSsw);
-
-    // TRMessage trmsg;
-    // trmsg.train = 1;
-    // trmsg.speed = 10;
-    // trmsg.headlights = true;
-    // Send(mstid, (char*)&trmsg, trmsg.size(), "reply", 6);
     // bwprintf(COM2, "Bootloader - Exiting");
 
     Exit();
