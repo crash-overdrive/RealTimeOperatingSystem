@@ -34,6 +34,7 @@ class TrackNode {
         int num;              /* sensor or switch number */
         TrackNode *reverseNode;  /* same location, but opposite direction */
         TrackEdge edges[2];
+        bool reserved;
 };
 
 class Track {

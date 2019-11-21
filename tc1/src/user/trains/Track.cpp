@@ -13,6 +13,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[0].edges[DIR_AHEAD].srcNode = &trackNodes[0];
         trackNodes[0].edges[DIR_AHEAD].destNode = &trackNodes[103];
         trackNodes[0].edges[DIR_AHEAD].dist = 231;
+        trackNodes[0].reserved = false;
         trackNodes[1].name = "A2";
         trackNodes[1].type = NODE_SENSOR;
         trackNodes[1].num = 1;
@@ -21,6 +22,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[1].edges[DIR_AHEAD].srcNode = &trackNodes[1];
         trackNodes[1].edges[DIR_AHEAD].destNode = &trackNodes[133];
         trackNodes[1].edges[DIR_AHEAD].dist = 504;
+        trackNodes[1].reserved = false;
         trackNodes[2].name = "A3";
         trackNodes[2].type = NODE_SENSOR;
         trackNodes[2].num = 2;
@@ -29,6 +31,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[2].edges[DIR_AHEAD].srcNode = &trackNodes[2];
         trackNodes[2].edges[DIR_AHEAD].destNode = &trackNodes[106];
         trackNodes[2].edges[DIR_AHEAD].dist = 43;
+        trackNodes[2].reserved = false;
         trackNodes[3].name = "A4";
         trackNodes[3].type = NODE_SENSOR;
         trackNodes[3].num = 3;
@@ -37,6 +40,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[3].edges[DIR_AHEAD].srcNode = &trackNodes[3];
         trackNodes[3].edges[DIR_AHEAD].destNode = &trackNodes[31];
         trackNodes[3].edges[DIR_AHEAD].dist = 437;
+        trackNodes[3].reserved = false;
         trackNodes[4].name = "A5";
         trackNodes[4].type = NODE_SENSOR;
         trackNodes[4].num = 4;
@@ -45,6 +49,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[4].edges[DIR_AHEAD].srcNode = &trackNodes[4];
         trackNodes[4].edges[DIR_AHEAD].destNode = &trackNodes[85];
         trackNodes[4].edges[DIR_AHEAD].dist = 231;
+        trackNodes[4].reserved = false;
         trackNodes[5].name = "A6";
         trackNodes[5].type = NODE_SENSOR;
         trackNodes[5].num = 5;
@@ -53,6 +58,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[5].edges[DIR_AHEAD].srcNode = &trackNodes[5];
         trackNodes[5].edges[DIR_AHEAD].destNode = &trackNodes[25];
         trackNodes[5].edges[DIR_AHEAD].dist = 642;
+        trackNodes[5].reserved = false;
         trackNodes[6].name = "A7";
         trackNodes[6].type = NODE_SENSOR;
         trackNodes[6].num = 6;
@@ -61,6 +67,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[6].edges[DIR_AHEAD].srcNode = &trackNodes[6];
         trackNodes[6].edges[DIR_AHEAD].destNode = &trackNodes[27];
         trackNodes[6].edges[DIR_AHEAD].dist = 470;
+        trackNodes[6].reserved = false;
         trackNodes[7].name = "A8";
         trackNodes[7].type = NODE_SENSOR;
         trackNodes[7].num = 7;
@@ -69,6 +76,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[7].edges[DIR_AHEAD].srcNode = &trackNodes[7];
         trackNodes[7].edges[DIR_AHEAD].destNode = &trackNodes[83];
         trackNodes[7].edges[DIR_AHEAD].dist = 229;
+        trackNodes[7].reserved = false;
         trackNodes[8].name = "A9";
         trackNodes[8].type = NODE_SENSOR;
         trackNodes[8].num = 8;
@@ -77,6 +85,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[8].edges[DIR_AHEAD].srcNode = &trackNodes[8];
         trackNodes[8].edges[DIR_AHEAD].destNode = &trackNodes[23];
         trackNodes[8].edges[DIR_AHEAD].dist = 289;
+        trackNodes[8].reserved = false;
         trackNodes[9].name = "A10";
         trackNodes[9].type = NODE_SENSOR;
         trackNodes[9].num = 9;
@@ -85,6 +94,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[9].edges[DIR_AHEAD].srcNode = &trackNodes[9];
         trackNodes[9].edges[DIR_AHEAD].destNode = &trackNodes[81];
         trackNodes[9].edges[DIR_AHEAD].dist = 229;
+        trackNodes[9].reserved = false;
         trackNodes[10].name = "A11";
         trackNodes[10].type = NODE_SENSOR;
         trackNodes[10].num = 10;
@@ -93,6 +103,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[10].edges[DIR_AHEAD].srcNode = &trackNodes[10];
         trackNodes[10].edges[DIR_AHEAD].destNode = &trackNodes[81];
         trackNodes[10].edges[DIR_AHEAD].dist = 518;
+        trackNodes[10].reserved = false;
         trackNodes[11].name = "A12";
         trackNodes[11].type = NODE_SENSOR;
         trackNodes[11].num = 11;
@@ -101,6 +112,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[11].edges[DIR_AHEAD].srcNode = &trackNodes[11];
         trackNodes[11].edges[DIR_AHEAD].destNode = &trackNodes[139];
         trackNodes[11].edges[DIR_AHEAD].dist = 43;
+        trackNodes[11].reserved = false;
         trackNodes[12].name = "A13";
         trackNodes[12].type = NODE_SENSOR;
         trackNodes[12].num = 12;
@@ -109,6 +121,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[12].edges[DIR_AHEAD].srcNode = &trackNodes[12];
         trackNodes[12].edges[DIR_AHEAD].destNode = &trackNodes[87];
         trackNodes[12].edges[DIR_AHEAD].dist = 236;
+        trackNodes[12].reserved = false;
         trackNodes[13].name = "A14";
         trackNodes[13].type = NODE_SENSOR;
         trackNodes[13].num = 13;
@@ -117,6 +130,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[13].edges[DIR_AHEAD].srcNode = &trackNodes[13];
         trackNodes[13].edges[DIR_AHEAD].destNode = &trackNodes[131];
         trackNodes[13].edges[DIR_AHEAD].dist = 325;
+        trackNodes[13].reserved = false;
         trackNodes[14].name = "A15";
         trackNodes[14].type = NODE_SENSOR;
         trackNodes[14].num = 14;
@@ -125,6 +139,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[14].edges[DIR_AHEAD].srcNode = &trackNodes[14];
         trackNodes[14].edges[DIR_AHEAD].destNode = &trackNodes[135];
         trackNodes[14].edges[DIR_AHEAD].dist = 144;
+        trackNodes[14].reserved = false;
         trackNodes[15].name = "A16";
         trackNodes[15].type = NODE_SENSOR;
         trackNodes[15].num = 15;
@@ -133,6 +148,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[15].edges[DIR_AHEAD].srcNode = &trackNodes[15];
         trackNodes[15].edges[DIR_AHEAD].destNode = &trackNodes[87];
         trackNodes[15].edges[DIR_AHEAD].dist = 417;
+        trackNodes[15].reserved = false;
         trackNodes[16].name = "B1";
         trackNodes[16].type = NODE_SENSOR;
         trackNodes[16].num = 16;
@@ -141,6 +157,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[16].edges[DIR_AHEAD].srcNode = &trackNodes[16];
         trackNodes[16].edges[DIR_AHEAD].destNode = &trackNodes[61];
         trackNodes[16].edges[DIR_AHEAD].dist = 404;
+        trackNodes[16].reserved = false;
         trackNodes[17].name = "B2";
         trackNodes[17].type = NODE_SENSOR;
         trackNodes[17].num = 17;
@@ -149,6 +166,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[17].edges[DIR_AHEAD].srcNode = &trackNodes[17];
         trackNodes[17].edges[DIR_AHEAD].destNode = &trackNodes[111];
         trackNodes[17].edges[DIR_AHEAD].dist = 231;
+        trackNodes[17].reserved = false;
         trackNodes[18].name = "B3";
         trackNodes[18].type = NODE_SENSOR;
         trackNodes[18].num = 18;
@@ -157,6 +175,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[18].edges[DIR_AHEAD].srcNode = &trackNodes[18];
         trackNodes[18].edges[DIR_AHEAD].destNode = &trackNodes[33];
         trackNodes[18].edges[DIR_AHEAD].dist = 201;
+        trackNodes[18].reserved = false;
         trackNodes[19].name = "B4";
         trackNodes[19].type = NODE_SENSOR;
         trackNodes[19].num = 19;
@@ -165,6 +184,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[19].edges[DIR_AHEAD].srcNode = &trackNodes[19];
         trackNodes[19].edges[DIR_AHEAD].destNode = &trackNodes[111];
         trackNodes[19].edges[DIR_AHEAD].dist = 239;
+        trackNodes[19].reserved = false;
         trackNodes[20].name = "B5";
         trackNodes[20].type = NODE_SENSOR;
         trackNodes[20].num = 20;
@@ -173,6 +193,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[20].edges[DIR_AHEAD].srcNode = &trackNodes[20];
         trackNodes[20].edges[DIR_AHEAD].destNode = &trackNodes[50];
         trackNodes[20].edges[DIR_AHEAD].dist = 404;
+        trackNodes[20].reserved = false;
         trackNodes[21].name = "B6";
         trackNodes[21].type = NODE_SENSOR;
         trackNodes[21].num = 21;
@@ -181,6 +202,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[21].edges[DIR_AHEAD].srcNode = &trackNodes[21];
         trackNodes[21].edges[DIR_AHEAD].destNode = &trackNodes[105];
         trackNodes[21].edges[DIR_AHEAD].dist = 231;
+        trackNodes[21].reserved = false;
         trackNodes[22].name = "B7";
         trackNodes[22].type = NODE_SENSOR;
         trackNodes[22].num = 22;
@@ -189,6 +211,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[22].edges[DIR_AHEAD].srcNode = &trackNodes[22];
         trackNodes[22].edges[DIR_AHEAD].destNode = &trackNodes[9];
         trackNodes[22].edges[DIR_AHEAD].dist = 289;
+        trackNodes[22].reserved = false;
         trackNodes[23].name = "B8";
         trackNodes[23].type = NODE_SENSOR;
         trackNodes[23].num = 23;
@@ -197,6 +220,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[23].edges[DIR_AHEAD].srcNode = &trackNodes[23];
         trackNodes[23].edges[DIR_AHEAD].destNode = &trackNodes[137];
         trackNodes[23].edges[DIR_AHEAD].dist = 43;
+        trackNodes[23].reserved = false;
         trackNodes[24].name = "B9";
         trackNodes[24].type = NODE_SENSOR;
         trackNodes[24].num = 24;
@@ -205,6 +229,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[24].edges[DIR_AHEAD].srcNode = &trackNodes[24];
         trackNodes[24].edges[DIR_AHEAD].destNode = &trackNodes[4];
         trackNodes[24].edges[DIR_AHEAD].dist = 642;
+        trackNodes[24].reserved = false;
         trackNodes[25].name = "B10";
         trackNodes[25].type = NODE_SENSOR;
         trackNodes[25].num = 25;
@@ -213,6 +238,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[25].edges[DIR_AHEAD].srcNode = &trackNodes[25];
         trackNodes[25].edges[DIR_AHEAD].destNode = &trackNodes[141];
         trackNodes[25].edges[DIR_AHEAD].dist = 50;
+        trackNodes[25].reserved = false;
         trackNodes[26].name = "B11";
         trackNodes[26].type = NODE_SENSOR;
         trackNodes[26].num = 26;
@@ -221,6 +247,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[26].edges[DIR_AHEAD].srcNode = &trackNodes[26];
         trackNodes[26].edges[DIR_AHEAD].destNode = &trackNodes[7];
         trackNodes[26].edges[DIR_AHEAD].dist = 470;
+        trackNodes[26].reserved = false;
         trackNodes[27].name = "B12";
         trackNodes[27].type = NODE_SENSOR;
         trackNodes[27].num = 27;
@@ -229,6 +256,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[27].edges[DIR_AHEAD].srcNode = &trackNodes[27];
         trackNodes[27].edges[DIR_AHEAD].destNode = &trackNodes[143];
         trackNodes[27].edges[DIR_AHEAD].dist = 50;
+        trackNodes[27].reserved = false;
         trackNodes[28].name = "B13";
         trackNodes[28].type = NODE_SENSOR;
         trackNodes[28].num = 28;
@@ -237,6 +265,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[28].edges[DIR_AHEAD].srcNode = &trackNodes[28];
         trackNodes[28].edges[DIR_AHEAD].destNode = &trackNodes[119];
         trackNodes[28].edges[DIR_AHEAD].dist = 239;
+        trackNodes[28].reserved = false;
         trackNodes[29].name = "B14";
         trackNodes[29].type = NODE_SENSOR;
         trackNodes[29].num = 29;
@@ -245,6 +274,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[29].edges[DIR_AHEAD].srcNode = &trackNodes[29];
         trackNodes[29].edges[DIR_AHEAD].destNode = &trackNodes[63];
         trackNodes[29].edges[DIR_AHEAD].dist = 201;
+        trackNodes[29].reserved = false;
         trackNodes[30].name = "B15";
         trackNodes[30].type = NODE_SENSOR;
         trackNodes[30].num = 30;
@@ -253,6 +283,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[30].edges[DIR_AHEAD].srcNode = &trackNodes[30];
         trackNodes[30].edges[DIR_AHEAD].destNode = &trackNodes[2];
         trackNodes[30].edges[DIR_AHEAD].dist = 437;
+        trackNodes[30].reserved = false;
         trackNodes[31].name = "B16";
         trackNodes[31].type = NODE_SENSOR;
         trackNodes[31].num = 31;
@@ -261,6 +292,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[31].edges[DIR_AHEAD].srcNode = &trackNodes[31];
         trackNodes[31].edges[DIR_AHEAD].destNode = &trackNodes[108];
         trackNodes[31].edges[DIR_AHEAD].dist = 50;
+        trackNodes[31].reserved = false;
         trackNodes[32].name = "C1";
         trackNodes[32].type = NODE_SENSOR;
         trackNodes[32].num = 32;
@@ -269,6 +301,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[32].edges[DIR_AHEAD].srcNode = &trackNodes[32];
         trackNodes[32].edges[DIR_AHEAD].destNode = &trackNodes[19];
         trackNodes[32].edges[DIR_AHEAD].dist = 201;
+        trackNodes[32].reserved = false;
         trackNodes[33].name = "C2";
         trackNodes[33].type = NODE_SENSOR;
         trackNodes[33].num = 33;
@@ -277,6 +310,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[33].edges[DIR_AHEAD].srcNode = &trackNodes[33];
         trackNodes[33].edges[DIR_AHEAD].destNode = &trackNodes[117];
         trackNodes[33].edges[DIR_AHEAD].dist = 246;
+        trackNodes[33].reserved = false;
         trackNodes[34].name = "C3";
         trackNodes[34].type = NODE_SENSOR;
         trackNodes[34].num = 34;
@@ -285,6 +319,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[34].edges[DIR_AHEAD].srcNode = &trackNodes[34];
         trackNodes[34].edges[DIR_AHEAD].destNode = &trackNodes[129];
         trackNodes[34].edges[DIR_AHEAD].dist = 514;
+        trackNodes[34].reserved = false;
         trackNodes[35].name = "C4";
         trackNodes[35].type = NODE_SENSOR;
         trackNodes[35].num = 35;
@@ -293,6 +328,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[35].edges[DIR_AHEAD].srcNode = &trackNodes[35];
         trackNodes[35].edges[DIR_AHEAD].destNode = &trackNodes[89];
         trackNodes[35].edges[DIR_AHEAD].dist = 239;
+        trackNodes[35].reserved = false;
         trackNodes[36].name = "C5";
         trackNodes[36].type = NODE_SENSOR;
         trackNodes[36].num = 36;
@@ -301,6 +337,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[36].edges[DIR_AHEAD].srcNode = &trackNodes[36];
         trackNodes[36].edges[DIR_AHEAD].destNode = &trackNodes[90];
         trackNodes[36].edges[DIR_AHEAD].dist = 61;
+        trackNodes[36].reserved = false;
         trackNodes[37].name = "C6";
         trackNodes[37].type = NODE_SENSOR;
         trackNodes[37].num = 37;
@@ -309,6 +346,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[37].edges[DIR_AHEAD].srcNode = &trackNodes[37];
         trackNodes[37].edges[DIR_AHEAD].destNode = &trackNodes[109];
         trackNodes[37].edges[DIR_AHEAD].dist = 433;
+        trackNodes[37].reserved = false;
         trackNodes[38].name = "C7";
         trackNodes[38].type = NODE_SENSOR;
         trackNodes[38].num = 38;
@@ -317,6 +355,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[38].edges[DIR_AHEAD].srcNode = &trackNodes[38];
         trackNodes[38].edges[DIR_AHEAD].destNode = &trackNodes[115];
         trackNodes[38].edges[DIR_AHEAD].dist = 231;
+        trackNodes[38].reserved = false;
         trackNodes[39].name = "C8";
         trackNodes[39].type = NODE_SENSOR;
         trackNodes[39].num = 39;
@@ -325,6 +364,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[39].edges[DIR_AHEAD].srcNode = &trackNodes[39];
         trackNodes[39].edges[DIR_AHEAD].destNode = &trackNodes[84];
         trackNodes[39].edges[DIR_AHEAD].dist = 128;
+        trackNodes[39].reserved = false;
         trackNodes[40].name = "C9";
         trackNodes[40].type = NODE_SENSOR;
         trackNodes[40].num = 40;
@@ -333,6 +373,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[40].edges[DIR_AHEAD].srcNode = &trackNodes[40];
         trackNodes[40].edges[DIR_AHEAD].destNode = &trackNodes[109];
         trackNodes[40].edges[DIR_AHEAD].dist = 326;
+        trackNodes[40].reserved = false;
         trackNodes[41].name = "C10";
         trackNodes[41].type = NODE_SENSOR;
         trackNodes[41].num = 41;
@@ -341,6 +382,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[41].edges[DIR_AHEAD].srcNode = &trackNodes[41];
         trackNodes[41].edges[DIR_AHEAD].destNode = &trackNodes[110];
         trackNodes[41].edges[DIR_AHEAD].dist = 128;
+        trackNodes[41].reserved = false;
         trackNodes[42].name = "C11";
         trackNodes[42].type = NODE_SENSOR;
         trackNodes[42].num = 42;
@@ -349,6 +391,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[42].edges[DIR_AHEAD].srcNode = &trackNodes[42];
         trackNodes[42].edges[DIR_AHEAD].destNode = &trackNodes[104];
         trackNodes[42].edges[DIR_AHEAD].dist = 120;
+        trackNodes[42].reserved = false;
         trackNodes[43].name = "C12";
         trackNodes[43].type = NODE_SENSOR;
         trackNodes[43].num = 43;
@@ -357,6 +400,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[43].edges[DIR_AHEAD].srcNode = &trackNodes[43];
         trackNodes[43].edges[DIR_AHEAD].destNode = &trackNodes[107];
         trackNodes[43].edges[DIR_AHEAD].dist = 333;
+        trackNodes[43].reserved = false;
         trackNodes[44].name = "C13";
         trackNodes[44].type = NODE_SENSOR;
         trackNodes[44].num = 44;
@@ -365,6 +409,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[44].edges[DIR_AHEAD].srcNode = &trackNodes[44];
         trackNodes[44].edges[DIR_AHEAD].destNode = &trackNodes[70];
         trackNodes[44].edges[DIR_AHEAD].dist = 875;
+        trackNodes[44].reserved = false;
         trackNodes[45].name = "C14";
         trackNodes[45].type = NODE_SENSOR;
         trackNodes[45].num = 45;
@@ -373,6 +418,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[45].edges[DIR_AHEAD].srcNode = &trackNodes[45];
         trackNodes[45].edges[DIR_AHEAD].destNode = &trackNodes[100];
         trackNodes[45].edges[DIR_AHEAD].dist = 43;
+        trackNodes[45].reserved = false;
         trackNodes[46].name = "C15";
         trackNodes[46].type = NODE_SENSOR;
         trackNodes[46].num = 46;
@@ -381,6 +427,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[46].edges[DIR_AHEAD].srcNode = &trackNodes[46];
         trackNodes[46].edges[DIR_AHEAD].destNode = &trackNodes[59];
         trackNodes[46].edges[DIR_AHEAD].dist = 404;
+        trackNodes[46].reserved = false;
         trackNodes[47].name = "C16";
         trackNodes[47].type = NODE_SENSOR;
         trackNodes[47].num = 47;
@@ -389,6 +436,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[47].edges[DIR_AHEAD].srcNode = &trackNodes[47];
         trackNodes[47].edges[DIR_AHEAD].destNode = &trackNodes[91];
         trackNodes[47].edges[DIR_AHEAD].dist = 239;
+        trackNodes[47].reserved = false;
         trackNodes[48].name = "D1";
         trackNodes[48].type = NODE_SENSOR;
         trackNodes[48].num = 48;
@@ -397,6 +445,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[48].edges[DIR_AHEAD].srcNode = &trackNodes[48];
         trackNodes[48].edges[DIR_AHEAD].destNode = &trackNodes[121];
         trackNodes[48].edges[DIR_AHEAD].dist = 246;
+        trackNodes[48].reserved = false;
         trackNodes[49].name = "D2";
         trackNodes[49].type = NODE_SENSOR;
         trackNodes[49].num = 49;
@@ -405,6 +454,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[49].edges[DIR_AHEAD].srcNode = &trackNodes[49];
         trackNodes[49].edges[DIR_AHEAD].destNode = &trackNodes[67];
         trackNodes[49].edges[DIR_AHEAD].dist = 201;
+        trackNodes[49].reserved = false;
         trackNodes[50].name = "D3";
         trackNodes[50].type = NODE_SENSOR;
         trackNodes[50].num = 50;
@@ -413,6 +463,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[50].edges[DIR_AHEAD].srcNode = &trackNodes[50];
         trackNodes[50].edges[DIR_AHEAD].destNode = &trackNodes[99];
         trackNodes[50].edges[DIR_AHEAD].dist = 239;
+        trackNodes[50].reserved = false;
         trackNodes[51].name = "D4";
         trackNodes[51].type = NODE_SENSOR;
         trackNodes[51].num = 51;
@@ -421,6 +472,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[51].edges[DIR_AHEAD].srcNode = &trackNodes[51];
         trackNodes[51].edges[DIR_AHEAD].destNode = &trackNodes[21];
         trackNodes[51].edges[DIR_AHEAD].dist = 404;
+        trackNodes[51].reserved = false;
         trackNodes[52].name = "D5";
         trackNodes[52].type = NODE_SENSOR;
         trackNodes[52].num = 52;
@@ -429,6 +481,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[52].edges[DIR_AHEAD].srcNode = &trackNodes[52];
         trackNodes[52].edges[DIR_AHEAD].destNode = &trackNodes[69];
         trackNodes[52].edges[DIR_AHEAD].dist = 376;
+        trackNodes[52].reserved = false;
         trackNodes[53].name = "D6";
         trackNodes[53].type = NODE_SENSOR;
         trackNodes[53].num = 53;
@@ -437,6 +490,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[53].edges[DIR_AHEAD].srcNode = &trackNodes[53];
         trackNodes[53].edges[DIR_AHEAD].destNode = &trackNodes[97];
         trackNodes[53].edges[DIR_AHEAD].dist = 239;
+        trackNodes[53].reserved = false;
         trackNodes[54].name = "D7";
         trackNodes[54].type = NODE_SENSOR;
         trackNodes[54].num = 54;
@@ -445,6 +499,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[54].edges[DIR_AHEAD].srcNode = &trackNodes[54];
         trackNodes[54].edges[DIR_AHEAD].destNode = &trackNodes[97];
         trackNodes[54].edges[DIR_AHEAD].dist = 309;
+        trackNodes[54].reserved = false;
         trackNodes[55].name = "D8";
         trackNodes[55].type = NODE_SENSOR;
         trackNodes[55].num = 55;
@@ -453,6 +508,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[55].edges[DIR_AHEAD].srcNode = &trackNodes[55];
         trackNodes[55].edges[DIR_AHEAD].destNode = &trackNodes[71];
         trackNodes[55].edges[DIR_AHEAD].dist = 384;
+        trackNodes[55].reserved = false;
         trackNodes[56].name = "D9";
         trackNodes[56].type = NODE_SENSOR;
         trackNodes[56].num = 56;
@@ -461,6 +517,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[56].edges[DIR_AHEAD].srcNode = &trackNodes[56];
         trackNodes[56].edges[DIR_AHEAD].destNode = &trackNodes[75];
         trackNodes[56].edges[DIR_AHEAD].dist = 369;
+        trackNodes[56].reserved = false;
         trackNodes[57].name = "D10";
         trackNodes[57].type = NODE_SENSOR;
         trackNodes[57].num = 57;
@@ -469,6 +526,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[57].edges[DIR_AHEAD].srcNode = &trackNodes[57];
         trackNodes[57].edges[DIR_AHEAD].destNode = &trackNodes[95];
         trackNodes[57].edges[DIR_AHEAD].dist = 316;
+        trackNodes[57].reserved = false;
         trackNodes[58].name = "D11";
         trackNodes[58].type = NODE_SENSOR;
         trackNodes[58].num = 58;
@@ -477,6 +535,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[58].edges[DIR_AHEAD].srcNode = &trackNodes[58];
         trackNodes[58].edges[DIR_AHEAD].destNode = &trackNodes[47];
         trackNodes[58].edges[DIR_AHEAD].dist = 404;
+        trackNodes[58].reserved = false;
         trackNodes[59].name = "D12";
         trackNodes[59].type = NODE_SENSOR;
         trackNodes[59].num = 59;
@@ -485,6 +544,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[59].edges[DIR_AHEAD].srcNode = &trackNodes[59];
         trackNodes[59].edges[DIR_AHEAD].destNode = &trackNodes[93];
         trackNodes[59].edges[DIR_AHEAD].dist = 231;
+        trackNodes[59].reserved = false;
         trackNodes[60].name = "D13";
         trackNodes[60].type = NODE_SENSOR;
         trackNodes[60].num = 60;
@@ -493,6 +553,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[60].edges[DIR_AHEAD].srcNode = &trackNodes[60];
         trackNodes[60].edges[DIR_AHEAD].destNode = &trackNodes[17];
         trackNodes[60].edges[DIR_AHEAD].dist = 404;
+        trackNodes[60].reserved = false;
         trackNodes[61].name = "D14";
         trackNodes[61].type = NODE_SENSOR;
         trackNodes[61].num = 61;
@@ -501,6 +562,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[61].edges[DIR_AHEAD].srcNode = &trackNodes[61];
         trackNodes[61].edges[DIR_AHEAD].destNode = &trackNodes[113];
         trackNodes[61].edges[DIR_AHEAD].dist = 239;
+        trackNodes[61].reserved = false;
         trackNodes[62].name = "D15";
         trackNodes[62].type = NODE_SENSOR;
         trackNodes[62].num = 62;
@@ -509,6 +571,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[62].edges[DIR_AHEAD].srcNode = &trackNodes[62];
         trackNodes[62].edges[DIR_AHEAD].destNode = &trackNodes[28];
         trackNodes[62].edges[DIR_AHEAD].dist = 201;
+        trackNodes[62].reserved = false;
         trackNodes[63].name = "D16";
         trackNodes[63].type = NODE_SENSOR;
         trackNodes[63].num = 63;
@@ -517,6 +580,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[63].edges[DIR_AHEAD].srcNode = &trackNodes[63];
         trackNodes[63].edges[DIR_AHEAD].destNode = &trackNodes[113];
         trackNodes[63].edges[DIR_AHEAD].dist = 246;
+        trackNodes[63].reserved = false;
         trackNodes[64].name = "E1";
         trackNodes[64].type = NODE_SENSOR;
         trackNodes[64].num = 64;
@@ -525,6 +589,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[64].edges[DIR_AHEAD].srcNode = &trackNodes[64];
         trackNodes[64].edges[DIR_AHEAD].destNode = &trackNodes[123];
         trackNodes[64].edges[DIR_AHEAD].dist = 239;
+        trackNodes[64].reserved = false;
         trackNodes[65].name = "E2";
         trackNodes[65].type = NODE_SENSOR;
         trackNodes[65].num = 65;
@@ -533,6 +598,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[65].edges[DIR_AHEAD].srcNode = &trackNodes[65];
         trackNodes[65].edges[DIR_AHEAD].destNode = &trackNodes[78];
         trackNodes[65].edges[DIR_AHEAD].dist = 201;
+        trackNodes[65].reserved = false;
         trackNodes[66].name = "E3";
         trackNodes[66].type = NODE_SENSOR;
         trackNodes[66].num = 66;
@@ -541,6 +607,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[66].edges[DIR_AHEAD].srcNode = &trackNodes[66];
         trackNodes[66].edges[DIR_AHEAD].destNode = &trackNodes[48];
         trackNodes[66].edges[DIR_AHEAD].dist = 201;
+        trackNodes[66].reserved = false;
         trackNodes[67].name = "E4";
         trackNodes[67].type = NODE_SENSOR;
         trackNodes[67].num = 67;
@@ -549,6 +616,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[67].edges[DIR_AHEAD].srcNode = &trackNodes[67];
         trackNodes[67].edges[DIR_AHEAD].destNode = &trackNodes[99];
         trackNodes[67].edges[DIR_AHEAD].dist = 239;
+        trackNodes[67].reserved = false;
         trackNodes[68].name = "E5";
         trackNodes[68].type = NODE_SENSOR;
         trackNodes[68].num = 68;
@@ -557,6 +625,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[68].edges[DIR_AHEAD].srcNode = &trackNodes[68];
         trackNodes[68].edges[DIR_AHEAD].destNode = &trackNodes[53];
         trackNodes[68].edges[DIR_AHEAD].dist = 376;
+        trackNodes[68].reserved = false;
         trackNodes[69].name = "E6";
         trackNodes[69].type = NODE_SENSOR;
         trackNodes[69].num = 69;
@@ -565,6 +634,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[69].edges[DIR_AHEAD].srcNode = &trackNodes[69];
         trackNodes[69].edges[DIR_AHEAD].destNode = &trackNodes[98];
         trackNodes[69].edges[DIR_AHEAD].dist = 50;
+        trackNodes[69].reserved = false;
         trackNodes[70].name = "E7";
         trackNodes[70].type = NODE_SENSOR;
         trackNodes[70].num = 70;
@@ -573,6 +643,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[70].edges[DIR_AHEAD].srcNode = &trackNodes[70];
         trackNodes[70].edges[DIR_AHEAD].destNode = &trackNodes[54];
         trackNodes[70].edges[DIR_AHEAD].dist = 384;
+        trackNodes[70].reserved = false;
         trackNodes[71].name = "E8";
         trackNodes[71].type = NODE_SENSOR;
         trackNodes[71].num = 71;
@@ -581,6 +652,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[71].edges[DIR_AHEAD].srcNode = &trackNodes[71];
         trackNodes[71].edges[DIR_AHEAD].destNode = &trackNodes[45];
         trackNodes[71].edges[DIR_AHEAD].dist = 875;
+        trackNodes[71].reserved = false;
         trackNodes[72].name = "E9";
         trackNodes[72].type = NODE_SENSOR;
         trackNodes[72].num = 72;
@@ -589,6 +661,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[72].edges[DIR_AHEAD].srcNode = &trackNodes[72];
         trackNodes[72].edges[DIR_AHEAD].destNode = &trackNodes[95];
         trackNodes[72].edges[DIR_AHEAD].dist = 239;
+        trackNodes[72].reserved = false;
         trackNodes[73].name = "E10";
         trackNodes[73].type = NODE_SENSOR;
         trackNodes[73].num = 73;
@@ -597,6 +670,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[73].edges[DIR_AHEAD].srcNode = &trackNodes[73];
         trackNodes[73].edges[DIR_AHEAD].destNode = &trackNodes[76];
         trackNodes[73].edges[DIR_AHEAD].dist = 376;
+        trackNodes[73].reserved = false;
         trackNodes[74].name = "E11";
         trackNodes[74].type = NODE_SENSOR;
         trackNodes[74].num = 74;
@@ -605,6 +679,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[74].edges[DIR_AHEAD].srcNode = &trackNodes[74];
         trackNodes[74].edges[DIR_AHEAD].destNode = &trackNodes[57];
         trackNodes[74].edges[DIR_AHEAD].dist = 369;
+        trackNodes[74].reserved = false;
         trackNodes[75].name = "E12";
         trackNodes[75].type = NODE_SENSOR;
         trackNodes[75].num = 75;
@@ -613,6 +688,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[75].edges[DIR_AHEAD].srcNode = &trackNodes[75];
         trackNodes[75].edges[DIR_AHEAD].destNode = &trackNodes[92];
         trackNodes[75].edges[DIR_AHEAD].dist = 50;
+        trackNodes[75].reserved = false;
         trackNodes[76].name = "E13";
         trackNodes[76].type = NODE_SENSOR;
         trackNodes[76].num = 76;
@@ -621,6 +697,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[76].edges[DIR_AHEAD].srcNode = &trackNodes[76];
         trackNodes[76].edges[DIR_AHEAD].destNode = &trackNodes[112];
         trackNodes[76].edges[DIR_AHEAD].dist = 43;
+        trackNodes[76].reserved = false;
         trackNodes[77].name = "E14";
         trackNodes[77].type = NODE_SENSOR;
         trackNodes[77].num = 77;
@@ -629,6 +706,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[77].edges[DIR_AHEAD].srcNode = &trackNodes[77];
         trackNodes[77].edges[DIR_AHEAD].destNode = &trackNodes[72];
         trackNodes[77].edges[DIR_AHEAD].dist = 376;
+        trackNodes[77].reserved = false;
         trackNodes[78].name = "E15";
         trackNodes[78].type = NODE_SENSOR;
         trackNodes[78].num = 78;
@@ -637,6 +715,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[78].edges[DIR_AHEAD].srcNode = &trackNodes[78];
         trackNodes[78].edges[DIR_AHEAD].destNode = &trackNodes[105];
         trackNodes[78].edges[DIR_AHEAD].dist = 246;
+        trackNodes[78].reserved = false;
         trackNodes[79].name = "E16";
         trackNodes[79].type = NODE_SENSOR;
         trackNodes[79].num = 79;
@@ -645,6 +724,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[79].edges[DIR_AHEAD].srcNode = &trackNodes[79];
         trackNodes[79].edges[DIR_AHEAD].destNode = &trackNodes[64];
         trackNodes[79].edges[DIR_AHEAD].dist = 201;
+        trackNodes[79].reserved = false;
         trackNodes[80].name = "BR1";
         trackNodes[80].type = NODE_BRANCH;
         trackNodes[80].num = 1;
@@ -657,6 +737,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[80].edges[DIR_CURVED].srcNode = &trackNodes[80];
         trackNodes[80].edges[DIR_CURVED].destNode = &trackNodes[8];
         trackNodes[80].edges[DIR_CURVED].dist = 229;
+        trackNodes[80].reserved = false;
         trackNodes[81].name = "MR1";
         trackNodes[81].type = NODE_MERGE;
         trackNodes[81].num = 1;
@@ -665,6 +746,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[81].edges[DIR_AHEAD].srcNode = &trackNodes[81];
         trackNodes[81].edges[DIR_AHEAD].destNode = &trackNodes[83];
         trackNodes[81].edges[DIR_AHEAD].dist = 188;
+        trackNodes[81].reserved = false;
         trackNodes[82].name = "BR2";
         trackNodes[82].type = NODE_BRANCH;
         trackNodes[82].num = 2;
@@ -677,6 +759,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[82].edges[DIR_CURVED].srcNode = &trackNodes[82];
         trackNodes[82].edges[DIR_CURVED].destNode = &trackNodes[6];
         trackNodes[82].edges[DIR_CURVED].dist = 229;
+        trackNodes[82].reserved = false;
         trackNodes[83].name = "MR2";
         trackNodes[83].type = NODE_MERGE;
         trackNodes[83].num = 2;
@@ -685,6 +768,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[83].edges[DIR_AHEAD].srcNode = &trackNodes[83];
         trackNodes[83].edges[DIR_AHEAD].destNode = &trackNodes[85];
         trackNodes[83].edges[DIR_AHEAD].dist = 185;
+        trackNodes[83].reserved = false;
         trackNodes[84].name = "BR3";
         trackNodes[84].type = NODE_BRANCH;
         trackNodes[84].num = 3;
@@ -697,6 +781,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[84].edges[DIR_CURVED].srcNode = &trackNodes[84];
         trackNodes[84].edges[DIR_CURVED].destNode = &trackNodes[82];
         trackNodes[84].edges[DIR_CURVED].dist = 185;
+        trackNodes[84].reserved = false;
         trackNodes[85].name = "MR3";
         trackNodes[85].type = NODE_MERGE;
         trackNodes[85].num = 3;
@@ -705,6 +790,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[85].edges[DIR_AHEAD].srcNode = &trackNodes[85];
         trackNodes[85].edges[DIR_AHEAD].destNode = &trackNodes[38];
         trackNodes[85].edges[DIR_AHEAD].dist = 128;
+        trackNodes[85].reserved = false;
         trackNodes[86].name = "BR4";
         trackNodes[86].type = NODE_BRANCH;
         trackNodes[86].num = 4;
@@ -717,6 +803,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[86].edges[DIR_CURVED].srcNode = &trackNodes[86];
         trackNodes[86].edges[DIR_CURVED].destNode = &trackNodes[13];
         trackNodes[86].edges[DIR_CURVED].dist = 236;
+        trackNodes[86].reserved = false;
         trackNodes[87].name = "MR4";
         trackNodes[87].type = NODE_MERGE;
         trackNodes[87].num = 4;
@@ -725,6 +812,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[87].edges[DIR_AHEAD].srcNode = &trackNodes[87];
         trackNodes[87].edges[DIR_AHEAD].destNode = &trackNodes[103];
         trackNodes[87].edges[DIR_AHEAD].dist = 185;
+        trackNodes[87].reserved = false;
         trackNodes[88].name = "BR5";
         trackNodes[88].type = NODE_BRANCH;
         trackNodes[88].num = 5;
@@ -737,6 +825,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[88].edges[DIR_CURVED].srcNode = &trackNodes[88];
         trackNodes[88].edges[DIR_CURVED].destNode = &trackNodes[93];
         trackNodes[88].edges[DIR_CURVED].dist = 371;
+        trackNodes[88].reserved = false;
         trackNodes[89].name = "MR5";
         trackNodes[89].type = NODE_MERGE;
         trackNodes[89].num = 5;
@@ -745,6 +834,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[89].edges[DIR_AHEAD].srcNode = &trackNodes[89];
         trackNodes[89].edges[DIR_AHEAD].destNode = &trackNodes[114];
         trackNodes[89].edges[DIR_AHEAD].dist = 155;
+        trackNodes[89].reserved = false;
         trackNodes[90].name = "BR6";
         trackNodes[90].type = NODE_BRANCH;
         trackNodes[90].num = 6;
@@ -757,6 +847,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[90].edges[DIR_CURVED].srcNode = &trackNodes[90];
         trackNodes[90].edges[DIR_CURVED].destNode = &trackNodes[115];
         trackNodes[90].edges[DIR_CURVED].dist = 371;
+        trackNodes[90].reserved = false;
         trackNodes[91].name = "MR6";
         trackNodes[91].type = NODE_MERGE;
         trackNodes[91].num = 6;
@@ -765,6 +856,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[91].edges[DIR_AHEAD].srcNode = &trackNodes[91];
         trackNodes[91].edges[DIR_AHEAD].destNode = &trackNodes[37];
         trackNodes[91].edges[DIR_AHEAD].dist = 61;
+        trackNodes[91].reserved = false;
         trackNodes[92].name = "BR7";
         trackNodes[92].type = NODE_BRANCH;
         trackNodes[92].num = 7;
@@ -777,6 +869,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[92].edges[DIR_CURVED].srcNode = &trackNodes[92];
         trackNodes[92].edges[DIR_CURVED].destNode = &trackNodes[89];
         trackNodes[92].edges[DIR_CURVED].dist = 371;
+        trackNodes[92].reserved = false;
         trackNodes[93].name = "MR7";
         trackNodes[93].type = NODE_MERGE;
         trackNodes[93].num = 7;
@@ -785,6 +878,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[93].edges[DIR_AHEAD].srcNode = &trackNodes[93];
         trackNodes[93].edges[DIR_AHEAD].destNode = &trackNodes[74];
         trackNodes[93].edges[DIR_AHEAD].dist = 50;
+        trackNodes[93].reserved = false;
         trackNodes[94].name = "BR8";
         trackNodes[94].type = NODE_BRANCH;
         trackNodes[94].num = 8;
@@ -797,6 +891,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[94].edges[DIR_CURVED].srcNode = &trackNodes[94];
         trackNodes[94].edges[DIR_CURVED].destNode = &trackNodes[73];
         trackNodes[94].edges[DIR_CURVED].dist = 239;
+        trackNodes[94].reserved = false;
         trackNodes[95].name = "MR8";
         trackNodes[95].type = NODE_MERGE;
         trackNodes[95].num = 8;
@@ -805,6 +900,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[95].edges[DIR_AHEAD].srcNode = &trackNodes[95];
         trackNodes[95].edges[DIR_AHEAD].destNode = &trackNodes[96];
         trackNodes[95].edges[DIR_AHEAD].dist = 155;
+        trackNodes[95].reserved = false;
         trackNodes[96].name = "BR9";
         trackNodes[96].type = NODE_BRANCH;
         trackNodes[96].num = 9;
@@ -817,6 +913,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[96].edges[DIR_CURVED].srcNode = &trackNodes[96];
         trackNodes[96].edges[DIR_CURVED].destNode = &trackNodes[52];
         trackNodes[96].edges[DIR_CURVED].dist = 239;
+        trackNodes[96].reserved = false;
         trackNodes[97].name = "MR9";
         trackNodes[97].type = NODE_MERGE;
         trackNodes[97].num = 9;
@@ -825,6 +922,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[97].edges[DIR_AHEAD].srcNode = &trackNodes[97];
         trackNodes[97].edges[DIR_AHEAD].destNode = &trackNodes[94];
         trackNodes[97].edges[DIR_AHEAD].dist = 155;
+        trackNodes[97].reserved = false;
         trackNodes[98].name = "BR10";
         trackNodes[98].type = NODE_BRANCH;
         trackNodes[98].num = 10;
@@ -837,6 +935,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[98].edges[DIR_CURVED].srcNode = &trackNodes[98];
         trackNodes[98].edges[DIR_CURVED].destNode = &trackNodes[66];
         trackNodes[98].edges[DIR_CURVED].dist = 239;
+        trackNodes[98].reserved = false;
         trackNodes[99].name = "MR10";
         trackNodes[99].type = NODE_MERGE;
         trackNodes[99].num = 10;
@@ -845,6 +944,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[99].edges[DIR_AHEAD].srcNode = &trackNodes[99];
         trackNodes[99].edges[DIR_AHEAD].destNode = &trackNodes[68];
         trackNodes[99].edges[DIR_AHEAD].dist = 50;
+        trackNodes[99].reserved = false;
         trackNodes[100].name = "BR11";
         trackNodes[100].type = NODE_BRANCH;
         trackNodes[100].num = 11;
@@ -857,6 +957,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[100].edges[DIR_CURVED].srcNode = &trackNodes[100];
         trackNodes[100].edges[DIR_CURVED].destNode = &trackNodes[107];
         trackNodes[100].edges[DIR_CURVED].dist = 495;
+        trackNodes[100].reserved = false;
         trackNodes[101].name = "MR11";
         trackNodes[101].type = NODE_MERGE;
         trackNodes[101].num = 11;
@@ -865,6 +966,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[101].edges[DIR_AHEAD].srcNode = &trackNodes[101];
         trackNodes[101].edges[DIR_AHEAD].destNode = &trackNodes[44];
         trackNodes[101].edges[DIR_AHEAD].dist = 43;
+        trackNodes[101].reserved = false;
         trackNodes[102].name = "BR12";
         trackNodes[102].type = NODE_BRANCH;
         trackNodes[102].num = 12;
@@ -877,6 +979,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[102].edges[DIR_CURVED].srcNode = &trackNodes[102];
         trackNodes[102].edges[DIR_CURVED].destNode = &trackNodes[86];
         trackNodes[102].edges[DIR_CURVED].dist = 185;
+        trackNodes[102].reserved = false;
         trackNodes[103].name = "MR12";
         trackNodes[103].type = NODE_MERGE;
         trackNodes[103].num = 12;
@@ -885,6 +988,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[103].edges[DIR_AHEAD].srcNode = &trackNodes[103];
         trackNodes[103].edges[DIR_AHEAD].destNode = &trackNodes[101];
         trackNodes[103].edges[DIR_AHEAD].dist = 188;
+        trackNodes[103].reserved = false;
         trackNodes[104].name = "BR13";
         trackNodes[104].type = NODE_BRANCH;
         trackNodes[104].num = 13;
@@ -897,6 +1001,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[104].edges[DIR_CURVED].srcNode = &trackNodes[104];
         trackNodes[104].edges[DIR_CURVED].destNode = &trackNodes[79];
         trackNodes[104].edges[DIR_CURVED].dist = 246;
+        trackNodes[104].reserved = false;
         trackNodes[105].name = "MR13";
         trackNodes[105].type = NODE_MERGE;
         trackNodes[105].num = 13;
@@ -905,6 +1010,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[105].edges[DIR_AHEAD].srcNode = &trackNodes[105];
         trackNodes[105].edges[DIR_AHEAD].destNode = &trackNodes[43];
         trackNodes[105].edges[DIR_AHEAD].dist = 120;
+        trackNodes[105].reserved = false;
         trackNodes[106].name = "BR14";
         trackNodes[106].type = NODE_BRANCH;
         trackNodes[106].num = 14;
@@ -917,6 +1023,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[106].edges[DIR_CURVED].srcNode = &trackNodes[106];
         trackNodes[106].edges[DIR_CURVED].destNode = &trackNodes[42];
         trackNodes[106].edges[DIR_CURVED].dist = 333;
+        trackNodes[106].reserved = false;
         trackNodes[107].name = "MR14";
         trackNodes[107].type = NODE_MERGE;
         trackNodes[107].num = 14;
@@ -925,6 +1032,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[107].edges[DIR_AHEAD].srcNode = &trackNodes[107];
         trackNodes[107].edges[DIR_AHEAD].destNode = &trackNodes[3];
         trackNodes[107].edges[DIR_AHEAD].dist = 43;
+        trackNodes[107].reserved = false;
         trackNodes[108].name = "BR15";
         trackNodes[108].type = NODE_BRANCH;
         trackNodes[108].num = 15;
@@ -937,6 +1045,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[108].edges[DIR_CURVED].srcNode = &trackNodes[108];
         trackNodes[108].edges[DIR_CURVED].destNode = &trackNodes[41];
         trackNodes[108].edges[DIR_CURVED].dist = 326;
+        trackNodes[108].reserved = false;
         trackNodes[109].name = "MR15";
         trackNodes[109].type = NODE_MERGE;
         trackNodes[109].num = 15;
@@ -945,6 +1054,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[109].edges[DIR_AHEAD].srcNode = &trackNodes[109];
         trackNodes[109].edges[DIR_AHEAD].destNode = &trackNodes[30];
         trackNodes[109].edges[DIR_AHEAD].dist = 50;
+        trackNodes[109].reserved = false;
         trackNodes[110].name = "BR16";
         trackNodes[110].type = NODE_BRANCH;
         trackNodes[110].num = 16;
@@ -957,6 +1067,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[110].edges[DIR_CURVED].srcNode = &trackNodes[110];
         trackNodes[110].edges[DIR_CURVED].destNode = &trackNodes[18];
         trackNodes[110].edges[DIR_CURVED].dist = 239;
+        trackNodes[110].reserved = false;
         trackNodes[111].name = "MR16";
         trackNodes[111].type = NODE_MERGE;
         trackNodes[111].num = 16;
@@ -965,6 +1076,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[111].edges[DIR_AHEAD].srcNode = &trackNodes[111];
         trackNodes[111].edges[DIR_AHEAD].destNode = &trackNodes[40];
         trackNodes[111].edges[DIR_AHEAD].dist = 128;
+        trackNodes[111].reserved = false;
         trackNodes[112].name = "BR17";
         trackNodes[112].type = NODE_BRANCH;
         trackNodes[112].num = 17;
@@ -977,6 +1089,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[112].edges[DIR_CURVED].srcNode = &trackNodes[112];
         trackNodes[112].edges[DIR_CURVED].destNode = &trackNodes[62];
         trackNodes[112].edges[DIR_CURVED].dist = 246;
+        trackNodes[112].reserved = false;
         trackNodes[113].name = "MR17";
         trackNodes[113].type = NODE_MERGE;
         trackNodes[113].num = 17;
@@ -985,6 +1098,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[113].edges[DIR_AHEAD].srcNode = &trackNodes[113];
         trackNodes[113].edges[DIR_AHEAD].destNode = &trackNodes[77];
         trackNodes[113].edges[DIR_AHEAD].dist = 43;
+        trackNodes[113].reserved = false;
         trackNodes[114].name = "BR18";
         trackNodes[114].type = NODE_BRANCH;
         trackNodes[114].num = 18;
@@ -997,6 +1111,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[114].edges[DIR_CURVED].srcNode = &trackNodes[114];
         trackNodes[114].edges[DIR_CURVED].destNode = &trackNodes[91];
         trackNodes[114].edges[DIR_CURVED].dist = 371;
+        trackNodes[114].reserved = false;
         trackNodes[115].name = "MR18";
         trackNodes[115].type = NODE_MERGE;
         trackNodes[115].num = 18;
@@ -1005,6 +1120,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[115].edges[DIR_AHEAD].srcNode = &trackNodes[115];
         trackNodes[115].edges[DIR_AHEAD].destNode = &trackNodes[88];
         trackNodes[115].edges[DIR_AHEAD].dist = 155;
+        trackNodes[115].reserved = false;
         trackNodes[116].name = "BR153";
         trackNodes[116].type = NODE_BRANCH;
         trackNodes[116].num = 153;
@@ -1017,6 +1133,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[116].edges[DIR_CURVED].srcNode = &trackNodes[116];
         trackNodes[116].edges[DIR_CURVED].destNode = &trackNodes[32];
         trackNodes[116].edges[DIR_CURVED].dist = 246;
+        trackNodes[116].reserved = false;
         trackNodes[117].name = "MR153";
         trackNodes[117].type = NODE_MERGE;
         trackNodes[117].num = 153;
@@ -1025,6 +1142,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[117].edges[DIR_AHEAD].srcNode = &trackNodes[117];
         trackNodes[117].edges[DIR_AHEAD].destNode = &trackNodes[119];
         trackNodes[117].edges[DIR_AHEAD].dist = 0;
+        trackNodes[117].reserved = false;
         trackNodes[118].name = "BR154";
         trackNodes[118].type = NODE_BRANCH;
         trackNodes[118].num = 154;
@@ -1037,6 +1155,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[118].edges[DIR_CURVED].srcNode = &trackNodes[118];
         trackNodes[118].edges[DIR_CURVED].destNode = &trackNodes[29];
         trackNodes[118].edges[DIR_CURVED].dist = 239;
+        trackNodes[118].reserved = false;
         trackNodes[119].name = "MR154";
         trackNodes[119].type = NODE_MERGE;
         trackNodes[119].num = 154;
@@ -1045,6 +1164,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[119].edges[DIR_AHEAD].srcNode = &trackNodes[119];
         trackNodes[119].edges[DIR_AHEAD].destNode = &trackNodes[122];
         trackNodes[119].edges[DIR_AHEAD].dist = 0;
+        trackNodes[119].reserved = false;
         trackNodes[120].name = "BR155";
         trackNodes[120].type = NODE_BRANCH;
         trackNodes[120].num = 155;
@@ -1057,6 +1177,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[120].edges[DIR_CURVED].srcNode = &trackNodes[120];
         trackNodes[120].edges[DIR_CURVED].destNode = &trackNodes[49];
         trackNodes[120].edges[DIR_CURVED].dist = 246;
+        trackNodes[120].reserved = false;
         trackNodes[121].name = "MR155";
         trackNodes[121].type = NODE_MERGE;
         trackNodes[121].num = 155;
@@ -1065,6 +1186,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[121].edges[DIR_AHEAD].srcNode = &trackNodes[121];
         trackNodes[121].edges[DIR_AHEAD].destNode = &trackNodes[123];
         trackNodes[121].edges[DIR_AHEAD].dist = 0;
+        trackNodes[121].reserved = false;
         trackNodes[122].name = "BR156";
         trackNodes[122].type = NODE_BRANCH;
         trackNodes[122].num = 156;
@@ -1077,6 +1199,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[122].edges[DIR_CURVED].srcNode = &trackNodes[122];
         trackNodes[122].edges[DIR_CURVED].destNode = &trackNodes[65];
         trackNodes[122].edges[DIR_CURVED].dist = 239;
+        trackNodes[122].reserved = false;
         trackNodes[123].name = "MR156";
         trackNodes[123].type = NODE_MERGE;
         trackNodes[123].num = 156;
@@ -1085,6 +1208,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[123].edges[DIR_AHEAD].srcNode = &trackNodes[123];
         trackNodes[123].edges[DIR_AHEAD].destNode = &trackNodes[118];
         trackNodes[123].edges[DIR_AHEAD].dist = 0;
+        trackNodes[123].reserved = false;
         trackNodes[124].name = "EN1";
         trackNodes[124].type = NODE_ENTER;
         trackNodes[124].reverseNode = &trackNodes[125];
@@ -1092,9 +1216,11 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[124].edges[DIR_AHEAD].srcNode = &trackNodes[124];
         trackNodes[124].edges[DIR_AHEAD].destNode = &trackNodes[117];
         trackNodes[124].edges[DIR_AHEAD].dist = 253;
+        trackNodes[124].reserved = false;
         trackNodes[125].name = "EX1";
         trackNodes[125].type = NODE_EXIT;
         trackNodes[125].reverseNode = &trackNodes[124];
+        trackNodes[125].reserved = false;
         trackNodes[126].name = "EN2";
         trackNodes[126].type = NODE_ENTER;
         trackNodes[126].reverseNode = &trackNodes[127];
@@ -1102,9 +1228,11 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[126].edges[DIR_AHEAD].srcNode = &trackNodes[126];
         trackNodes[126].edges[DIR_AHEAD].destNode = &trackNodes[121];
         trackNodes[126].edges[DIR_AHEAD].dist = 282;
+        trackNodes[126].reserved = false;
         trackNodes[127].name = "EX2";
         trackNodes[127].type = NODE_EXIT;
         trackNodes[127].reverseNode = &trackNodes[126];
+        trackNodes[127].reserved = false;
         trackNodes[128].name = "EN3";
         trackNodes[128].type = NODE_ENTER;
         trackNodes[128].reverseNode = &trackNodes[129];
@@ -1112,9 +1240,11 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[128].edges[DIR_AHEAD].srcNode = &trackNodes[128];
         trackNodes[128].edges[DIR_AHEAD].destNode = &trackNodes[35];
         trackNodes[128].edges[DIR_AHEAD].dist = 514;
+        trackNodes[128].reserved = false;
         trackNodes[129].name = "EX3";
         trackNodes[129].type = NODE_EXIT;
         trackNodes[129].reverseNode = &trackNodes[128];
+        trackNodes[129].reserved = false;
         trackNodes[130].name = "EN4";
         trackNodes[130].type = NODE_ENTER;
         trackNodes[130].reverseNode = &trackNodes[131];
@@ -1122,9 +1252,11 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[130].edges[DIR_AHEAD].srcNode = &trackNodes[130];
         trackNodes[130].edges[DIR_AHEAD].destNode = &trackNodes[12];
         trackNodes[130].edges[DIR_AHEAD].dist = 325;
+        trackNodes[130].reserved = false;
         trackNodes[131].name = "EX4";
         trackNodes[131].type = NODE_EXIT;
         trackNodes[131].reverseNode = &trackNodes[130];
+        trackNodes[131].reserved = false;
         trackNodes[132].name = "EN5";
         trackNodes[132].type = NODE_ENTER;
         trackNodes[132].reverseNode = &trackNodes[133];
@@ -1132,9 +1264,11 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[132].edges[DIR_AHEAD].srcNode = &trackNodes[132];
         trackNodes[132].edges[DIR_AHEAD].destNode = &trackNodes[0];
         trackNodes[132].edges[DIR_AHEAD].dist = 504;
+        trackNodes[132].reserved = false;
         trackNodes[133].name = "EX5";
         trackNodes[133].type = NODE_EXIT;
         trackNodes[133].reverseNode = &trackNodes[132];
+        trackNodes[133].reserved = false;
         trackNodes[134].name = "EN6";
         trackNodes[134].type = NODE_ENTER;
         trackNodes[134].reverseNode = &trackNodes[135];
@@ -1142,9 +1276,11 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[134].edges[DIR_AHEAD].srcNode = &trackNodes[134];
         trackNodes[134].edges[DIR_AHEAD].destNode = &trackNodes[15];
         trackNodes[134].edges[DIR_AHEAD].dist = 144;
+        trackNodes[134].reserved = false;
         trackNodes[135].name = "EX6";
         trackNodes[135].type = NODE_EXIT;
         trackNodes[135].reverseNode = &trackNodes[134];
+        trackNodes[135].reserved = false;
         trackNodes[136].name = "EN7";
         trackNodes[136].type = NODE_ENTER;
         trackNodes[136].reverseNode = &trackNodes[137];
@@ -1152,9 +1288,11 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[136].edges[DIR_AHEAD].srcNode = &trackNodes[136];
         trackNodes[136].edges[DIR_AHEAD].destNode = &trackNodes[22];
         trackNodes[136].edges[DIR_AHEAD].dist = 43;
+        trackNodes[136].reserved = false;
         trackNodes[137].name = "EX7";
         trackNodes[137].type = NODE_EXIT;
         trackNodes[137].reverseNode = &trackNodes[136];
+        trackNodes[137].reserved = false;
         trackNodes[138].name = "EN8";
         trackNodes[138].type = NODE_ENTER;
         trackNodes[138].reverseNode = &trackNodes[139];
@@ -1162,9 +1300,11 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[138].edges[DIR_AHEAD].srcNode = &trackNodes[138];
         trackNodes[138].edges[DIR_AHEAD].destNode = &trackNodes[10];
         trackNodes[138].edges[DIR_AHEAD].dist = 43;
+        trackNodes[138].reserved = false;
         trackNodes[139].name = "EX8";
         trackNodes[139].type = NODE_EXIT;
         trackNodes[139].reverseNode = &trackNodes[138];
+        trackNodes[139].reserved = false;
         trackNodes[140].name = "EN9";
         trackNodes[140].type = NODE_ENTER;
         trackNodes[140].reverseNode = &trackNodes[141];
@@ -1172,9 +1312,11 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[140].edges[DIR_AHEAD].srcNode = &trackNodes[140];
         trackNodes[140].edges[DIR_AHEAD].destNode = &trackNodes[24];
         trackNodes[140].edges[DIR_AHEAD].dist = 50;
+        trackNodes[140].reserved = false;
         trackNodes[141].name = "EX9";
         trackNodes[141].type = NODE_EXIT;
         trackNodes[141].reverseNode = &trackNodes[140];
+        trackNodes[141].reserved = false;
         trackNodes[142].name = "EN10";
         trackNodes[142].type = NODE_ENTER;
         trackNodes[142].reverseNode = &trackNodes[143];
@@ -1182,9 +1324,11 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[142].edges[DIR_AHEAD].srcNode = &trackNodes[142];
         trackNodes[142].edges[DIR_AHEAD].destNode = &trackNodes[26];
         trackNodes[142].edges[DIR_AHEAD].dist = 50;
+        trackNodes[142].reserved = false;
         trackNodes[143].name = "EX10";
         trackNodes[143].type = NODE_EXIT;
         trackNodes[143].reverseNode = &trackNodes[142];
+        trackNodes[143].reserved = false;
         break;
     case 'B':
     case 'b':
@@ -1197,6 +1341,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[0].edges[DIR_AHEAD].srcNode = &trackNodes[0];
         trackNodes[0].edges[DIR_AHEAD].destNode = &trackNodes[103];
         trackNodes[0].edges[DIR_AHEAD].dist = 231;
+        trackNodes[0].reserved = false;
         trackNodes[1].name = "A2";
         trackNodes[1].type = NODE_SENSOR;
         trackNodes[1].num = 1;
@@ -1205,6 +1350,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[1].edges[DIR_AHEAD].srcNode = &trackNodes[1];
         trackNodes[1].edges[DIR_AHEAD].destNode = &trackNodes[133];
         trackNodes[1].edges[DIR_AHEAD].dist = 504;
+        trackNodes[1].reserved = false;
         trackNodes[2].name = "A3";
         trackNodes[2].type = NODE_SENSOR;
         trackNodes[2].num = 2;
@@ -1213,6 +1359,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[2].edges[DIR_AHEAD].srcNode = &trackNodes[2];
         trackNodes[2].edges[DIR_AHEAD].destNode = &trackNodes[106];
         trackNodes[2].edges[DIR_AHEAD].dist = 43;
+        trackNodes[2].reserved = false;
         trackNodes[3].name = "A4";
         trackNodes[3].type = NODE_SENSOR;
         trackNodes[3].num = 3;
@@ -1221,6 +1368,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[3].edges[DIR_AHEAD].srcNode = &trackNodes[3];
         trackNodes[3].edges[DIR_AHEAD].destNode = &trackNodes[31];
         trackNodes[3].edges[DIR_AHEAD].dist = 437;
+        trackNodes[3].reserved = false;
         trackNodes[4].name = "A5";
         trackNodes[4].type = NODE_SENSOR;
         trackNodes[4].num = 4;
@@ -1229,6 +1377,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[4].edges[DIR_AHEAD].srcNode = &trackNodes[4];
         trackNodes[4].edges[DIR_AHEAD].destNode = &trackNodes[85];
         trackNodes[4].edges[DIR_AHEAD].dist = 231;
+        trackNodes[4].reserved = false;
         trackNodes[5].name = "A6";
         trackNodes[5].type = NODE_SENSOR;
         trackNodes[5].num = 5;
@@ -1237,6 +1386,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[5].edges[DIR_AHEAD].srcNode = &trackNodes[5];
         trackNodes[5].edges[DIR_AHEAD].destNode = &trackNodes[25];
         trackNodes[5].edges[DIR_AHEAD].dist = 642;
+        trackNodes[5].reserved = false;
         trackNodes[6].name = "A7";
         trackNodes[6].type = NODE_SENSOR;
         trackNodes[6].num = 6;
@@ -1245,6 +1395,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[6].edges[DIR_AHEAD].srcNode = &trackNodes[6];
         trackNodes[6].edges[DIR_AHEAD].destNode = &trackNodes[27];
         trackNodes[6].edges[DIR_AHEAD].dist = 470;
+        trackNodes[6].reserved = false;
         trackNodes[7].name = "A8";
         trackNodes[7].type = NODE_SENSOR;
         trackNodes[7].num = 7;
@@ -1253,6 +1404,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[7].edges[DIR_AHEAD].srcNode = &trackNodes[7];
         trackNodes[7].edges[DIR_AHEAD].destNode = &trackNodes[83];
         trackNodes[7].edges[DIR_AHEAD].dist = 229;
+        trackNodes[7].reserved = false;
         trackNodes[8].name = "A9";
         trackNodes[8].type = NODE_SENSOR;
         trackNodes[8].num = 8;
@@ -1261,6 +1413,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[8].edges[DIR_AHEAD].srcNode = &trackNodes[8];
         trackNodes[8].edges[DIR_AHEAD].destNode = &trackNodes[23];
         trackNodes[8].edges[DIR_AHEAD].dist = 289;
+        trackNodes[8].reserved = false;
         trackNodes[9].name = "A10";
         trackNodes[9].type = NODE_SENSOR;
         trackNodes[9].num = 9;
@@ -1269,6 +1422,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[9].edges[DIR_AHEAD].srcNode = &trackNodes[9];
         trackNodes[9].edges[DIR_AHEAD].destNode = &trackNodes[81];
         trackNodes[9].edges[DIR_AHEAD].dist = 229;
+        trackNodes[9].reserved = false;
         trackNodes[10].name = "A11";
         trackNodes[10].type = NODE_SENSOR;
         trackNodes[10].num = 10;
@@ -1277,6 +1431,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[10].edges[DIR_AHEAD].srcNode = &trackNodes[10];
         trackNodes[10].edges[DIR_AHEAD].destNode = &trackNodes[81];
         trackNodes[10].edges[DIR_AHEAD].dist = 282;
+        trackNodes[10].reserved = false;
         trackNodes[11].name = "A12";
         trackNodes[11].type = NODE_SENSOR;
         trackNodes[11].num = 11;
@@ -1285,6 +1440,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[11].edges[DIR_AHEAD].srcNode = &trackNodes[11];
         trackNodes[11].edges[DIR_AHEAD].destNode = &trackNodes[15];
         trackNodes[11].edges[DIR_AHEAD].dist = 814;
+        trackNodes[11].reserved = false;
         trackNodes[12].name = "A13";
         trackNodes[12].type = NODE_SENSOR;
         trackNodes[12].num = 12;
@@ -1293,6 +1449,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[12].edges[DIR_AHEAD].srcNode = &trackNodes[12];
         trackNodes[12].edges[DIR_AHEAD].destNode = &trackNodes[87];
         trackNodes[12].edges[DIR_AHEAD].dist = 236;
+        trackNodes[12].reserved = false;
         trackNodes[13].name = "A14";
         trackNodes[13].type = NODE_SENSOR;
         trackNodes[13].num = 13;
@@ -1301,6 +1458,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[13].edges[DIR_AHEAD].srcNode = &trackNodes[13];
         trackNodes[13].edges[DIR_AHEAD].destNode = &trackNodes[131];
         trackNodes[13].edges[DIR_AHEAD].dist = 325;
+        trackNodes[13].reserved = false;
         trackNodes[14].name = "A15";
         trackNodes[14].type = NODE_SENSOR;
         trackNodes[14].num = 14;
@@ -1309,6 +1467,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[14].edges[DIR_AHEAD].srcNode = &trackNodes[14];
         trackNodes[14].edges[DIR_AHEAD].destNode = &trackNodes[10];
         trackNodes[14].edges[DIR_AHEAD].dist = 814;
+        trackNodes[14].reserved = false;
         trackNodes[15].name = "A16";
         trackNodes[15].type = NODE_SENSOR;
         trackNodes[15].num = 15;
@@ -1317,6 +1476,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[15].edges[DIR_AHEAD].srcNode = &trackNodes[15];
         trackNodes[15].edges[DIR_AHEAD].destNode = &trackNodes[87];
         trackNodes[15].edges[DIR_AHEAD].dist = 275;
+        trackNodes[15].reserved = false;
         trackNodes[16].name = "B1";
         trackNodes[16].type = NODE_SENSOR;
         trackNodes[16].num = 16;
@@ -1325,6 +1485,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[16].edges[DIR_AHEAD].srcNode = &trackNodes[16];
         trackNodes[16].edges[DIR_AHEAD].destNode = &trackNodes[61];
         trackNodes[16].edges[DIR_AHEAD].dist = 404;
+        trackNodes[16].reserved = false;
         trackNodes[17].name = "B2";
         trackNodes[17].type = NODE_SENSOR;
         trackNodes[17].num = 17;
@@ -1333,6 +1494,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[17].edges[DIR_AHEAD].srcNode = &trackNodes[17];
         trackNodes[17].edges[DIR_AHEAD].destNode = &trackNodes[111];
         trackNodes[17].edges[DIR_AHEAD].dist = 231;
+        trackNodes[17].reserved = false;
         trackNodes[18].name = "B3";
         trackNodes[18].type = NODE_SENSOR;
         trackNodes[18].num = 18;
@@ -1341,6 +1503,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[18].edges[DIR_AHEAD].srcNode = &trackNodes[18];
         trackNodes[18].edges[DIR_AHEAD].destNode = &trackNodes[33];
         trackNodes[18].edges[DIR_AHEAD].dist = 201;
+        trackNodes[18].reserved = false;
         trackNodes[19].name = "B4";
         trackNodes[19].type = NODE_SENSOR;
         trackNodes[19].num = 19;
@@ -1349,6 +1512,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[19].edges[DIR_AHEAD].srcNode = &trackNodes[19];
         trackNodes[19].edges[DIR_AHEAD].destNode = &trackNodes[111];
         trackNodes[19].edges[DIR_AHEAD].dist = 239;
+        trackNodes[19].reserved = false;
         trackNodes[20].name = "B5";
         trackNodes[20].type = NODE_SENSOR;
         trackNodes[20].num = 20;
@@ -1357,6 +1521,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[20].edges[DIR_AHEAD].srcNode = &trackNodes[20];
         trackNodes[20].edges[DIR_AHEAD].destNode = &trackNodes[50];
         trackNodes[20].edges[DIR_AHEAD].dist = 404;
+        trackNodes[20].reserved = false;
         trackNodes[21].name = "B6";
         trackNodes[21].type = NODE_SENSOR;
         trackNodes[21].num = 21;
@@ -1365,6 +1530,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[21].edges[DIR_AHEAD].srcNode = &trackNodes[21];
         trackNodes[21].edges[DIR_AHEAD].destNode = &trackNodes[105];
         trackNodes[21].edges[DIR_AHEAD].dist = 231;
+        trackNodes[21].reserved = false;
         trackNodes[22].name = "B7";
         trackNodes[22].type = NODE_SENSOR;
         trackNodes[22].num = 22;
@@ -1373,6 +1539,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[22].edges[DIR_AHEAD].srcNode = &trackNodes[22];
         trackNodes[22].edges[DIR_AHEAD].destNode = &trackNodes[9];
         trackNodes[22].edges[DIR_AHEAD].dist = 289;
+        trackNodes[22].reserved = false;
         trackNodes[23].name = "B8";
         trackNodes[23].type = NODE_SENSOR;
         trackNodes[23].num = 23;
@@ -1381,6 +1548,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[23].edges[DIR_AHEAD].srcNode = &trackNodes[23];
         trackNodes[23].edges[DIR_AHEAD].destNode = &trackNodes[135];
         trackNodes[23].edges[DIR_AHEAD].dist = 43;
+        trackNodes[23].reserved = false;
         trackNodes[24].name = "B9";
         trackNodes[24].type = NODE_SENSOR;
         trackNodes[24].num = 24;
@@ -1389,6 +1557,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[24].edges[DIR_AHEAD].srcNode = &trackNodes[24];
         trackNodes[24].edges[DIR_AHEAD].destNode = &trackNodes[4];
         trackNodes[24].edges[DIR_AHEAD].dist = 642;
+        trackNodes[24].reserved = false;
         trackNodes[25].name = "B10";
         trackNodes[25].type = NODE_SENSOR;
         trackNodes[25].num = 25;
@@ -1397,6 +1566,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[25].edges[DIR_AHEAD].srcNode = &trackNodes[25];
         trackNodes[25].edges[DIR_AHEAD].destNode = &trackNodes[137];
         trackNodes[25].edges[DIR_AHEAD].dist = 50;
+        trackNodes[25].reserved = false;
         trackNodes[26].name = "B11";
         trackNodes[26].type = NODE_SENSOR;
         trackNodes[26].num = 26;
@@ -1405,6 +1575,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[26].edges[DIR_AHEAD].srcNode = &trackNodes[26];
         trackNodes[26].edges[DIR_AHEAD].destNode = &trackNodes[7];
         trackNodes[26].edges[DIR_AHEAD].dist = 470;
+        trackNodes[26].reserved = false;
         trackNodes[27].name = "B12";
         trackNodes[27].type = NODE_SENSOR;
         trackNodes[27].num = 27;
@@ -1413,6 +1584,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[27].edges[DIR_AHEAD].srcNode = &trackNodes[27];
         trackNodes[27].edges[DIR_AHEAD].destNode = &trackNodes[139];
         trackNodes[27].edges[DIR_AHEAD].dist = 50;
+        trackNodes[27].reserved = false;
         trackNodes[28].name = "B13";
         trackNodes[28].type = NODE_SENSOR;
         trackNodes[28].num = 28;
@@ -1421,6 +1593,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[28].edges[DIR_AHEAD].srcNode = &trackNodes[28];
         trackNodes[28].edges[DIR_AHEAD].destNode = &trackNodes[119];
         trackNodes[28].edges[DIR_AHEAD].dist = 239;
+        trackNodes[28].reserved = false;
         trackNodes[29].name = "B14";
         trackNodes[29].type = NODE_SENSOR;
         trackNodes[29].num = 29;
@@ -1429,6 +1602,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[29].edges[DIR_AHEAD].srcNode = &trackNodes[29];
         trackNodes[29].edges[DIR_AHEAD].destNode = &trackNodes[63];
         trackNodes[29].edges[DIR_AHEAD].dist = 201;
+        trackNodes[29].reserved = false;
         trackNodes[30].name = "B15";
         trackNodes[30].type = NODE_SENSOR;
         trackNodes[30].num = 30;
@@ -1437,6 +1611,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[30].edges[DIR_AHEAD].srcNode = &trackNodes[30];
         trackNodes[30].edges[DIR_AHEAD].destNode = &trackNodes[2];
         trackNodes[30].edges[DIR_AHEAD].dist = 437;
+        trackNodes[30].reserved = false;
         trackNodes[31].name = "B16";
         trackNodes[31].type = NODE_SENSOR;
         trackNodes[31].num = 31;
@@ -1445,6 +1620,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[31].edges[DIR_AHEAD].srcNode = &trackNodes[31];
         trackNodes[31].edges[DIR_AHEAD].destNode = &trackNodes[108];
         trackNodes[31].edges[DIR_AHEAD].dist = 50;
+        trackNodes[31].reserved = false;
         trackNodes[32].name = "C1";
         trackNodes[32].type = NODE_SENSOR;
         trackNodes[32].num = 32;
@@ -1453,6 +1629,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[32].edges[DIR_AHEAD].srcNode = &trackNodes[32];
         trackNodes[32].edges[DIR_AHEAD].destNode = &trackNodes[19];
         trackNodes[32].edges[DIR_AHEAD].dist = 201;
+        trackNodes[32].reserved = false;
         trackNodes[33].name = "C2";
         trackNodes[33].type = NODE_SENSOR;
         trackNodes[33].num = 33;
@@ -1461,6 +1638,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[33].edges[DIR_AHEAD].srcNode = &trackNodes[33];
         trackNodes[33].edges[DIR_AHEAD].destNode = &trackNodes[117];
         trackNodes[33].edges[DIR_AHEAD].dist = 246;
+        trackNodes[33].reserved = false;
         trackNodes[34].name = "C3";
         trackNodes[34].type = NODE_SENSOR;
         trackNodes[34].num = 34;
@@ -1469,6 +1647,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[34].edges[DIR_AHEAD].srcNode = &trackNodes[34];
         trackNodes[34].edges[DIR_AHEAD].destNode = &trackNodes[129];
         trackNodes[34].edges[DIR_AHEAD].dist = 514;
+        trackNodes[34].reserved = false;
         trackNodes[35].name = "C4";
         trackNodes[35].type = NODE_SENSOR;
         trackNodes[35].num = 35;
@@ -1477,6 +1656,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[35].edges[DIR_AHEAD].srcNode = &trackNodes[35];
         trackNodes[35].edges[DIR_AHEAD].destNode = &trackNodes[89];
         trackNodes[35].edges[DIR_AHEAD].dist = 239;
+        trackNodes[35].reserved = false;
         trackNodes[36].name = "C5";
         trackNodes[36].type = NODE_SENSOR;
         trackNodes[36].num = 36;
@@ -1485,6 +1665,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[36].edges[DIR_AHEAD].srcNode = &trackNodes[36];
         trackNodes[36].edges[DIR_AHEAD].destNode = &trackNodes[90];
         trackNodes[36].edges[DIR_AHEAD].dist = 61;
+        trackNodes[36].reserved = false;
         trackNodes[37].name = "C6";
         trackNodes[37].type = NODE_SENSOR;
         trackNodes[37].num = 37;
@@ -1493,6 +1674,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[37].edges[DIR_AHEAD].srcNode = &trackNodes[37];
         trackNodes[37].edges[DIR_AHEAD].destNode = &trackNodes[109];
         trackNodes[37].edges[DIR_AHEAD].dist = 433;
+        trackNodes[37].reserved = false;
         trackNodes[38].name = "C7";
         trackNodes[38].type = NODE_SENSOR;
         trackNodes[38].num = 38;
@@ -1501,6 +1683,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[38].edges[DIR_AHEAD].srcNode = &trackNodes[38];
         trackNodes[38].edges[DIR_AHEAD].destNode = &trackNodes[115];
         trackNodes[38].edges[DIR_AHEAD].dist = 231;
+        trackNodes[38].reserved = false;
         trackNodes[39].name = "C8";
         trackNodes[39].type = NODE_SENSOR;
         trackNodes[39].num = 39;
@@ -1509,6 +1692,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[39].edges[DIR_AHEAD].srcNode = &trackNodes[39];
         trackNodes[39].edges[DIR_AHEAD].destNode = &trackNodes[84];
         trackNodes[39].edges[DIR_AHEAD].dist = 128;
+        trackNodes[39].reserved = false;
         trackNodes[40].name = "C9";
         trackNodes[40].type = NODE_SENSOR;
         trackNodes[40].num = 40;
@@ -1517,6 +1701,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[40].edges[DIR_AHEAD].srcNode = &trackNodes[40];
         trackNodes[40].edges[DIR_AHEAD].destNode = &trackNodes[109];
         trackNodes[40].edges[DIR_AHEAD].dist = 326;
+        trackNodes[40].reserved = false;
         trackNodes[41].name = "C10";
         trackNodes[41].type = NODE_SENSOR;
         trackNodes[41].num = 41;
@@ -1525,6 +1710,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[41].edges[DIR_AHEAD].srcNode = &trackNodes[41];
         trackNodes[41].edges[DIR_AHEAD].destNode = &trackNodes[110];
         trackNodes[41].edges[DIR_AHEAD].dist = 128;
+        trackNodes[41].reserved = false;
         trackNodes[42].name = "C11";
         trackNodes[42].type = NODE_SENSOR;
         trackNodes[42].num = 42;
@@ -1533,6 +1719,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[42].edges[DIR_AHEAD].srcNode = &trackNodes[42];
         trackNodes[42].edges[DIR_AHEAD].destNode = &trackNodes[104];
         trackNodes[42].edges[DIR_AHEAD].dist = 120;
+        trackNodes[42].reserved = false;
         trackNodes[43].name = "C12";
         trackNodes[43].type = NODE_SENSOR;
         trackNodes[43].num = 43;
@@ -1541,6 +1728,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[43].edges[DIR_AHEAD].srcNode = &trackNodes[43];
         trackNodes[43].edges[DIR_AHEAD].destNode = &trackNodes[107];
         trackNodes[43].edges[DIR_AHEAD].dist = 333;
+        trackNodes[43].reserved = false;
         trackNodes[44].name = "C13";
         trackNodes[44].type = NODE_SENSOR;
         trackNodes[44].num = 44;
@@ -1549,6 +1737,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[44].edges[DIR_AHEAD].srcNode = &trackNodes[44];
         trackNodes[44].edges[DIR_AHEAD].destNode = &trackNodes[70];
         trackNodes[44].edges[DIR_AHEAD].dist = 780;
+        trackNodes[44].reserved = false;
         trackNodes[45].name = "C14";
         trackNodes[45].type = NODE_SENSOR;
         trackNodes[45].num = 45;
@@ -1557,6 +1746,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[45].edges[DIR_AHEAD].srcNode = &trackNodes[45];
         trackNodes[45].edges[DIR_AHEAD].destNode = &trackNodes[100];
         trackNodes[45].edges[DIR_AHEAD].dist = 50;
+        trackNodes[45].reserved = false;
         trackNodes[46].name = "C15";
         trackNodes[46].type = NODE_SENSOR;
         trackNodes[46].num = 46;
@@ -1565,6 +1755,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[46].edges[DIR_AHEAD].srcNode = &trackNodes[46];
         trackNodes[46].edges[DIR_AHEAD].destNode = &trackNodes[59];
         trackNodes[46].edges[DIR_AHEAD].dist = 404;
+        trackNodes[46].reserved = false;
         trackNodes[47].name = "C16";
         trackNodes[47].type = NODE_SENSOR;
         trackNodes[47].num = 47;
@@ -1573,6 +1764,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[47].edges[DIR_AHEAD].srcNode = &trackNodes[47];
         trackNodes[47].edges[DIR_AHEAD].destNode = &trackNodes[91];
         trackNodes[47].edges[DIR_AHEAD].dist = 239;
+        trackNodes[47].reserved = false;
         trackNodes[48].name = "D1";
         trackNodes[48].type = NODE_SENSOR;
         trackNodes[48].num = 48;
@@ -1581,6 +1773,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[48].edges[DIR_AHEAD].srcNode = &trackNodes[48];
         trackNodes[48].edges[DIR_AHEAD].destNode = &trackNodes[121];
         trackNodes[48].edges[DIR_AHEAD].dist = 246;
+        trackNodes[48].reserved = false;
         trackNodes[49].name = "D2";
         trackNodes[49].type = NODE_SENSOR;
         trackNodes[49].num = 49;
@@ -1589,6 +1782,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[49].edges[DIR_AHEAD].srcNode = &trackNodes[49];
         trackNodes[49].edges[DIR_AHEAD].destNode = &trackNodes[67];
         trackNodes[49].edges[DIR_AHEAD].dist = 201;
+        trackNodes[49].reserved = false;
         trackNodes[50].name = "D3";
         trackNodes[50].type = NODE_SENSOR;
         trackNodes[50].num = 50;
@@ -1597,6 +1791,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[50].edges[DIR_AHEAD].srcNode = &trackNodes[50];
         trackNodes[50].edges[DIR_AHEAD].destNode = &trackNodes[99];
         trackNodes[50].edges[DIR_AHEAD].dist = 239;
+        trackNodes[50].reserved = false;
         trackNodes[51].name = "D4";
         trackNodes[51].type = NODE_SENSOR;
         trackNodes[51].num = 51;
@@ -1605,6 +1800,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[51].edges[DIR_AHEAD].srcNode = &trackNodes[51];
         trackNodes[51].edges[DIR_AHEAD].destNode = &trackNodes[21];
         trackNodes[51].edges[DIR_AHEAD].dist = 404;
+        trackNodes[51].reserved = false;
         trackNodes[52].name = "D5";
         trackNodes[52].type = NODE_SENSOR;
         trackNodes[52].num = 52;
@@ -1613,6 +1809,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[52].edges[DIR_AHEAD].srcNode = &trackNodes[52];
         trackNodes[52].edges[DIR_AHEAD].destNode = &trackNodes[69];
         trackNodes[52].edges[DIR_AHEAD].dist = 282;
+        trackNodes[52].reserved = false;
         trackNodes[53].name = "D6";
         trackNodes[53].type = NODE_SENSOR;
         trackNodes[53].num = 53;
@@ -1621,6 +1818,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[53].edges[DIR_AHEAD].srcNode = &trackNodes[53];
         trackNodes[53].edges[DIR_AHEAD].destNode = &trackNodes[97];
         trackNodes[53].edges[DIR_AHEAD].dist = 229;
+        trackNodes[53].reserved = false;
         trackNodes[54].name = "D7";
         trackNodes[54].type = NODE_SENSOR;
         trackNodes[54].num = 54;
@@ -1629,6 +1827,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[54].edges[DIR_AHEAD].srcNode = &trackNodes[54];
         trackNodes[54].edges[DIR_AHEAD].destNode = &trackNodes[97];
         trackNodes[54].edges[DIR_AHEAD].dist = 309;
+        trackNodes[54].reserved = false;
         trackNodes[55].name = "D8";
         trackNodes[55].type = NODE_SENSOR;
         trackNodes[55].num = 55;
@@ -1637,6 +1836,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[55].edges[DIR_AHEAD].srcNode = &trackNodes[55];
         trackNodes[55].edges[DIR_AHEAD].destNode = &trackNodes[71];
         trackNodes[55].edges[DIR_AHEAD].dist = 376;
+        trackNodes[55].reserved = false;
         trackNodes[56].name = "D9";
         trackNodes[56].type = NODE_SENSOR;
         trackNodes[56].num = 56;
@@ -1645,6 +1845,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[56].edges[DIR_AHEAD].srcNode = &trackNodes[56];
         trackNodes[56].edges[DIR_AHEAD].destNode = &trackNodes[75];
         trackNodes[56].edges[DIR_AHEAD].dist = 282;
+        trackNodes[56].reserved = false;
         trackNodes[57].name = "D10";
         trackNodes[57].type = NODE_SENSOR;
         trackNodes[57].num = 57;
@@ -1653,6 +1854,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[57].edges[DIR_AHEAD].srcNode = &trackNodes[57];
         trackNodes[57].edges[DIR_AHEAD].destNode = &trackNodes[95];
         trackNodes[57].edges[DIR_AHEAD].dist = 316;
+        trackNodes[57].reserved = false;
         trackNodes[58].name = "D11";
         trackNodes[58].type = NODE_SENSOR;
         trackNodes[58].num = 58;
@@ -1661,6 +1863,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[58].edges[DIR_AHEAD].srcNode = &trackNodes[58];
         trackNodes[58].edges[DIR_AHEAD].destNode = &trackNodes[47];
         trackNodes[58].edges[DIR_AHEAD].dist = 404;
+        trackNodes[58].reserved = false;
         trackNodes[59].name = "D12";
         trackNodes[59].type = NODE_SENSOR;
         trackNodes[59].num = 59;
@@ -1669,6 +1872,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[59].edges[DIR_AHEAD].srcNode = &trackNodes[59];
         trackNodes[59].edges[DIR_AHEAD].destNode = &trackNodes[93];
         trackNodes[59].edges[DIR_AHEAD].dist = 231;
+        trackNodes[59].reserved = false;
         trackNodes[60].name = "D13";
         trackNodes[60].type = NODE_SENSOR;
         trackNodes[60].num = 60;
@@ -1677,6 +1881,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[60].edges[DIR_AHEAD].srcNode = &trackNodes[60];
         trackNodes[60].edges[DIR_AHEAD].destNode = &trackNodes[17];
         trackNodes[60].edges[DIR_AHEAD].dist = 404;
+        trackNodes[60].reserved = false;
         trackNodes[61].name = "D14";
         trackNodes[61].type = NODE_SENSOR;
         trackNodes[61].num = 61;
@@ -1685,6 +1890,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[61].edges[DIR_AHEAD].srcNode = &trackNodes[61];
         trackNodes[61].edges[DIR_AHEAD].destNode = &trackNodes[113];
         trackNodes[61].edges[DIR_AHEAD].dist = 239;
+        trackNodes[61].reserved = false;
         trackNodes[62].name = "D15";
         trackNodes[62].type = NODE_SENSOR;
         trackNodes[62].num = 62;
@@ -1693,6 +1899,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[62].edges[DIR_AHEAD].srcNode = &trackNodes[62];
         trackNodes[62].edges[DIR_AHEAD].destNode = &trackNodes[28];
         trackNodes[62].edges[DIR_AHEAD].dist = 201;
+        trackNodes[62].reserved = false;
         trackNodes[63].name = "D16";
         trackNodes[63].type = NODE_SENSOR;
         trackNodes[63].num = 63;
@@ -1701,6 +1908,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[63].edges[DIR_AHEAD].srcNode = &trackNodes[63];
         trackNodes[63].edges[DIR_AHEAD].destNode = &trackNodes[113];
         trackNodes[63].edges[DIR_AHEAD].dist = 246;
+        trackNodes[63].reserved = false;
         trackNodes[64].name = "E1";
         trackNodes[64].type = NODE_SENSOR;
         trackNodes[64].num = 64;
@@ -1709,6 +1917,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[64].edges[DIR_AHEAD].srcNode = &trackNodes[64];
         trackNodes[64].edges[DIR_AHEAD].destNode = &trackNodes[123];
         trackNodes[64].edges[DIR_AHEAD].dist = 239;
+        trackNodes[64].reserved = false;
         trackNodes[65].name = "E2";
         trackNodes[65].type = NODE_SENSOR;
         trackNodes[65].num = 65;
@@ -1717,6 +1926,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[65].edges[DIR_AHEAD].srcNode = &trackNodes[65];
         trackNodes[65].edges[DIR_AHEAD].destNode = &trackNodes[78];
         trackNodes[65].edges[DIR_AHEAD].dist = 201;
+        trackNodes[65].reserved = false;
         trackNodes[66].name = "E3";
         trackNodes[66].type = NODE_SENSOR;
         trackNodes[66].num = 66;
@@ -1725,6 +1935,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[66].edges[DIR_AHEAD].srcNode = &trackNodes[66];
         trackNodes[66].edges[DIR_AHEAD].destNode = &trackNodes[48];
         trackNodes[66].edges[DIR_AHEAD].dist = 201;
+        trackNodes[66].reserved = false;
         trackNodes[67].name = "E4";
         trackNodes[67].type = NODE_SENSOR;
         trackNodes[67].num = 67;
@@ -1733,6 +1944,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[67].edges[DIR_AHEAD].srcNode = &trackNodes[67];
         trackNodes[67].edges[DIR_AHEAD].destNode = &trackNodes[99];
         trackNodes[67].edges[DIR_AHEAD].dist = 239;
+        trackNodes[67].reserved = false;
         trackNodes[68].name = "E5";
         trackNodes[68].type = NODE_SENSOR;
         trackNodes[68].num = 68;
@@ -1741,6 +1953,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[68].edges[DIR_AHEAD].srcNode = &trackNodes[68];
         trackNodes[68].edges[DIR_AHEAD].destNode = &trackNodes[53];
         trackNodes[68].edges[DIR_AHEAD].dist = 282;
+        trackNodes[68].reserved = false;
         trackNodes[69].name = "E6";
         trackNodes[69].type = NODE_SENSOR;
         trackNodes[69].num = 69;
@@ -1749,6 +1962,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[69].edges[DIR_AHEAD].srcNode = &trackNodes[69];
         trackNodes[69].edges[DIR_AHEAD].destNode = &trackNodes[98];
         trackNodes[69].edges[DIR_AHEAD].dist = 50;
+        trackNodes[69].reserved = false;
         trackNodes[70].name = "E7";
         trackNodes[70].type = NODE_SENSOR;
         trackNodes[70].num = 70;
@@ -1757,6 +1971,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[70].edges[DIR_AHEAD].srcNode = &trackNodes[70];
         trackNodes[70].edges[DIR_AHEAD].destNode = &trackNodes[54];
         trackNodes[70].edges[DIR_AHEAD].dist = 376;
+        trackNodes[70].reserved = false;
         trackNodes[71].name = "E8";
         trackNodes[71].type = NODE_SENSOR;
         trackNodes[71].num = 71;
@@ -1765,6 +1980,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[71].edges[DIR_AHEAD].srcNode = &trackNodes[71];
         trackNodes[71].edges[DIR_AHEAD].destNode = &trackNodes[45];
         trackNodes[71].edges[DIR_AHEAD].dist = 780;
+        trackNodes[71].reserved = false;
         trackNodes[72].name = "E9";
         trackNodes[72].type = NODE_SENSOR;
         trackNodes[72].num = 72;
@@ -1773,6 +1989,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[72].edges[DIR_AHEAD].srcNode = &trackNodes[72];
         trackNodes[72].edges[DIR_AHEAD].destNode = &trackNodes[95];
         trackNodes[72].edges[DIR_AHEAD].dist = 239;
+        trackNodes[72].reserved = false;
         trackNodes[73].name = "E10";
         trackNodes[73].type = NODE_SENSOR;
         trackNodes[73].num = 73;
@@ -1781,6 +1998,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[73].edges[DIR_AHEAD].srcNode = &trackNodes[73];
         trackNodes[73].edges[DIR_AHEAD].destNode = &trackNodes[76];
         trackNodes[73].edges[DIR_AHEAD].dist = 282;
+        trackNodes[73].reserved = false;
         trackNodes[74].name = "E11";
         trackNodes[74].type = NODE_SENSOR;
         trackNodes[74].num = 74;
@@ -1789,6 +2007,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[74].edges[DIR_AHEAD].srcNode = &trackNodes[74];
         trackNodes[74].edges[DIR_AHEAD].destNode = &trackNodes[57];
         trackNodes[74].edges[DIR_AHEAD].dist = 282;
+        trackNodes[74].reserved = false;
         trackNodes[75].name = "E12";
         trackNodes[75].type = NODE_SENSOR;
         trackNodes[75].num = 75;
@@ -1797,6 +2016,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[75].edges[DIR_AHEAD].srcNode = &trackNodes[75];
         trackNodes[75].edges[DIR_AHEAD].destNode = &trackNodes[92];
         trackNodes[75].edges[DIR_AHEAD].dist = 43;
+        trackNodes[75].reserved = false;
         trackNodes[76].name = "E13";
         trackNodes[76].type = NODE_SENSOR;
         trackNodes[76].num = 76;
@@ -1805,6 +2025,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[76].edges[DIR_AHEAD].srcNode = &trackNodes[76];
         trackNodes[76].edges[DIR_AHEAD].destNode = &trackNodes[112];
         trackNodes[76].edges[DIR_AHEAD].dist = 43;
+        trackNodes[76].reserved = false;
         trackNodes[77].name = "E14";
         trackNodes[77].type = NODE_SENSOR;
         trackNodes[77].num = 77;
@@ -1813,6 +2034,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[77].edges[DIR_AHEAD].srcNode = &trackNodes[77];
         trackNodes[77].edges[DIR_AHEAD].destNode = &trackNodes[72];
         trackNodes[77].edges[DIR_AHEAD].dist = 282;
+        trackNodes[77].reserved = false;
         trackNodes[78].name = "E15";
         trackNodes[78].type = NODE_SENSOR;
         trackNodes[78].num = 78;
@@ -1821,6 +2043,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[78].edges[DIR_AHEAD].srcNode = &trackNodes[78];
         trackNodes[78].edges[DIR_AHEAD].destNode = &trackNodes[105];
         trackNodes[78].edges[DIR_AHEAD].dist = 246;
+        trackNodes[78].reserved = false;
         trackNodes[79].name = "E16";
         trackNodes[79].type = NODE_SENSOR;
         trackNodes[79].num = 79;
@@ -1829,6 +2052,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[79].edges[DIR_AHEAD].srcNode = &trackNodes[79];
         trackNodes[79].edges[DIR_AHEAD].destNode = &trackNodes[64];
         trackNodes[79].edges[DIR_AHEAD].dist = 201;
+        trackNodes[79].reserved = false;
         trackNodes[80].name = "BR1";
         trackNodes[80].type = NODE_BRANCH;
         trackNodes[80].num = 1;
@@ -1841,6 +2065,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[80].edges[DIR_CURVED].srcNode = &trackNodes[80];
         trackNodes[80].edges[DIR_CURVED].destNode = &trackNodes[8];
         trackNodes[80].edges[DIR_CURVED].dist = 229;
+        trackNodes[80].reserved = false;
         trackNodes[81].name = "MR1";
         trackNodes[81].type = NODE_MERGE;
         trackNodes[81].num = 1;
@@ -1849,6 +2074,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[81].edges[DIR_AHEAD].srcNode = &trackNodes[81];
         trackNodes[81].edges[DIR_AHEAD].destNode = &trackNodes[83];
         trackNodes[81].edges[DIR_AHEAD].dist = 188;
+        trackNodes[81].reserved = false;
         trackNodes[82].name = "BR2";
         trackNodes[82].type = NODE_BRANCH;
         trackNodes[82].num = 2;
@@ -1861,6 +2087,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[82].edges[DIR_CURVED].srcNode = &trackNodes[82];
         trackNodes[82].edges[DIR_CURVED].destNode = &trackNodes[6];
         trackNodes[82].edges[DIR_CURVED].dist = 229;
+        trackNodes[82].reserved = false;
         trackNodes[83].name = "MR2";
         trackNodes[83].type = NODE_MERGE;
         trackNodes[83].num = 2;
@@ -1869,6 +2096,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[83].edges[DIR_AHEAD].srcNode = &trackNodes[83];
         trackNodes[83].edges[DIR_AHEAD].destNode = &trackNodes[85];
         trackNodes[83].edges[DIR_AHEAD].dist = 185;
+        trackNodes[83].reserved = false;
         trackNodes[84].name = "BR3";
         trackNodes[84].type = NODE_BRANCH;
         trackNodes[84].num = 3;
@@ -1881,6 +2109,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[84].edges[DIR_CURVED].srcNode = &trackNodes[84];
         trackNodes[84].edges[DIR_CURVED].destNode = &trackNodes[82];
         trackNodes[84].edges[DIR_CURVED].dist = 185;
+        trackNodes[84].reserved = false;
         trackNodes[85].name = "MR3";
         trackNodes[85].type = NODE_MERGE;
         trackNodes[85].num = 3;
@@ -1889,6 +2118,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[85].edges[DIR_AHEAD].srcNode = &trackNodes[85];
         trackNodes[85].edges[DIR_AHEAD].destNode = &trackNodes[38];
         trackNodes[85].edges[DIR_AHEAD].dist = 128;
+        trackNodes[85].reserved = false;
         trackNodes[86].name = "BR4";
         trackNodes[86].type = NODE_BRANCH;
         trackNodes[86].num = 4;
@@ -1901,6 +2131,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[86].edges[DIR_CURVED].srcNode = &trackNodes[86];
         trackNodes[86].edges[DIR_CURVED].destNode = &trackNodes[13];
         trackNodes[86].edges[DIR_CURVED].dist = 236;
+        trackNodes[86].reserved = false;
         trackNodes[87].name = "MR4";
         trackNodes[87].type = NODE_MERGE;
         trackNodes[87].num = 4;
@@ -1909,6 +2140,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[87].edges[DIR_AHEAD].srcNode = &trackNodes[87];
         trackNodes[87].edges[DIR_AHEAD].destNode = &trackNodes[103];
         trackNodes[87].edges[DIR_AHEAD].dist = 185;
+        trackNodes[87].reserved = false;
         trackNodes[88].name = "BR5";
         trackNodes[88].type = NODE_BRANCH;
         trackNodes[88].num = 5;
@@ -1921,6 +2153,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[88].edges[DIR_CURVED].srcNode = &trackNodes[88];
         trackNodes[88].edges[DIR_CURVED].destNode = &trackNodes[93];
         trackNodes[88].edges[DIR_CURVED].dist = 371;
+        trackNodes[88].reserved = false;
         trackNodes[89].name = "MR5";
         trackNodes[89].type = NODE_MERGE;
         trackNodes[89].num = 5;
@@ -1929,6 +2162,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[89].edges[DIR_AHEAD].srcNode = &trackNodes[89];
         trackNodes[89].edges[DIR_AHEAD].destNode = &trackNodes[114];
         trackNodes[89].edges[DIR_AHEAD].dist = 155;
+        trackNodes[89].reserved = false;
         trackNodes[90].name = "BR6";
         trackNodes[90].type = NODE_BRANCH;
         trackNodes[90].num = 6;
@@ -1941,6 +2175,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[90].edges[DIR_CURVED].srcNode = &trackNodes[90];
         trackNodes[90].edges[DIR_CURVED].destNode = &trackNodes[115];
         trackNodes[90].edges[DIR_CURVED].dist = 371;
+        trackNodes[90].reserved = false;
         trackNodes[91].name = "MR6";
         trackNodes[91].type = NODE_MERGE;
         trackNodes[91].num = 6;
@@ -1949,6 +2184,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[91].edges[DIR_AHEAD].srcNode = &trackNodes[91];
         trackNodes[91].edges[DIR_AHEAD].destNode = &trackNodes[37];
         trackNodes[91].edges[DIR_AHEAD].dist = 61;
+        trackNodes[91].reserved = false;
         trackNodes[92].name = "BR7";
         trackNodes[92].type = NODE_BRANCH;
         trackNodes[92].num = 7;
@@ -1961,6 +2197,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[92].edges[DIR_CURVED].srcNode = &trackNodes[92];
         trackNodes[92].edges[DIR_CURVED].destNode = &trackNodes[89];
         trackNodes[92].edges[DIR_CURVED].dist = 371;
+        trackNodes[92].reserved = false;
         trackNodes[93].name = "MR7";
         trackNodes[93].type = NODE_MERGE;
         trackNodes[93].num = 7;
@@ -1969,6 +2206,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[93].edges[DIR_AHEAD].srcNode = &trackNodes[93];
         trackNodes[93].edges[DIR_AHEAD].destNode = &trackNodes[74];
         trackNodes[93].edges[DIR_AHEAD].dist = 43;
+        trackNodes[93].reserved = false;
         trackNodes[94].name = "BR8";
         trackNodes[94].type = NODE_BRANCH;
         trackNodes[94].num = 8;
@@ -1981,6 +2219,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[94].edges[DIR_CURVED].srcNode = &trackNodes[94];
         trackNodes[94].edges[DIR_CURVED].destNode = &trackNodes[73];
         trackNodes[94].edges[DIR_CURVED].dist = 239;
+        trackNodes[94].reserved = false;
         trackNodes[95].name = "MR8";
         trackNodes[95].type = NODE_MERGE;
         trackNodes[95].num = 8;
@@ -1989,6 +2228,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[95].edges[DIR_AHEAD].srcNode = &trackNodes[95];
         trackNodes[95].edges[DIR_AHEAD].destNode = &trackNodes[96];
         trackNodes[95].edges[DIR_AHEAD].dist = 155;
+        trackNodes[95].reserved = false;
         trackNodes[96].name = "BR9";
         trackNodes[96].type = NODE_BRANCH;
         trackNodes[96].num = 9;
@@ -2001,6 +2241,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[96].edges[DIR_CURVED].srcNode = &trackNodes[96];
         trackNodes[96].edges[DIR_CURVED].destNode = &trackNodes[52];
         trackNodes[96].edges[DIR_CURVED].dist = 229;
+        trackNodes[96].reserved = false;
         trackNodes[97].name = "MR9";
         trackNodes[97].type = NODE_MERGE;
         trackNodes[97].num = 9;
@@ -2009,6 +2250,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[97].edges[DIR_AHEAD].srcNode = &trackNodes[97];
         trackNodes[97].edges[DIR_AHEAD].destNode = &trackNodes[94];
         trackNodes[97].edges[DIR_AHEAD].dist = 155;
+        trackNodes[97].reserved = false;
         trackNodes[98].name = "BR10";
         trackNodes[98].type = NODE_BRANCH;
         trackNodes[98].num = 10;
@@ -2021,6 +2263,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[98].edges[DIR_CURVED].srcNode = &trackNodes[98];
         trackNodes[98].edges[DIR_CURVED].destNode = &trackNodes[66];
         trackNodes[98].edges[DIR_CURVED].dist = 239;
+        trackNodes[98].reserved = false;
         trackNodes[99].name = "MR10";
         trackNodes[99].type = NODE_MERGE;
         trackNodes[99].num = 10;
@@ -2029,6 +2272,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[99].edges[DIR_AHEAD].srcNode = &trackNodes[99];
         trackNodes[99].edges[DIR_AHEAD].destNode = &trackNodes[68];
         trackNodes[99].edges[DIR_AHEAD].dist = 50;
+        trackNodes[99].reserved = false;
         trackNodes[100].name = "BR11";
         trackNodes[100].type = NODE_BRANCH;
         trackNodes[100].num = 11;
@@ -2041,6 +2285,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[100].edges[DIR_CURVED].srcNode = &trackNodes[100];
         trackNodes[100].edges[DIR_CURVED].destNode = &trackNodes[107];
         trackNodes[100].edges[DIR_CURVED].dist = 495;
+        trackNodes[100].reserved = false;
         trackNodes[101].name = "MR11";
         trackNodes[101].type = NODE_MERGE;
         trackNodes[101].num = 11;
@@ -2049,6 +2294,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[101].edges[DIR_AHEAD].srcNode = &trackNodes[101];
         trackNodes[101].edges[DIR_AHEAD].destNode = &trackNodes[44];
         trackNodes[101].edges[DIR_AHEAD].dist = 50;
+        trackNodes[101].reserved = false;
         trackNodes[102].name = "BR12";
         trackNodes[102].type = NODE_BRANCH;
         trackNodes[102].num = 12;
@@ -2061,6 +2307,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[102].edges[DIR_CURVED].srcNode = &trackNodes[102];
         trackNodes[102].edges[DIR_CURVED].destNode = &trackNodes[86];
         trackNodes[102].edges[DIR_CURVED].dist = 185;
+        trackNodes[102].reserved = false;
         trackNodes[103].name = "MR12";
         trackNodes[103].type = NODE_MERGE;
         trackNodes[103].num = 12;
@@ -2069,6 +2316,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[103].edges[DIR_AHEAD].srcNode = &trackNodes[103];
         trackNodes[103].edges[DIR_AHEAD].destNode = &trackNodes[101];
         trackNodes[103].edges[DIR_AHEAD].dist = 188;
+        trackNodes[103].reserved = false;
         trackNodes[104].name = "BR13";
         trackNodes[104].type = NODE_BRANCH;
         trackNodes[104].num = 13;
@@ -2081,6 +2329,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[104].edges[DIR_CURVED].srcNode = &trackNodes[104];
         trackNodes[104].edges[DIR_CURVED].destNode = &trackNodes[79];
         trackNodes[104].edges[DIR_CURVED].dist = 246;
+        trackNodes[104].reserved = false;
         trackNodes[105].name = "MR13";
         trackNodes[105].type = NODE_MERGE;
         trackNodes[105].num = 13;
@@ -2089,6 +2338,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[105].edges[DIR_AHEAD].srcNode = &trackNodes[105];
         trackNodes[105].edges[DIR_AHEAD].destNode = &trackNodes[43];
         trackNodes[105].edges[DIR_AHEAD].dist = 120;
+        trackNodes[105].reserved = false;
         trackNodes[106].name = "BR14";
         trackNodes[106].type = NODE_BRANCH;
         trackNodes[106].num = 14;
@@ -2101,6 +2351,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[106].edges[DIR_CURVED].srcNode = &trackNodes[106];
         trackNodes[106].edges[DIR_CURVED].destNode = &trackNodes[42];
         trackNodes[106].edges[DIR_CURVED].dist = 333;
+        trackNodes[106].reserved = false;
         trackNodes[107].name = "MR14";
         trackNodes[107].type = NODE_MERGE;
         trackNodes[107].num = 14;
@@ -2109,6 +2360,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[107].edges[DIR_AHEAD].srcNode = &trackNodes[107];
         trackNodes[107].edges[DIR_AHEAD].destNode = &trackNodes[3];
         trackNodes[107].edges[DIR_AHEAD].dist = 43;
+        trackNodes[107].reserved = false;
         trackNodes[108].name = "BR15";
         trackNodes[108].type = NODE_BRANCH;
         trackNodes[108].num = 15;
@@ -2121,6 +2373,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[108].edges[DIR_CURVED].srcNode = &trackNodes[108];
         trackNodes[108].edges[DIR_CURVED].destNode = &trackNodes[41];
         trackNodes[108].edges[DIR_CURVED].dist = 326;
+        trackNodes[108].reserved = false;
         trackNodes[109].name = "MR15";
         trackNodes[109].type = NODE_MERGE;
         trackNodes[109].num = 15;
@@ -2129,6 +2382,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[109].edges[DIR_AHEAD].srcNode = &trackNodes[109];
         trackNodes[109].edges[DIR_AHEAD].destNode = &trackNodes[30];
         trackNodes[109].edges[DIR_AHEAD].dist = 50;
+        trackNodes[109].reserved = false;
         trackNodes[110].name = "BR16";
         trackNodes[110].type = NODE_BRANCH;
         trackNodes[110].num = 16;
@@ -2141,6 +2395,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[110].edges[DIR_CURVED].srcNode = &trackNodes[110];
         trackNodes[110].edges[DIR_CURVED].destNode = &trackNodes[18];
         trackNodes[110].edges[DIR_CURVED].dist = 239;
+        trackNodes[110].reserved = false;
         trackNodes[111].name = "MR16";
         trackNodes[111].type = NODE_MERGE;
         trackNodes[111].num = 16;
@@ -2149,6 +2404,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[111].edges[DIR_AHEAD].srcNode = &trackNodes[111];
         trackNodes[111].edges[DIR_AHEAD].destNode = &trackNodes[40];
         trackNodes[111].edges[DIR_AHEAD].dist = 128;
+        trackNodes[111].reserved = false;
         trackNodes[112].name = "BR17";
         trackNodes[112].type = NODE_BRANCH;
         trackNodes[112].num = 17;
@@ -2161,6 +2417,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[112].edges[DIR_CURVED].srcNode = &trackNodes[112];
         trackNodes[112].edges[DIR_CURVED].destNode = &trackNodes[62];
         trackNodes[112].edges[DIR_CURVED].dist = 246;
+        trackNodes[112].reserved = false;
         trackNodes[113].name = "MR17";
         trackNodes[113].type = NODE_MERGE;
         trackNodes[113].num = 17;
@@ -2169,6 +2426,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[113].edges[DIR_AHEAD].srcNode = &trackNodes[113];
         trackNodes[113].edges[DIR_AHEAD].destNode = &trackNodes[77];
         trackNodes[113].edges[DIR_AHEAD].dist = 43;
+        trackNodes[113].reserved = false;
         trackNodes[114].name = "BR18";
         trackNodes[114].type = NODE_BRANCH;
         trackNodes[114].num = 18;
@@ -2181,6 +2439,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[114].edges[DIR_CURVED].srcNode = &trackNodes[114];
         trackNodes[114].edges[DIR_CURVED].destNode = &trackNodes[91];
         trackNodes[114].edges[DIR_CURVED].dist = 371;
+        trackNodes[114].reserved = false;
         trackNodes[115].name = "MR18";
         trackNodes[115].type = NODE_MERGE;
         trackNodes[115].num = 18;
@@ -2189,6 +2448,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[115].edges[DIR_AHEAD].srcNode = &trackNodes[115];
         trackNodes[115].edges[DIR_AHEAD].destNode = &trackNodes[88];
         trackNodes[115].edges[DIR_AHEAD].dist = 155;
+        trackNodes[115].reserved = false;
         trackNodes[116].name = "BR153";
         trackNodes[116].type = NODE_BRANCH;
         trackNodes[116].num = 153;
@@ -2201,6 +2461,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[116].edges[DIR_CURVED].srcNode = &trackNodes[116];
         trackNodes[116].edges[DIR_CURVED].destNode = &trackNodes[32];
         trackNodes[116].edges[DIR_CURVED].dist = 246;
+        trackNodes[116].reserved = false;
         trackNodes[117].name = "MR153";
         trackNodes[117].type = NODE_MERGE;
         trackNodes[117].num = 153;
@@ -2209,6 +2470,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[117].edges[DIR_AHEAD].srcNode = &trackNodes[117];
         trackNodes[117].edges[DIR_AHEAD].destNode = &trackNodes[119];
         trackNodes[117].edges[DIR_AHEAD].dist = 0;
+        trackNodes[117].reserved = false;
         trackNodes[118].name = "BR154";
         trackNodes[118].type = NODE_BRANCH;
         trackNodes[118].num = 154;
@@ -2221,6 +2483,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[118].edges[DIR_CURVED].srcNode = &trackNodes[118];
         trackNodes[118].edges[DIR_CURVED].destNode = &trackNodes[29];
         trackNodes[118].edges[DIR_CURVED].dist = 239;
+        trackNodes[118].reserved = false;
         trackNodes[119].name = "MR154";
         trackNodes[119].type = NODE_MERGE;
         trackNodes[119].num = 154;
@@ -2229,6 +2492,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[119].edges[DIR_AHEAD].srcNode = &trackNodes[119];
         trackNodes[119].edges[DIR_AHEAD].destNode = &trackNodes[122];
         trackNodes[119].edges[DIR_AHEAD].dist = 0;
+        trackNodes[119].reserved = false;
         trackNodes[120].name = "BR155";
         trackNodes[120].type = NODE_BRANCH;
         trackNodes[120].num = 155;
@@ -2241,6 +2505,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[120].edges[DIR_CURVED].srcNode = &trackNodes[120];
         trackNodes[120].edges[DIR_CURVED].destNode = &trackNodes[49];
         trackNodes[120].edges[DIR_CURVED].dist = 246;
+        trackNodes[120].reserved = false;
         trackNodes[121].name = "MR155";
         trackNodes[121].type = NODE_MERGE;
         trackNodes[121].num = 155;
@@ -2249,6 +2514,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[121].edges[DIR_AHEAD].srcNode = &trackNodes[121];
         trackNodes[121].edges[DIR_AHEAD].destNode = &trackNodes[123];
         trackNodes[121].edges[DIR_AHEAD].dist = 0;
+        trackNodes[121].reserved = false;
         trackNodes[122].name = "BR156";
         trackNodes[122].type = NODE_BRANCH;
         trackNodes[122].num = 156;
@@ -2261,6 +2527,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[122].edges[DIR_CURVED].srcNode = &trackNodes[122];
         trackNodes[122].edges[DIR_CURVED].destNode = &trackNodes[65];
         trackNodes[122].edges[DIR_CURVED].dist = 239;
+        trackNodes[122].reserved = false;
         trackNodes[123].name = "MR156";
         trackNodes[123].type = NODE_MERGE;
         trackNodes[123].num = 156;
@@ -2269,6 +2536,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[123].edges[DIR_AHEAD].srcNode = &trackNodes[123];
         trackNodes[123].edges[DIR_AHEAD].destNode = &trackNodes[118];
         trackNodes[123].edges[DIR_AHEAD].dist = 0;
+        trackNodes[123].reserved = false;
         trackNodes[124].name = "EN1";
         trackNodes[124].type = NODE_ENTER;
         trackNodes[124].reverseNode = &trackNodes[125];
@@ -2276,9 +2544,11 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[124].edges[DIR_AHEAD].srcNode = &trackNodes[124];
         trackNodes[124].edges[DIR_AHEAD].destNode = &trackNodes[117];
         trackNodes[124].edges[DIR_AHEAD].dist = 253;
+        trackNodes[124].reserved = false;
         trackNodes[125].name = "EX1";
         trackNodes[125].type = NODE_EXIT;
         trackNodes[125].reverseNode = &trackNodes[124];
+        trackNodes[125].reserved = false;
         trackNodes[126].name = "EN2";
         trackNodes[126].type = NODE_ENTER;
         trackNodes[126].reverseNode = &trackNodes[127];
@@ -2286,9 +2556,11 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[126].edges[DIR_AHEAD].srcNode = &trackNodes[126];
         trackNodes[126].edges[DIR_AHEAD].destNode = &trackNodes[121];
         trackNodes[126].edges[DIR_AHEAD].dist = 282;
+        trackNodes[126].reserved = false;
         trackNodes[127].name = "EX2";
         trackNodes[127].type = NODE_EXIT;
         trackNodes[127].reverseNode = &trackNodes[126];
+        trackNodes[127].reserved = false;
         trackNodes[128].name = "EN3";
         trackNodes[128].type = NODE_ENTER;
         trackNodes[128].reverseNode = &trackNodes[129];
@@ -2296,9 +2568,11 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[128].edges[DIR_AHEAD].srcNode = &trackNodes[128];
         trackNodes[128].edges[DIR_AHEAD].destNode = &trackNodes[35];
         trackNodes[128].edges[DIR_AHEAD].dist = 514;
+        trackNodes[128].reserved = false;
         trackNodes[129].name = "EX3";
         trackNodes[129].type = NODE_EXIT;
         trackNodes[129].reverseNode = &trackNodes[128];
+        trackNodes[129].reserved = false;
         trackNodes[130].name = "EN4";
         trackNodes[130].type = NODE_ENTER;
         trackNodes[130].reverseNode = &trackNodes[131];
@@ -2306,9 +2580,11 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[130].edges[DIR_AHEAD].srcNode = &trackNodes[130];
         trackNodes[130].edges[DIR_AHEAD].destNode = &trackNodes[12];
         trackNodes[130].edges[DIR_AHEAD].dist = 325;
+        trackNodes[130].reserved = false;
         trackNodes[131].name = "EX4";
         trackNodes[131].type = NODE_EXIT;
         trackNodes[131].reverseNode = &trackNodes[130];
+        trackNodes[131].reserved = false;
         trackNodes[132].name = "EN5";
         trackNodes[132].type = NODE_ENTER;
         trackNodes[132].reverseNode = &trackNodes[133];
@@ -2316,9 +2592,11 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[132].edges[DIR_AHEAD].srcNode = &trackNodes[132];
         trackNodes[132].edges[DIR_AHEAD].destNode = &trackNodes[0];
         trackNodes[132].edges[DIR_AHEAD].dist = 504;
+        trackNodes[132].reserved = false;
         trackNodes[133].name = "EX5";
         trackNodes[133].type = NODE_EXIT;
         trackNodes[133].reverseNode = &trackNodes[132];
+        trackNodes[133].reserved = false;
         trackNodes[134].name = "EN7";
         trackNodes[134].type = NODE_ENTER;
         trackNodes[134].reverseNode = &trackNodes[135];
@@ -2326,9 +2604,11 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[134].edges[DIR_AHEAD].srcNode = &trackNodes[134];
         trackNodes[134].edges[DIR_AHEAD].destNode = &trackNodes[22];
         trackNodes[134].edges[DIR_AHEAD].dist = 43;
+        trackNodes[134].reserved = false;
         trackNodes[135].name = "EX7";
         trackNodes[135].type = NODE_EXIT;
         trackNodes[135].reverseNode = &trackNodes[134];
+        trackNodes[135].reserved = false;
         trackNodes[136].name = "EN9";
         trackNodes[136].type = NODE_ENTER;
         trackNodes[136].reverseNode = &trackNodes[137];
@@ -2336,9 +2616,11 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[136].edges[DIR_AHEAD].srcNode = &trackNodes[136];
         trackNodes[136].edges[DIR_AHEAD].destNode = &trackNodes[24];
         trackNodes[136].edges[DIR_AHEAD].dist = 50;
+        trackNodes[136].reserved = false;
         trackNodes[137].name = "EX9";
         trackNodes[137].type = NODE_EXIT;
         trackNodes[137].reverseNode = &trackNodes[136];
+        trackNodes[137].reserved = false;
         trackNodes[138].name = "EN10";
         trackNodes[138].type = NODE_ENTER;
         trackNodes[138].reverseNode = &trackNodes[139];
@@ -2346,9 +2628,11 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[138].edges[DIR_AHEAD].srcNode = &trackNodes[138];
         trackNodes[138].edges[DIR_AHEAD].destNode = &trackNodes[26];
         trackNodes[138].edges[DIR_AHEAD].dist = 50;
+        trackNodes[138].reserved = false;
         trackNodes[139].name = "EX10";
         trackNodes[139].type = NODE_EXIT;
         trackNodes[139].reverseNode = &trackNodes[138];
+        trackNodes[139].reserved = false;
 
         break;
     default:
