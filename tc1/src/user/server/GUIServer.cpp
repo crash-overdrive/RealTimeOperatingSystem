@@ -10,6 +10,7 @@
 #include "user/message/TextMessage.hpp"
 #include "user/message/TimeMessage.hpp"
 #include "user/message/ThinMessage.hpp"
+#include "user/message/TrainMessage.hpp"
 #include "user/model/Train.hpp"
 #include "user/server/GUIServer.hpp"
 #include "user/syscall/UserSyscall.hpp"
@@ -139,6 +140,8 @@ void GUI::drawSwitch(char *msg) {
 
 void GUI::drawTrain(char *msg) {
     // TODO: implement me
+    TrainMessage *tm = (TrainMessage *)msg;
+    bwprintf(COM2, "{%c%d %c%d %d %d %d %d}", tm->next.bank, tm->next.number, tm->prev.bank, tm->prev.number, tm->predTime, tm->predDist, tm->realTime, tm->realDist);
 }
 
 void GUI::init() {
@@ -222,7 +225,10 @@ void guiServer() {
                 Reply(tid, (char*)&rdymsg, rdymsg.size());
                 tsBlocked = false;
                 break;
-            case Constants::MSG::TRAIN: // TODO(sgaweda): This case will remain unimplemented for now
+            case Constants::MSG::TRAIN:
+                if (tsBlocked != true) {
+                    bwprintf(COM2, "GUI Server - Courier unexpectedly blocked!");
+                }
                 gui.drawTrain(msg);
                 Reply(tid, (char*)&rdymsg, rdymsg.size());
                 tsBlocked = false;

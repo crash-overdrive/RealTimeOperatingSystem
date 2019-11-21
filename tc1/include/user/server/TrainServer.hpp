@@ -22,6 +22,8 @@ public:
     bool marklinCourierReady;
     int navCourier;
     bool navCourierReady;
+    int guiCourier;
+    bool guiCourierReady;
 
     void init();
     TRINDEX getTrainIndex(char number);
@@ -34,6 +36,7 @@ public:
     void attributeSensors();
     void sendSensorAttr();
     void updatePredictions();
+    void sendGUI();
 };
 
 #endif

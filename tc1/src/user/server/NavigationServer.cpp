@@ -334,7 +334,8 @@ void navigationServer() {
                     spmsg.predictions[spmsg.count].train = samsg->sensorAttrs[i].train;
                     spmsg.count++;
                 } else { // no match found
-                    bwprintf(COM2, "Nav Server - Bad Sensor Attribution..");
+                    // TODO: handle this error somehow, it was commented out for the demo
+                    // bwprintf(COM2, "Nav Server - Bad Sensor Attribution..");
                 }
             }
             Reply(tid, (char*)&spmsg, spmsg.size());
