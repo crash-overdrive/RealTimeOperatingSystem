@@ -1,12 +1,17 @@
 #include <string.h>
 
 #include "Constants.hpp"
+#include "data-structures/RingBuffer.hpp"
 #include "data-structures/Stack.hpp"
 #include "io/bwio.hpp"
 #include "io/StringFormat.hpp"
-#include "user/client/NavigationServer.hpp"
-#include "user/trains/Track.hpp"
+#include "user/message/MessageHeader.hpp"
+#include "user/message/SensorAttrMessage.hpp"
+#include "user/message/SensorPredMessage.hpp"
+#include "user/message/ThinMessage.hpp"
+#include "user/server/NavigationServer.hpp"
 #include "user/syscall/UserSyscall.hpp"
+#include "user/trains/Track.hpp"
 
 #define FOREVER for(;;)
 
@@ -193,90 +198,138 @@ void djikstra(Track* track, int srcIndex, int destIndex, int lastHop[]) {
 
 void navigationServer() {
     RegisterAs("NAV");
+
     Track track = Track('A');
-    DataStructures::Stack<int, TRACK_MAX> path;
+
+    char msg[128];
+    MessageHeader *mh = (MessageHeader*)&msg;
+    ThinMessage rdymsg(Constants::MSG::RDY);
+    ThinMessage errmsg(Constants::MSG::ERR);
+    SensorAttrMessage* samsg = (SensorAttrMessage*)&msg;
+    SensorPredMessage spmsg;
+
+    DataStructures::Stack<int, TRACK_MAX> paths[5];
+    DataStructures::Stack<Sensor, 20> sensorLists[5];
     int lastHop[track.noOfNodes];
+
     char src[10] = {0};
     char dest[10] = {0};
+
     int tid;
 
     FOREVER {
-        Receive(&tid, src, 10);
-        Reply(tid, &Constants::Server::ACK, 1);
-        Receive(&tid, dest, 10);
-        Reply(tid, &Constants::Server::ACK, 1);
+        Receive(&tid, (char*)&msg, 128);
 
-        int srcIndex = -1;
-        int destIndex = -1;
-        path.reset();
+        if (mh->type == Constants::MSG::RDY) {
+            // TODO: Implement me
 
-        for(int i = 0; i < track.noOfNodes; ++i) {
-            if (!strcmp(track.trackNodes[i].name, src)) {
-                srcIndex = i;
-            } else if(!strcmp(track.trackNodes[i].name, dest)) {
-                destIndex = i;
-            }
-        }
+        } else if (mh->type == 100) {
+            // TODO: Get src, dest and train from the message
+            int srcIndex = -1;
+            int destIndex = -1;
+            int train;
 
-        if (srcIndex == -1 || destIndex == -1) {
-            bwprintf(COM2, "Navigation Server - Bad src %s  or dest %s \n\r", src, dest);
-        }
-
-        djikstra(&track, srcIndex, destIndex, lastHop);
-
-        int index = destIndex;
-        path.push(index);
-        while (index != srcIndex) {
-            index = lastHop[index];
-            if (index == -1) {
-                bwprintf(COM2, "Navigation Server - No Path Exists from %s to %s\n\r", src, dest);
-                path.reset();
-                break;
-            }
-            path.push(index);
-        }
-
-        while(!path.empty()) {
-            int i = path.pop();
-            track.trackNodes[i].reserved = true;
-            track.trackNodes[i].reverseNode->reserved = true;
-
-            switch(track.trackNodes[i].type) {
-                case NODE_TYPE::NODE_BRANCH:
-                {
-                    const char* nextNodeName = track.trackNodes[path.peek()].name;
-                    const char* straightDirectionName = track.trackNodes[i].edges[DIR_STRAIGHT].destNode->name;
-                    const char* curvedDirectionName = track.trackNodes[i].edges[DIR_CURVED].destNode->name;
-
-                    if (!strcmp(nextNodeName, straightDirectionName)) {
-                        bwprintf(COM2, "Straight SW %s -> ", track.trackNodes[i].name);
-                    } else if(!strcmp(nextNodeName, curvedDirectionName)) {
-                        bwprintf(COM2, "Curved SW %s -> ", track.trackNodes[i].name);
-                    } else {
-                        bwprintf(COM2, "Navigation Client - Error Pathfinding!!\n\r");
-                    }
-                    break;
-                }
-                case NODE_TYPE::NODE_SENSOR:
-                case NODE_TYPE::NODE_MERGE:
-                {
-                    const char* nextNodeName = track.trackNodes[path.peek()].name;
-                    const char* aheadDirectionName = track.trackNodes[i].edges[DIR_AHEAD].destNode->name;
-                    const char* reverseDirectionName = track.trackNodes[i].reverseNode->name;
-                    if (!strcmp(nextNodeName, aheadDirectionName)) {
-                        bwprintf(COM2, "Straight %s -> ", track.trackNodes[i].name);
-                    } else if(!strcmp(nextNodeName, reverseDirectionName)) {
-                        bwprintf(COM2, "Reverse %s -> ", track.trackNodes[i].name);
-                    } else {
-                        bwprintf(COM2, track.trackNodes[i].name);
-                    }
-                    break;
-                }
-                default: {
-                    bwprintf(COM2, "%s ->", track.trackNodes[i].name);
-                    break;
+            for(int i = 0; i < track.noOfNodes; ++i) {
+                if (!strcmp(track.trackNodes[i].name, src)) {
+                    srcIndex = i;
+                } else if(!strcmp(track.trackNodes[i].name, dest)) {
+                    destIndex = i;
                 }
             }
+
+            if (srcIndex == -1 || destIndex == -1) {
+                bwprintf(COM2, "Navigation Server - Bad src %s  or dest %s \n\r", src, dest);
+            }
+
+            djikstra(&track, srcIndex, destIndex, lastHop);
+
+            int index = destIndex;
+            do {
+                if (index == -1) {
+                    bwprintf(COM2, "Navigation Server - No Path Exists from %s to %s\n\r", src, dest);
+                    paths[train].reset();
+                    continue;
+                }
+                paths[train].push(index);
+                if (track.trackNodes[index].type == NODE_SENSOR) {
+                    int num = track.trackNodes[index].num;
+                    int b = num / 16 + 'A';
+                    int n = num % 16 + 1;
+                    sensorLists[train].push(Sensor(b,n));
+                }
+                index = lastHop[index];
+            } while (index != srcIndex);
+            paths[train].push(index);
+            if (track.trackNodes[index].type == NODE_SENSOR) {
+                int num = track.trackNodes[index].num;
+                int b = num / 16 + 'A';
+                int n = num % 16 + 1;
+                sensorLists[train].push(Sensor(b,n));
+            }
+
+            // while(!paths[train].empty()) {
+            //     int i = paths[train].pop();
+            //     track.trackNodes[i].reserved = true;
+            //     track.trackNodes[i].reverseNode->reserved = true;
+
+            //     switch(track.trackNodes[i].type) {
+            //         case NODE_TYPE::NODE_BRANCH:
+            //         {
+            //             const char* nextNodeName = track.trackNodes[paths[train].peek()].name;
+            //             const char* straightDirectionName = track.trackNodes[i].edges[DIR_STRAIGHT].destNode->name;
+            //             const char* curvedDirectionName = track.trackNodes[i].edges[DIR_CURVED].destNode->name;
+
+            //             if (!strcmp(nextNodeName, straightDirectionName)) {
+            //                 bwprintf(COM2, "Straight SW %s -> ", track.trackNodes[i].name);
+            //             } else if(!strcmp(nextNodeName, curvedDirectionName)) {
+            //                 bwprintf(COM2, "Curved SW %s -> ", track.trackNodes[i].name);
+            //             } else {
+            //                 bwprintf(COM2, "Navigation Client - Error Pathfinding!!\n\r");
+            //             }
+            //             break;
+            //         }
+            //         case NODE_TYPE::NODE_SENSOR:
+            //         case NODE_TYPE::NODE_MERGE:
+            //         {
+            //             const char* nextNodeName = track.trackNodes[paths[train].peek()].name;
+            //             const char* aheadDirectionName = track.trackNodes[i].edges[DIR_AHEAD].destNode->name;
+            //             const char* reverseDirectionName = track.trackNodes[i].reverseNode->name;
+            //             if (!strcmp(nextNodeName, aheadDirectionName)) {
+            //                 bwprintf(COM2, "Straight %s -> ", track.trackNodes[i].name);
+            //             } else if(!strcmp(nextNodeName, reverseDirectionName)) {
+            //                 bwprintf(COM2, "Reverse %s -> ", track.trackNodes[i].name);
+            //             } else {
+            //                 bwprintf(COM2, track.trackNodes[i].name);
+            //             }
+            //             break;
+            //         }
+            //         default: {
+            //             bwprintf(COM2, "%s ->", track.trackNodes[i].name);
+            //             break;
+            //         }
+            //     }
+            // }
+        } else if (mh->type == Constants::MSG::SENSOR_ATTR) {
+            for (int i = 0; i < samsg->count; ++i) {
+                if (sensorLists[samsg->sensorAttrs[i].train].peek() == samsg->sensorAttrs[i].sensor) {
+                    sensorLists[samsg->sensorAttrs[i].train].pop();
+                    spmsg.predictions[spmsg.count].nextSensor[0] = sensorLists[samsg->sensorAttrs[i].train].peek();
+                    spmsg.predictions[spmsg.count].nextSensor[1] = sensorLists[samsg->sensorAttrs[i].train].peekSecond();
+                    spmsg.predictions[spmsg.count].train = samsg->sensorAttrs[i].train;
+                    spmsg.count++;
+                } else if ( sensorLists[samsg->sensorAttrs[i].train].peekSecond() == samsg->sensorAttrs->sensor) {
+                    sensorLists[samsg->sensorAttrs[i].train].pop();
+                    sensorLists[samsg->sensorAttrs[i].train].pop();
+                    spmsg.predictions[spmsg.count].nextSensor[0] = sensorLists[samsg->sensorAttrs[i].train].peek();
+                    spmsg.predictions[spmsg.count].nextSensor[1] = sensorLists[samsg->sensorAttrs[i].train].peekSecond();
+                    spmsg.predictions[spmsg.count].train = samsg->sensorAttrs[i].train;
+                    spmsg.count++;
+                } else { // no match found
+                    bwprintf(COM2, "Nav Server - Bad Sensor Attribution..");
+                }
+            }
+            Reply(tid, (char*)&spmsg, spmsg.size());
+            spmsg.count = 0;
         }
     }
 }

@@ -23,4 +23,12 @@ public:
     SensorAttr(char b, char n, char t);
 };
 
+class SensorPred {
+public:
+    Sensor nextSensor[2];
+    char train;
+
+    SensorPred();
+};
+
 #endif
