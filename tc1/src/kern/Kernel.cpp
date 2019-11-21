@@ -16,7 +16,7 @@ void Kernel::drawGUI() {
     bwprintf(COM2, Constants::VT100::MOVE_CURSOR_TO_HOME);
     bwprintf(COM2, Constants::VT100::CLEAR_SCREEN);
     bwprintf(COM2, "╔══════════════╦═════════════╦═══════════════════════════════════════════════════════════════╗\r\n"
-                   "║ %sTime%s MM:SS.S ║ %sIdle%s PP.PP%% ║                              S-OS                             ║\r\n"
+                   "║ %sTime%s MM:SS.S ║ %sIdle%s PP.PP%% ║                            🚂 S-OS                            ║\r\n"
                    "╠══════════════╩═════════════╩═══════════════════════════════════════════════════════════════╣\r\n"
                    "║ %sSwitches%s                                                                                   ║\r\n"
                    "║   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18 153 154 155 156   ║\r\n"
