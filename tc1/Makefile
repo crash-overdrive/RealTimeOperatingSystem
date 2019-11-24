@@ -1,19 +1,19 @@
 #
 # Makefile for entire kernel
 #
-XDIR=/u/cs452/public/xdev
-XBINDIR=$(XDIR)/bin
-XLIBDIR1=$(XDIR)/arm-none-eabi/lib
-XLIBDIR2=$(XDIR)/lib/gcc/arm-none-eabi/9.2.0/
-CPP = $(XBINDIR)/arm-none-eabi-g++
-AS = $(XBINDIR)/arm-none-eabi-as
-LD = $(XBINDIR)/arm-none-eabi-ld
+XDIR	= /u/cs452/public/xdev
+XBINDIR	= $(XDIR)/bin
+XLIBDIR1= $(XDIR)/arm-none-eabi/lib
+XLIBDIR2= $(XDIR)/lib/gcc/arm-none-eabi/9.2.0/
+CPP 	= $(XBINDIR)/arm-none-eabi-g++
+AS 		= $(XBINDIR)/arm-none-eabi-as
+LD 		= $(XBINDIR)/arm-none-eabi-ld
 
 # -static: force static linking
 # -e: set entry point
 # -nmagic: no page alignment
 # -T: use linker script
-LDFLAGS = -static -e main -nmagic -T ../src/linker.ld -L $(XLIBDIR1) -L lib -L $(XLIBDIR2) -lstdc++
+LDFLAGS = -static -e main -nmagic -T src/linker.ld -L $(XLIBDIR1) -L lib -L $(XLIBDIR2) -lstdc++
 
 # -g: include debug information for gdb
 # -S: only compile and emit assembly
@@ -23,39 +23,47 @@ LDFLAGS = -static -e main -nmagic -T ../src/linker.ld -L $(XLIBDIR1) -L lib -L $
 # -msoft-float: no FP co-processor
 CPPFLAGS = -fno-exceptions -fno-unwind-tables -fno-rtti -std=c++17 -g -S -fPIC -Wall -mcpu=arm920t -msoft-float -I. -I./include -lstdc++
 
-OPTIMIZATION := $(if $(O),$(addprefix -O, $(O)),-O3)
-CPPFLAGS += $(OPTIMIZATION)
+OPTIMIZATION:= $(if $(O),$(addprefix -O, $(O)),-O3)
+CPPFLAGS		+= $(OPTIMIZATION)
 
-CPPFILES := $(shell find src -name '*.cpp')
+SRCDIRS		:= $(shell find src -type d)
+OBJDIRS		:= $(patsubst src%,obj%,$(SRCDIRS))
 
-SFILES := $(patsubst %.s, %.o, $(shell find src -name '*.s'))
+ECH01 := $(echo $(SRCDIRS))
+ECHO2 := $(echo $(OBJDIRS))
 
-ASMFILES := $(patsubst %.cpp,%.s,$(CPPFILES))
+CPPFILES	:= $(shell find src -type f -name '*.cpp')
+SFILES		:= $(shell find src -type f -name '*.s')
+OBJFILES	:= $(patsubst src%,obj%,$(patsubst %.cpp,%.o,$(CPPFILES)) $(patsubst %.s,%.o,$(SFILES)))
+OBJFILESA	:= $(patsubst src%,obj%,$(patsubst %.cpp,%.o,$(CPPFILES)))
+OBJFILESS	:= $(patsubst src%,obj%,$(patsubst %.s,%.o,$(SFILES)))
+ASMFILES	:= $(patsubst src%,obj%,$(patsubst %.cpp,%.a,$(CPPFILES)))
 
-OBJECTS := $(patsubst %.s, %.o, $(ASMFILES))
+OBJDIR		= obj
+BUILDDIR	= build
+ELF			:= tc1.elf
+ELFPATH		:= $(BUILDDIR)/$(ELF)
 
-ELF := tc1.elf
+.PHONY: all dirs clean
 
-all : clean dirs $(ELF)
-	cp build/$(ELF) /u/cs452/tftp/ARM/$(USER)
-	chmod 777 /u/cs452/tftp/ARM/$(USER)/$(ELF)
+all : dirs $(ELFPATH)
+	cp $(ELFPATH) /u/cs452/tftp/ARM/$(USER)
+	chmod 777 /u/cs452/tftp/ARM/$(USER)/tc1.elf
 
-$(ELF): $(OBJECTS) $(SFILES)
-	cd build && $(LD) $(LDFLAGS) -o $@ *.o -lgcc -lc
+$(ELFPATH): $(OBJFILESS) $(OBJFILESA) $(ASMFILES)
+	$(LD) $(LDFLAGS) -o $@ $(OBJFILES) -lgcc -lc
 
-$(OBJECTS): %.o : %.s
-	$(AS) $(ASFLAGS) -o $(addprefix build/, $(notdir $@)) $(addprefix build/, $(notdir $<)) 
+$(OBJFILESA): $(ASMFILES)
+	$(AS) $(ASFLAGS) -o $@ $(patsubst %.o,%.a,$@)
 
-$(SFILES): %.o : %.s
-	$(AS) $(ASFLAGS) -o   $(addprefix build/, $(notdir $@)) $<
+$(OBJFILESS): $(SFILES)
+	 $(AS) $(ASFLAGS) -o $@ $(patsubst obj%,src%,$(patsubst %.o,%.s,$@))
 
-$(ASMFILES): %.s : %.cpp
-	$(CPP) $(CPPFLAGS) $< -o $(addprefix build/, $(notdir $@))
+$(ASMFILES): $(CPPFILES)
+	$(CPP) $(CPPFLAGS) $(patsubst obj%,src%,$(patsubst %.a,%.cpp,$@)) -o $@
 
 dirs:
-	mkdir build
+	mkdir -p $(BUILDDIR) $(OBJDIRS)
 
 clean:
-	rm -rf build
-
-	
+	rm -r $(BUILDDIR)/$(ELF) $(OBJDIR)
