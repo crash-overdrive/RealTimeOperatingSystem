@@ -47,8 +47,8 @@ ELFPATH		:= $(BUILDDIR)/$(ELF)
 .PHONY: all dirs clean
 
 all : dirs $(ELFPATH)
-	cp $(ELFPATH) /u/cs452/tftp/ARM/$(USER)
-	chmod 777 /u/cs452/tftp/ARM/$(USER)/tc1.elf
+	@ cp $(ELFPATH) /u/cs452/tftp/ARM/$(USER)
+	@ chmod 777 /u/cs452/tftp/ARM/$(USER)/tc1.elf
 
 $(ELFPATH): $(OBJFILESS) $(OBJFILESA) $(ASMFILES)
 	$(LD) $(LDFLAGS) -o $@ $(OBJFILES) -lgcc -lc
@@ -63,7 +63,7 @@ $(ASMFILES): $(CPPFILES)
 	$(CPP) $(CPPFLAGS) $(patsubst obj%,src%,$(patsubst %.a,%.cpp,$@)) -o $@
 
 dirs:
-	mkdir -p $(BUILDDIR) $(OBJDIRS)
+	@ mkdir -p $(BUILDDIR) $(OBJDIRS)
 
 clean:
-	rm -r $(BUILDDIR)/$(ELF) $(OBJDIR)
+	@ rm -r $(BUILDDIR)/$(ELF) $(OBJDIR)
