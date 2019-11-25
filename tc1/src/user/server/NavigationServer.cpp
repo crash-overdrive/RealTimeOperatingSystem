@@ -7,6 +7,7 @@
 #include "io/bwio.hpp"
 #include "io/StringFormat.hpp"
 #include "user/courier/NavCommandCourier.hpp"
+#include "user/courier/NavTrainCourier.hpp"
 #include "user/message/MessageHeader.hpp"
 #include "user/message/DTMessage.hpp"
 #include "user/message/RTMessage.hpp"
@@ -14,9 +15,10 @@
 #include "user/message/SensorAttrMessage.hpp"
 #include "user/message/SensorPredMessage.hpp"
 #include "user/message/SWMessage.hpp"
+#include "user/message/ThinMessage.hpp"
 #include "user/message/TPMessage.hpp"
 #include "user/message/TRMessage.hpp"
-#include "user/message/ThinMessage.hpp"
+#include "user/model/Train.hpp"
 #include "user/server/NavigationServer.hpp"
 #include "user/syscall/UserSyscall.hpp"
 #include "user/trains/Track.hpp"
@@ -204,13 +206,6 @@ void djikstra(const Track* track, int srcIndex, int destIndex, int lastHop[]) {
     } while(!djikstraFinished(track, visitedNodes));
 }
 
-
-void NavigationServer::init() {
-    // TODO: (spratap) add support for both tracks
-    // track = Track('A');
-    commandCourier = Create(7, navCommandCourier);
-}
-
 void NavigationServer::findPath() {
     int srcIndex = -1;
     int destIndex = -1;
@@ -223,12 +218,13 @@ void NavigationServer::findPath() {
             destIndex = i;
         }
         if (track.trackNodes[i].reserved) {
-            bwprintf(COM2, "%d res ", i);
+            bwprintf(COM2, "%d res ", i); // What does this mean?
         }
     }
 
     if (srcIndex == -1 || destIndex == -1) {
-        bwprintf(COM2, "Navigation Server continue- Bad src <%s> [%d]  or dest <%s> [%d]\n\r", rtmsg->src, srcIndex, rtmsg->dest, destIndex);
+        // Note: enclosing in brackets ()[]{}<> is a debugging tactic, not intended for actual server messages/kernel panics!
+        bwprintf(COM2, "Navigation Server continue- Bad src <%s> [%d]  or dest <%s> [%d]\n\r", rtmsg->src, srcIndex, rtmsg->dest, destIndex); // continue??? what does that even mean?
         return;
     }
 
@@ -236,57 +232,67 @@ void NavigationServer::findPath() {
 
     // TODO: (spratap) Analyze if we need to turn off tracks here?
     int index = destIndex;
+    int trainIndex = Train::getTrainIndex(rtmsg->train);
     do {
         if (index == -1) {
-            bwprintf(COM2, "Navigation Server - No Path Exists from <%s> to <%s>\n\r", rtmsg->src, rtmsg->dest);
-            paths[rtmsg->train].reset();
-            sensorLists[rtmsg->train].reset();
+            bwprintf(COM2, "Navigation Server - No Path Exists from <%s> to <%s>\n\r", rtmsg->src, rtmsg->dest); // TODO(sgaweda): This actually shouldn't never happen and if it can we have to find a way around it!
+            paths[trainIndex].reset();
+            sensorLists[trainIndex].reset();
             return;
         }
-        paths[rtmsg->train].push(index);
+        paths[trainIndex].push(index);
         if (track.trackNodes[index].type == NODE_SENSOR) {
             int num = track.trackNodes[index].num;
-            int b = num / 16 + 'A';
-            int n = num % 16 + 1;
-            sensorLists[rtmsg->train].push(Sensor(b,n));
+            char b = (char)(num / 16 + 'A');
+            char n = (char)(num % 16 + 1);
+            sensorLists[trainIndex].push(Sensor(b,n));
         }
         index = lastHop[index];
     } while (index != srcIndex);
-    paths[rtmsg->train].push(index);
+    paths[trainIndex].push(index);
     if (track.trackNodes[index].type == NODE_SENSOR) {
         int num = track.trackNodes[index].num;
         int b = num / 16 + 'A';
         int n = num % 16 + 1;
-        sensorLists[rtmsg->train].push(Sensor(b,n));
+        sensorLists[trainIndex].push(Sensor(b,n));
     } else {
-        bwprintf(COM2, "Navigation Server - Destination is not a Sensor <%s>\n\r", rtmsg->dest);
+        bwprintf(COM2, "Navigation Server - Destination is not a Sensor <%s>\n\r", rtmsg->dest); // TODO(sgaweda): Why is this an issue? If destinations must be sensors then we need to restrict the input too so we can save computation!
     }
 }
 
-void NavigationServer::attributeSensors() {
-    //TODO:(spratap) pop stuff off from path too
-    for (int i = 0; i < samsg->count; ++i) {
-        if (sensorLists[samsg->sensorAttrs[i].train].peek() == samsg->sensorAttrs[i].sensor) {
-            // Assert(paths[samsg->sensorAttrs[i].train].peek() == samsg->sensorAttrs[i].sensor);
-            paths[samsg->sensorAttrs[i].train].pop();
-            sensorLists[samsg->sensorAttrs[i].train].pop();
-            spmsg.predictions[spmsg.count].nextSensor[0] = sensorLists[samsg->sensorAttrs[i].train].peek();
-            spmsg.predictions[spmsg.count].nextSensor[1] = sensorLists[samsg->sensorAttrs[i].train].peekSecond();
-            spmsg.predictions[spmsg.count].train = samsg->sensorAttrs[i].train;
-            spmsg.count++;
-        } else if (sensorLists[samsg->sensorAttrs[i].train].peekSecond() == samsg->sensorAttrs->sensor) {
-            bwprintf(COM2, "Fucked");
-            sensorLists[samsg->sensorAttrs[i].train].pop();
-            sensorLists[samsg->sensorAttrs[i].train].pop();
-            paths[samsg->sensorAttrs[i].train].pop();
-            paths[samsg->sensorAttrs[i].train].pop();
-            spmsg.predictions[spmsg.count].nextSensor[0] = sensorLists[samsg->sensorAttrs[i].train].peek();
-            spmsg.predictions[spmsg.count].nextSensor[1] = sensorLists[samsg->sensorAttrs[i].train].peekSecond();
-            spmsg.predictions[spmsg.count].train = samsg->sensorAttrs[i].train;
-            spmsg.count++;
-        } else { // no match found
-            bwprintf(COM2, "Nav Server - Bad Sensor Attribution..");
+void NavigationServer::predictSensors() {
+    // check what type of message wants us to predict
+    if (mh->type == Constants::SENSOR_ATTR) {
+        //TODO:(spratap) pop stuff off from path too
+        for (int i = 0; i < samsg->count; ++i) {
+            if (sensorLists[samsg->sensorAttrs[i].train].peek() == samsg->sensorAttrs[i].sensor) {
+                // Assert(paths[samsg->sensorAttrs[i].train].peek() == samsg->sensorAttrs[i].sensor);
+                paths[samsg->sensorAttrs[i].train].pop();
+                sensorLists[samsg->sensorAttrs[i].train].pop();
+                spmsg.predictions[spmsg.count].nextSensor[0] = sensorLists[samsg->sensorAttrs[i].train].peek();
+                spmsg.predictions[spmsg.count].nextSensor[1] = sensorLists[samsg->sensorAttrs[i].train].peekSecond();
+                spmsg.predictions[spmsg.count].train = samsg->sensorAttrs[i].train;
+                spmsg.count++;
+            } else if (sensorLists[samsg->sensorAttrs[i].train].peekSecond() == samsg->sensorAttrs->sensor) {
+                bwprintf(COM2, "Fucked"); // ? Why are we fucked here?
+                sensorLists[samsg->sensorAttrs[i].train].pop();
+                sensorLists[samsg->sensorAttrs[i].train].pop();
+                paths[samsg->sensorAttrs[i].train].pop();
+                paths[samsg->sensorAttrs[i].train].pop();
+                spmsg.predictions[spmsg.count].nextSensor[0] = sensorLists[samsg->sensorAttrs[i].train].peek();
+                spmsg.predictions[spmsg.count].nextSensor[1] = sensorLists[samsg->sensorAttrs[i].train].peekSecond();
+                spmsg.predictions[spmsg.count].train = samsg->sensorAttrs[i].train;
+                spmsg.count++;
+            } else { // no match found
+                bwprintf(COM2, "Nav Server - Bad Sensor Attribution.."); // NOTE(sgaweda): This should NEVER happen, if a train attributes a sensor incorrectly, it's because the Navigation Server told it to!
+            }
         }
+    } else if (mh->type == Constants::RT) {
+        int index = Train::getTrainIndex(rtmsg->train);
+        spmsg.predictions[spmsg.count].nextSensor[0] = sensorLists[index].peek();
+        spmsg.predictions[spmsg.count].nextSensor[1] = sensorLists[index].peekSecond();
+        spmsg.predictions[spmsg.count].train = index; // TODO: FIX ME! I should be passing along the TRAIN not the INDEX!!!!
+        spmsg.count++;
     }
 }
 
@@ -352,6 +358,13 @@ void NavigationServer::navigate() {
     }
 }
 
+void NavigationServer::init() {
+    // TODO: (spratap) add support for both tracks
+    // track = Track('A');
+    commandCourier = Create(7, navCommandCourier);
+    trainCourier = Create(5, navTrainCourier);
+}
+
 void navigationServer() {
     RegisterAs("NAV");
     ThinMessage rdymsg(Constants::MSG::RDY);
@@ -366,30 +379,40 @@ void navigationServer() {
         Receive(&tid, (char*)&ns.msg, 128);
 
         if (ns.mh->type == Constants::MSG::RDY) {
-            ns.commandCourierReady = true;
-            ns.navigate();
+            if (tid == ns.commandCourier) {
+                ns.commandCourierReady = true;
+                ns.navigate();
+            } else if (tid == ns.trainCourier) {
+                ns.trainCourierReady = true;
+            }
         } else if (ns.mh->type == Constants::MSG::RT) {
             ns.findPath();
-            Reply(tid, (char*)&rdymsg, rdymsg.size());
-
             // TODO: (spratap) start the train here
             // ns.trmsg.train = ns.rtmsg->train;
             // ns.trmsg.speed = 14;
             // ns.trmsg.headlights = true;
             // Reply(ns.commandCourier, (char*)&ns.trmsg, ns.trmsg.size());
 
+            // TODO (gaweda): train control will be responsible for determining if this train speed change needs to occur. We can assume train is stopped here.
+
+            ns.predictSensors();
+            Assert(ns.trainCourierReady); // This should always be true because it's impossible for lower priority command server to run before the train server gets back to us.
+            Reply(ns.trainCourier, (char*)&ns.spmsg, ns.spmsg.size());
+            ns.trainCourierReady == false;
+            // We always reply to the requesting task last. Yes it blocks for longer but we're not ready to process another parsed command anyway. Plus no one types that fast!
+            Reply(tid, (char*)&rdymsg, rdymsg.size());
         } else if (ns.mh->type == Constants::MSG::DT) {
-            // bwprintf(COM2, "Nav - DT Rec");
+            // TODO: Implement me
             // Once we have information it should be possible to change destination
         } else if (ns.mh->type == Constants::MSG::TP) {
             // Placeholder, super low priority to implement this
         } else if (ns.mh->type == Constants::MSG::SENSOR_ATTR) {
-            ns.attributeSensors();
+            ns.predictSensors();
             Reply(tid, (char*)&ns.spmsg, ns.spmsg.size());
+            ns.spmsg.count = 0;
             if (ns.commandCourierReady) {
                 ns.navigate();
             }
-            ns.spmsg.count = 0;
         }
     }
 }

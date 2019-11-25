@@ -27,6 +27,8 @@ class NavigationServer {
 
         int commandCourier;
         bool commandCourierReady;
+        int trainCourier;
+        bool trainCourierReady;
 
         Track track;
 
@@ -34,7 +36,7 @@ class NavigationServer {
         DataStructures::Stack<Sensor, 20> sensorLists[5];
 
         void init();
-        void attributeSensors();
+        void predictSensors();
         void findPath();
         void navigate();
 };

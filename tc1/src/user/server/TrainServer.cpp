@@ -121,19 +121,6 @@ void TrainServer::init() {
     navCourierReady = false;
     guiCourier = Create(8, trainGUICourier);
     guiCourierReady = false;
-
-    // TODO: initialize expected sensors pragmatically (by giving train starting position and direction)
-    // This is here for testing out sensor attribution
-    trains[T1].nextSensor[0] = Sensor('B', 11);
-    trains[T1].nextSensor[1] = Sensor('B', 9);
-    trains[T24].nextSensor[0] = Sensor('B', 12);
-    trains[T24].nextSensor[1] = Sensor('B', 10);
-    trains[T58].nextSensor[0] = Sensor('A', 11);
-    trains[T58].nextSensor[1] = Sensor('B', 7);
-    trains[T74].nextSensor[0] = Sensor('A', 12);
-    trains[T74].nextSensor[1] = Sensor('B', 8);
-    trains[T78].nextSensor[0] = Sensor('A', 10);
-    trains[T78].nextSensor[1] = Sensor('A', 9);
 }
 
 void trainServer() {
@@ -193,14 +180,25 @@ void trainServer() {
             Reply(tid, (char *)&rdymsg, rdymsg.size());
         } else if (mh->type == Constants::MSG::SENSOR_DIFF) {
             ts.attributeSensors();
-            Reply(ts.navCourier, (char *)&ts.samsg, ts.samsg.size());
-            ts.navCourierReady = false;
+            if (ts.samsg.count > 0) {
+                Reply(ts.navCourier, (char *)&ts.samsg, ts.samsg.size());
+                ts.navCourierReady = false;
+            }
             Reply(tid, (char *)&ts.samsg, ts.samsg.size());
             ts.samsg.count = 0; // Reset the state of the attribution
         } else if (mh->type == Constants::MSG::SENSOR_PRED) {
+            // If it's an empty message there's nothing to update (This occurs when receiving the first spmsg from the courier)
+            if (ts.spmsg->count == 0) {
+                ts.navCourierReady = true;
+                continue;
+            }
             ts.updatePredictions();
-            // This is updated, but since this communication chain is dependent, do not actually need to track this
-            ts.navCourierReady = true;
+            if (tid == ts.navCourier) {
+                // This is updated, but since this communication chain is dependent, do not actually need to track this
+                ts.navCourierReady = true;
+            } else {
+                Reply(tid, (char*)&rdymsg, rdymsg.size());
+            }
         } else {
             bwprintf(COM2, "Train Server - Unrecognized message type received %d", mh->type);
         }
