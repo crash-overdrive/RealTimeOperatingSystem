@@ -53,13 +53,14 @@ all : dirs $(ELFPATH)
 $(ELFPATH): $(OBJFILESS) $(OBJFILESA) $(ASMFILES)
 	$(LD) $(LDFLAGS) -o $@ $(OBJFILES) -lgcc -lc
 
-$(OBJFILESA): $(ASMFILES)
+.SECONDEXPANSION:
+$(OBJFILESA): $$(patsubst %.o,%.a,$$@)
 	$(AS) $(ASFLAGS) -o $@ $(patsubst %.o,%.a,$@)
 
-$(OBJFILESS): $(SFILES)
+$(OBJFILESS): $$(patsubst obj%,src%,$(patsubst %.o,%.s,$$@))
 	 $(AS) $(ASFLAGS) -o $@ $(patsubst obj%,src%,$(patsubst %.o,%.s,$@))
 
-$(ASMFILES): $(CPPFILES)
+$(ASMFILES): $$(patsubst obj%,src%,$$(patsubst %.a,%.cpp,$$@))
 	$(CPP) $(CPPFLAGS) $(patsubst obj%,src%,$(patsubst %.a,%.cpp,$@)) -o $@
 
 dirs:
