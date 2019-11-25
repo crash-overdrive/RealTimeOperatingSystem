@@ -361,7 +361,6 @@ void navigationServer() {
     ns.init();
 
     int tid;
-    Assert(1==0);
 
     FOREVER {
         Receive(&tid, (char*)&ns.msg, 128);

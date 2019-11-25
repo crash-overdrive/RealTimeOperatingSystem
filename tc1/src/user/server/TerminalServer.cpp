@@ -73,23 +73,23 @@ void terminalServer() {
         } else if (mh->type == Constants::MSG::RX) {
             if (rxmsg->ch == Constants::TrainCommandServer::ENTER) {
                 inmsg.msg[inmsg.msglen++] = 0;
-                // outbuf.push('\033');
-                // outbuf.push('[');
-                // outbuf.push('2');
-                // outbuf.push('1');
-                // outbuf.push(';');
-                // outbuf.push('5');
-                // outbuf.push('f');
-                // for (int i = 0; i < 40; i++) {
-                //     outbuf.push(' ');
-                // }
-                // outbuf.push('\033');
-                // outbuf.push('[');
-                // outbuf.push('2');
-                // outbuf.push('1');
-                // outbuf.push(';');
-                // outbuf.push('5');
-                // outbuf.push('f');
+                outbuf.push('\033');
+                outbuf.push('[');
+                outbuf.push('2');
+                outbuf.push('1');
+                outbuf.push(';');
+                outbuf.push('5');
+                outbuf.push('f');
+                for (int i = 0; i < 40; i++) {
+                    outbuf.push(' ');
+                }
+                outbuf.push('\033');
+                outbuf.push('[');
+                outbuf.push('2');
+                outbuf.push('1');
+                outbuf.push(';');
+                outbuf.push('5');
+                outbuf.push('f');
 
                 Reply(PARSE, (char* )&inmsg, inmsg.size());
                 // TODO(sgaweda): Create courier which communicates with train control server
