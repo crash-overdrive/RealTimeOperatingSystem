@@ -34,7 +34,7 @@ void termParseCourier() {
             bwprintf(COM2, "Term->Parse Courier - Invalid command error received\r\n");
             rdymsg.mh.type = Constants::MSG::RDY;
         } else if (rdymsg.mh.type != Constants::MSG::RDY) {
-            bwprintf(COM2, "Term->Parse Courier - Expected RDY message type but received unexpected message type\r\n");
+            bwprintf(COM2, "Term->Parse Courier - Expected RDY message type but received unexpected message type %d\r\n", rdymsg.mh.type);
         }
         rdymsg.mh.type = Constants::MSG::REQUEST;
     }

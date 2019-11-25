@@ -47,6 +47,9 @@ class Track {
         Track(char trackIdentifier) {
             initializeTrack(trackIdentifier);
         }
+        Track() {
+            initializeTrack('A');
+        }
 };
 
 #endif

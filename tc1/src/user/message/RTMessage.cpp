@@ -3,5 +3,5 @@
 RTMessage::RTMessage() : mh(Constants::MSG::RT), train(0) {}
 
 int RTMessage::size() {
-    return mh.size() + sizeof(char) + sizeof(char) * 12;
+    return mh.size() + sizeof(char) + sizeof(char) * 6 + sizeof(char) * 6;
 }

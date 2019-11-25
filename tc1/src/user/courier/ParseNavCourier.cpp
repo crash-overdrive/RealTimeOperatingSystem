@@ -23,7 +23,7 @@ void parseNavCourier() {
 
     FOREVER {
         // Get command message from parse server
-        result = Send(PARSE, (char *)&rdymsg, rdymsg.size(), cmd, 10);
+        result = Send(PARSE, (char *)&rdymsg, rdymsg.size(), cmd, 16);
         if (result < 0) {
             bwprintf(COM2, "Parse->Nav Courier - Send to Parse Server failed\r\n");
         }

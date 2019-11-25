@@ -5,7 +5,7 @@
 
 namespace Constants {
     const int NUM_PRIORITIES = 12;
-    const int Q_LENGTH = 10;
+    const int Q_LENGTH = 12;
     const int NUM_TASKS = 128;
     const int EXIT_Q_LENGTH = NUM_TASKS;
     const int RECEIVE_QUEUE_LENGTH = 32;

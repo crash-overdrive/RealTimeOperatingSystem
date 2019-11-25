@@ -44,11 +44,12 @@ int parseInt(char *str, int index, int* ret) {
 int parseAlphaNum(char *src, char *dest, int index) {
     int count = 0;
     char c = src[index];
-    while ((c >= '0' && c <= '9') || c >= 'A' && c <= 'z') {
-        dest[index + count] = c;
+    while ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
+        dest[count] = c;
         count++;
         c = src[index + count];
     }
+    dest[count] = 0;
     return count;
 }
 
