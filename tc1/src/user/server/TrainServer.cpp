@@ -2,6 +2,7 @@
 #include "data-structures/RingBuffer.hpp"
 #include "io/bwio.hpp"
 #include "io/ts7200.h"
+#include "user/courier/TrainGUICourier.hpp"
 #include "user/courier/TrainMarklinCourier.hpp"
 #include "user/courier/TrainNavCourier.hpp"
 #include "user/message/RVMessage.hpp"
@@ -103,6 +104,10 @@ void TrainServer::updatePredictions() {
     }
 }
 
+void TrainServer::sendGUI() {
+    // TODO: add prediction update logic
+}
+
 void TrainServer::init() {
     trains[T1] = Train(1);
     trains[T24] = Train(24);
@@ -114,12 +119,21 @@ void TrainServer::init() {
     marklinCourierReady = false;
     navCourier = Create(5, trainNavCourier);
     navCourierReady = false;
+    guiCourier = Create(8, trainGUICourier);
+    guiCourierReady = false;
 
     // TODO: initialize expected sensors pragmatically (by giving train starting position and direction)
-    // trains[T1].nextSensor[0] = Sensor('B', 11);
-    // trains[T1].nextSensor[1] = Sensor('B', 7);
-    // trains[T24].nextSensor[0] = Sensor('B', 12);
-    // trains[T24].nextSensor[1] = Sensor('B', 8);
+    // This is here for testing out sensor attribution
+    trains[T1].nextSensor[0] = Sensor('B', 11);
+    trains[T1].nextSensor[1] = Sensor('B', 9);
+    trains[T24].nextSensor[0] = Sensor('B', 12);
+    trains[T24].nextSensor[1] = Sensor('B', 10);
+    trains[T58].nextSensor[0] = Sensor('A', 11);
+    trains[T58].nextSensor[1] = Sensor('B', 7);
+    trains[T74].nextSensor[0] = Sensor('A', 12);
+    trains[T74].nextSensor[1] = Sensor('B', 8);
+    trains[T78].nextSensor[0] = Sensor('A', 10);
+    trains[T78].nextSensor[1] = Sensor('A', 9);
 }
 
 void trainServer() {
@@ -144,12 +158,19 @@ void trainServer() {
 
         if (mh->type == Constants::MSG::RDY) {
             int index = ts.queueIndex();
-            if (index < 0) {
-                ts.marklinCourierReady = true;
+            if (tid == ts.marklinCourier) {
+                if (index < 0) {
+                    ts.marklinCourierReady = true;
+                } else {
+                    *trmsg = ts.popTRMessage(index);
+                    ts.setTrainSpeed(index, trmsg->speed);
+                    Reply(ts.marklinCourier, ts.msg, trmsg->size());
+                }
+            } else if (tid == ts.guiCourier) {
+                ts.guiCourierReady = true;
+                ts.sendGUI();
             } else {
-                *trmsg = ts.popTRMessage(index);
-                ts.setTrainSpeed(index, trmsg->speed);
-                Reply(ts.marklinCourier, ts.msg, trmsg->size());
+                bwprintf(COM2, "Train Server - Unexpected ready message!");
             }
         } else if (mh->type == Constants::MSG::TR) {
             if (ts.marklinCourierReady) {

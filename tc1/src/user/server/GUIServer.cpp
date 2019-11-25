@@ -10,6 +10,7 @@
 #include "user/message/TextMessage.hpp"
 #include "user/message/TimeMessage.hpp"
 #include "user/message/ThinMessage.hpp"
+#include "user/message/TrainMessage.hpp"
 #include "user/model/Train.hpp"
 #include "user/server/GUIServer.hpp"
 #include "user/syscall/UserSyscall.hpp"
@@ -95,10 +96,18 @@ void GUI::drawSensors(char *msg) {
     for (int i = 9; i >= 0; --i) {
         // We check here to see if the bank isn't a valid bank
         if (sm->sensorData[i].sensor.bank > 0) {
-            if (sm->sensorData[i].train == 1) {
+            if (sm->sensorData[i].train == 0) {
+                drawmsg.msglen += insertSetDisplayAttrs(&drawmsg.msg[drawmsg.msglen], FG_GREEN);
+            } else if (sm->sensorData[i].train == 1) {
+                drawmsg.msglen += insertSetDisplayAttrs(&drawmsg.msg[drawmsg.msglen], FG_MAGENTA);
+            } else if (sm->sensorData[i].train == 2) {
+                drawmsg.msglen += insertSetDisplayAttrs(&drawmsg.msg[drawmsg.msglen], FG_YELLOW);
+            } else if (sm->sensorData[i].train == 3) {
                 drawmsg.msglen += insertSetDisplayAttrs(&drawmsg.msg[drawmsg.msglen], FG_RED);
-            } else {
+            } else if (sm->sensorData[i].train == 4) {
                 drawmsg.msglen += insertSetDisplayAttrs(&drawmsg.msg[drawmsg.msglen], FG_BLUE);
+            } else {
+                drawmsg.msglen += insertSetDisplayAttrs(&drawmsg.msg[drawmsg.msglen], FG_CYAN);
             }
             if (sm->sensorData[i].sensor.number / 10 == 0) {
                 drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%c0%d ", sm->sensorData[i].sensor.bank, sm->sensorData[i].sensor.number);
@@ -131,6 +140,8 @@ void GUI::drawSwitch(char *msg) {
 
 void GUI::drawTrain(char *msg) {
     // TODO: implement me
+    TrainMessage *tm = (TrainMessage *)msg;
+    bwprintf(COM2, "{%c%d %c%d %d %d %d %d}", tm->next.bank, tm->next.number, tm->prev.bank, tm->prev.number, tm->predTime, tm->predDist, tm->realTime, tm->realDist);
 }
 
 void GUI::init() {
@@ -214,7 +225,10 @@ void guiServer() {
                 Reply(tid, (char*)&rdymsg, rdymsg.size());
                 tsBlocked = false;
                 break;
-            case Constants::MSG::TRAIN: // TODO(sgaweda): This case will remain unimplemented for now
+            case Constants::MSG::TRAIN:
+                if (tsBlocked != true) {
+                    bwprintf(COM2, "GUI Server - Courier unexpectedly blocked!");
+                }
                 gui.drawTrain(msg);
                 Reply(tid, (char*)&rdymsg, rdymsg.size());
                 tsBlocked = false;

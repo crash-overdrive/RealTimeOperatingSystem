@@ -1,6 +1,6 @@
 #include "Constants.hpp"
 #include "io/bwio.hpp"
-#include "user/courier/TCSGUICourier.hpp"
+#include "user/courier/SwitchGUICourier.hpp"
 #include "user/message/SWMessage.hpp"
 #include "user/message/TextMessage.hpp"
 #include "user/message/ThinMessage.hpp"
