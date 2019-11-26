@@ -16,7 +16,7 @@ void trainGUICourier() {
 
     char msg[128];
     MessageHeader *mh = (MessageHeader *)msg;
-    TrainMessage *swmsg = (TrainMessage *)msg;
+    TrainMessage *trainmsg = (TrainMessage *)msg;
     ThinMessage rdymsg(Constants::MSG::RDY);
 
     FOREVER {
@@ -29,7 +29,7 @@ void trainGUICourier() {
             bwprintf(COM2, "Train->GUI Courier - Expected TRAIN message type but received unexpected message type %d\r\n", mh->type);
         }
 
-        result = Send(GUI, (char*)swmsg, swmsg->size(), (char *)&rdymsg, rdymsg.size());
+        result = Send(GUI, (char*)trainmsg, trainmsg->size(), (char *)&rdymsg, rdymsg.size());
         if (result < 0) {
             bwprintf(COM2, "Train->GUI Courier - Send to GUI Server failed\r\n");
         }

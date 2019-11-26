@@ -10,6 +10,7 @@ public:
 
     Sensor next, prev;
     int predTime, predDist, realTime, realDist;
+    char train;
 
     TrainMessage();
 

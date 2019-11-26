@@ -5,5 +5,5 @@
 TrainMessage::TrainMessage() : mh(Constants::MSG::TRAIN), predTime{0}, predDist{0}, realTime{0}, realDist{0} {}
 
 int TrainMessage::size() {
-    return sizeof(MessageHeader) + 4 - sizeof(MessageHeader) % 4 + sizeof(Sensor) * 2 + sizeof(int) * 4;
+    return sizeof(MessageHeader) + 4 - sizeof(MessageHeader) % 4 + sizeof(Sensor) * 2 + sizeof(int) * 4 + sizeof(char);
 }

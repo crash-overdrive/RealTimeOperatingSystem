@@ -27,13 +27,13 @@ void Kernel::drawGUI() {
                    "╠════════════════════════════════════════════════════════════════════════════════════════════╣\r\n"
                    "║ %sSensor Predictions%s                                                                         ║\r\n"
                    "║                                                                                            ║\r\n"
-                   "║   Next                                                                                     ║\r\n"
-                   "║   Time Pred                                                                                ║\r\n"
-                   "║   Dist Pred                                                                                ║\r\n"
+                   "║       N Sensor  Est Time  Est Dist  P Sensor  Real Time Real Dist                          ║\r\n"
+                   "║   %sT1%s                                                                                       ║\r\n"
+                   "║   %sT24%s                                                                                      ║\r\n"
+                   "║   %sT58%s                                                                                      ║\r\n"
+                   "║   %sT74%s                                                                                      ║\r\n"
+                   "║   %sT78%s                                                                                      ║\r\n"
                    "║                                                                                            ║\r\n"
-                   "║   Last                                                                                     ║\r\n"
-                   "║   Time Real                                                                                ║\r\n"
-                   "║   Dist Real                                                                                ║\r\n"
                    "╠════════════════════════════════════════════════════════════════════════════════════════════║\r\n"
                    "║ >                                                                                          ║\r\n"
                    "║                                                                                            ║\r\n"
@@ -49,6 +49,11 @@ void Kernel::drawGUI() {
                    Constants::VT100::SET_UNDERSCORE, Constants::VT100::UNSET_UNDERSCORE,
                    Constants::VT100::SET_UNDERSCORE, Constants::VT100::UNSET_UNDERSCORE,
                    Constants::VT100::SET_UNDERSCORE, Constants::VT100::UNSET_UNDERSCORE,
+                   "\033[32m", "\033[39m",
+                   "\033[35m", "\033[39m",
+                   "\033[33m", "\033[39m",
+                   "\033[31m", "\033[39m",
+                   "\033[34m", "\033[39m",
                    Constants::VT100::SET_UNDERSCORE, Constants::VT100::UNSET_UNDERSCORE);
     // These are for checking print positions, leave here for regression testing
     // bwprintf(COM2, Constants::VT100::MOVE_CURSOR_POS_TO_TIME);

@@ -61,6 +61,7 @@ void GUI::drawTime(char *msg) {
     }
     drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%d.%d%s", tm->s, tm->ms, Constants::VT100::RESTORE_CURSOR_AND_ATTRS);
     drawmsg.msg[drawmsg.msglen] = 0;
+
     Reply(termCourier, (char*)&drawmsg, drawmsg.size());
 }
 
@@ -83,6 +84,7 @@ void GUI::drawIdle(char *msg) {
         drawmsg.msg[drawmsg.msglen++] = '0';
     }
     drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%d%s", im->fractional, Constants::VT100::RESTORE_CURSOR_AND_ATTRS);
+
     Reply(termCourier, (char*)&drawmsg, drawmsg.size());
 }
 
@@ -96,15 +98,16 @@ void GUI::drawSensors(char *msg) {
     for (int i = 9; i >= 0; --i) {
         // We check here to see if the bank isn't a valid bank
         if (sm->sensorData[i].sensor.bank > 0) {
-            if (sm->sensorData[i].train == 0) {
+            int index = Train::getTrainIndex(sm->sensorData[i].train);
+            if (index == TRINDEX::T1) {
                 drawmsg.msglen += insertSetDisplayAttrs(&drawmsg.msg[drawmsg.msglen], FG_GREEN);
-            } else if (sm->sensorData[i].train == 1) {
+            } else if (index == TRINDEX::T24) {
                 drawmsg.msglen += insertSetDisplayAttrs(&drawmsg.msg[drawmsg.msglen], FG_MAGENTA);
-            } else if (sm->sensorData[i].train == 2) {
+            } else if (index == TRINDEX::T58) {
                 drawmsg.msglen += insertSetDisplayAttrs(&drawmsg.msg[drawmsg.msglen], FG_YELLOW);
-            } else if (sm->sensorData[i].train == 3) {
+            } else if (index == TRINDEX::T74) {
                 drawmsg.msglen += insertSetDisplayAttrs(&drawmsg.msg[drawmsg.msglen], FG_RED);
-            } else if (sm->sensorData[i].train == 4) {
+            } else if (index == TRINDEX::T78) {
                 drawmsg.msglen += insertSetDisplayAttrs(&drawmsg.msg[drawmsg.msglen], FG_BLUE);
             } else {
                 drawmsg.msglen += insertSetDisplayAttrs(&drawmsg.msg[drawmsg.msglen], FG_CYAN);
@@ -117,54 +120,112 @@ void GUI::drawSensors(char *msg) {
         }
     }
     drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%s", Constants::VT100::RESTORE_CURSOR_AND_ATTRS);
+
     Reply(termCourier, (char*)&drawmsg, drawmsg.size());
 }
 
 void GUI::drawSwitch(char *msg) {
     char posstr[8] = {0};
     SWMessage *sw = (SWMessage *)msg;
-    int xpos = 6;
-    int ypos = 1;
+    int xpos = 1;
+    int ypos = 6;
     if (sw->sw >= 153) {
-        ypos += (sw->sw - 152 + 18) * 4;
+        xpos += (sw->sw - 152 + 18) * 4;
     } else {
-        ypos += sw->sw * 4;
+        xpos += sw->sw * 4;
     }
-    format(posstr, Constants::VT100::MOVE_CURSOR_POS, xpos, ypos);
+    format(posstr, Constants::VT100::MOVE_CURSOR_POS, ypos, xpos);
 
     drawmsg.msglen = 0;
     drawmsg.msglen += format(drawmsg.msg, "%s%s%c%s", Constants::VT100::SAVE_CURSOR_AND_ATTRS, posstr, sw->state, Constants::VT100::RESTORE_CURSOR_AND_ATTRS);
     drawmsg.msg[drawmsg.msglen] = 0;
+
     Reply(termCourier, (char*)&drawmsg, drawmsg.size());
 }
 
 void GUI::drawTrain(char *msg) {
-    // TODO: implement me
+    char posstr[8] = {0};
     TrainMessage *tm = (TrainMessage *)msg;
-    bwprintf(COM2, "{%c%d %c%d %d %d %d %d}", tm->next.bank, tm->next.number, tm->prev.bank, tm->prev.number, tm->predTime, tm->predDist, tm->realTime, tm->realDist);
+    int xpos = 9;
+    int ypos = 14;
+
+    int index = Train::getTrainIndex(tm->train);
+    int diff;
+
+    ypos += index;
+    // Move the cursor to the right position for the train
+    format(posstr, Constants::VT100::MOVE_CURSOR_POS, ypos, xpos);
+    drawmsg.msglen = 0;
+    drawmsg.msglen += format(drawmsg.msg, "%s%s", Constants::VT100::SAVE_CURSOR_AND_ATTRS, posstr);
+
+    if (index == TRINDEX::T1) {
+        drawmsg.msglen += insertSetDisplayAttrs(&drawmsg.msg[drawmsg.msglen], FG_GREEN);
+    } else if (index == TRINDEX::T24) {
+        drawmsg.msglen += insertSetDisplayAttrs(&drawmsg.msg[drawmsg.msglen], FG_MAGENTA);
+    } else if (index == TRINDEX::T58) {
+        drawmsg.msglen += insertSetDisplayAttrs(&drawmsg.msg[drawmsg.msglen], FG_YELLOW);
+    } else if (index == TRINDEX::T74) {
+        drawmsg.msglen += insertSetDisplayAttrs(&drawmsg.msg[drawmsg.msglen], FG_RED);
+    } else if (index == TRINDEX::T78) {
+        drawmsg.msglen += insertSetDisplayAttrs(&drawmsg.msg[drawmsg.msglen], FG_BLUE);
+    } else {
+        drawmsg.msglen += insertSetDisplayAttrs(&drawmsg.msg[drawmsg.msglen], FG_CYAN);
+    }
+
+    // Draw next sensor
+    if (tm->next.number == 0) {
+        drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "N/A       ", tm->next.bank ,tm->next.number);
+    } else if (tm->next.number / 10 == 0) {
+        drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%c0%d       ", tm->next.bank ,tm->next.number);
+    } else {
+        drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%c%d       ", tm->next.bank ,tm->next.number);
+    }
+
+    // Draw estimate time
+    diff = format(&drawmsg.msg[drawmsg.msglen], "%d", tm->predTime);
+    drawmsg.msglen += diff;
+    for (int i = 0; i < 10 - diff; ++i) {
+        drawmsg.msg[drawmsg.msglen++] = ' ';
+    }
+
+    // Draw estimate dist
+    diff = format(&drawmsg.msg[drawmsg.msglen], "%d", tm->predDist);
+    drawmsg.msglen += diff;
+    for (int i = 0; i < 10 - diff; ++i) {
+        drawmsg.msg[drawmsg.msglen++] = ' ';
+    }
+
+    // Draw prev sensor
+    if (tm->prev.number == 0) {
+        drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "N/A       ", tm->prev.bank ,tm->prev.number);
+    } else if (tm->prev.number / 10 == 0) {
+        drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%c0%d       ", tm->prev.bank ,tm->prev.number);
+    } else {
+        drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%c%d       ", tm->prev.bank ,tm->prev.number);
+    }
+
+    // Draw actual time
+    diff = format(&drawmsg.msg[drawmsg.msglen], "%d", tm->realTime);
+    drawmsg.msglen += diff;
+    for (int i = 0; i < 10 - diff; ++i) {
+        drawmsg.msg[drawmsg.msglen++] = ' ';
+    }
+
+    // Draw actual dist
+    diff = format(&drawmsg.msg[drawmsg.msglen], "%d", tm->realDist);
+    drawmsg.msglen += diff;
+    for (int i = 0; i < 10 - diff; ++i) {
+        drawmsg.msg[drawmsg.msglen++] = ' ';
+    }
+
+    drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%s", Constants::VT100::RESTORE_CURSOR_AND_ATTRS);
+    drawmsg.msg[drawmsg.msglen] = 0;
+
+    Reply(termCourier, (char *)&drawmsg, drawmsg.size());
 }
 
 void GUI::init() {
-    // style = Constants::GUIServer::STYLE::B;
-    // switch(style) {
-    // case Constants::GUIServer::STYLE::A:
-    //     base = baseGUIa;
-    //     baseWidth = baseGUIaWidth;
-    //     break;
-    // case Constants::GUIServer::STYLE::B:
-    //     base = baseGUIb;
-    //     baseWidth = baseGUIbWidth;
-    //     break;
-    // case Constants::GUIServer::STYLE::C:
-    //     base = baseGUIc;
-    //     baseWidth = baseGUIcWidth;
-    //     break;
-    // default:
-    //     bwprintf(COM2, "GUI Server - Invalid GUI style!");
-    //     break;
-    // }
     termCourier = Create(7, guiTermCourier);
-    // drawingBase = true;
 }
 
 void guiServer() {
@@ -175,8 +236,6 @@ void guiServer() {
     int result, tid;
     char msg[128];
     MessageHeader *mh = (MessageHeader *)msg;
-    // SensorMessage *sm = (SensorMessage *)msg;
-    // TimeMessage *tm = (TimeMessage *)msg;
     ThinMessage rdymsg(Constants::MSG::RDY);
 
     bool tsBlocked = false;
@@ -195,7 +254,7 @@ void guiServer() {
                 break;
             case Constants::MSG::TIME:
                 if (tsBlocked != true) {
-                    bwprintf(COM2, "GUI Server - Courier unexpectedly blocked!");
+                    bwprintf(COM2, "GUI Server - Terminal courier unexpectedly blocked on TIME!");
                 }
                 gui.drawTime(msg);
                 Reply(tid, (char*)&rdymsg, rdymsg.size());
@@ -203,7 +262,7 @@ void guiServer() {
                 break;
             case Constants::MSG::IDLE:
                 if (tsBlocked != true) {
-                    bwprintf(COM2, "GUI Server - Courier unexpectedly blocked!");
+                    bwprintf(COM2, "GUI Server - Terminal courier unexpectedly blocked on IDLE!");
                 }
                 gui.drawIdle(msg);
                 Reply(tid, (char*)&rdymsg, rdymsg.size());
@@ -211,7 +270,7 @@ void guiServer() {
                 break;
             case Constants::MSG::SENSOR:
                 if (tsBlocked != true) {
-                    bwprintf(COM2, "GUI Server - Courier unexpectedly blocked!");
+                    bwprintf(COM2, "GUI Server - Terminal courier unexpectedly blocked on SENSOR!");
                 }
                 gui.drawSensors(msg);
                 Reply(tid, (char*)&rdymsg, rdymsg.size());
@@ -219,7 +278,7 @@ void guiServer() {
                 break;
             case Constants::MSG::SW:
                 if (tsBlocked != true) {
-                    bwprintf(COM2, "GUI Server - Courier unexpectedly blocked!");
+                    bwprintf(COM2, "GUI Server - Terminal courier unexpectedly blocked on SW!");
                 }
                 gui.drawSwitch(msg);
                 Reply(tid, (char*)&rdymsg, rdymsg.size());
@@ -227,7 +286,7 @@ void guiServer() {
                 break;
             case Constants::MSG::TRAIN:
                 if (tsBlocked != true) {
-                    bwprintf(COM2, "GUI Server - Courier unexpectedly blocked!");
+                    bwprintf(COM2, "GUI Server - Terminal courier unexpectedly blocked on TRAIN!");
                 }
                 gui.drawTrain(msg);
                 Reply(tid, (char*)&rdymsg, rdymsg.size());
@@ -342,3 +401,35 @@ void guiServer() {
 // "|                                                                                       |\r\n"
 // "|                                                                                       |\r\n"
 // "+=======================================================================================+\r\n";
+
+// ORIGINAL_KERNEL_GUI
+// "╔══════════════╦═════════════╦═══════════════════════════════════════════════════════════════╗\r\n"
+// "║ %sTime%s MM:SS.S ║ %sIdle%s PP.PP%% ║                            🚂 S-OS                            ║\r\n"
+// "╠══════════════╩═════════════╩═══════════════════════════════════════════════════════════════╣\r\n"
+// "║ %sSwitches%s                                                                                   ║\r\n"
+// "║   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18 153 154 155 156   ║\r\n"
+// "║                                                                                            ║\r\n"
+// "╠════════════════════════════════════════════════════════════════════════════════════════════╣\r\n"
+// "║ %sSensors%s                                                                                    ║\r\n"
+// "║   [                                         ]                                              ║\r\n"
+// "╠════════════════════════════════════════════════════════════════════════════════════════════╣\r\n"
+// "║ %sSensor Predictions%s                                                                         ║\r\n"
+// "║                                                                                            ║\r\n"
+// "║               T1      T24     T58     T74     T78                                          ║\r\n"
+// "║   Next      XxxxxxX XxxxxxX XxxxxxX XxxxxxX XxxxxxX                                        ║\r\n"
+// "║   Time Pred X00                                                                            ║\r\n"
+// "║   Dist Pred Xmm                                                                            ║\r\n"
+// "║                                                                                            ║\r\n"
+// "║   Last      XxxxxxX                                                                        ║\r\n"
+// "║   Time Real X00                                                                            ║\r\n"
+// "║   Dist Real Xmm                                                                            ║\r\n"
+// "╠════════════════════════════════════════════════════════════════════════════════════════════║\r\n"
+// "║ >                                                                                          ║\r\n"
+// "║                                                                                            ║\r\n"
+// "╠════════════════════════════════════════════════════════════════════════════════════════════╣\r\n"
+// "║ %sMessage Log%s                                                                                ║\r\n"
+// "║                                                                                            ║\r\n"
+// "║                                                                                            ║\r\n"
+// "║                                                                                            ║\r\n"
+// "║                                                                                            ║\r\n"
+// "╚════════════════════════════════════════════════════════════════════════════════════════════╝\r\n",

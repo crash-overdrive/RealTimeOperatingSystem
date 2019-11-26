@@ -10,6 +10,7 @@
 #include "user/message/SensorDiffMessage.hpp"
 #include "user/message/ThinMessage.hpp"
 #include "user/message/TRMessage.hpp"
+#include "user/message/TrainMessage.hpp"
 #include "user/model/Train.hpp"
 #include "user/server/TrainServer.hpp"
 #include "user/syscall/UserSyscall.hpp"
@@ -106,7 +107,23 @@ void TrainServer::updatePredictions() {
 }
 
 void TrainServer::sendGUI() {
-    // TODO: add prediction update logic
+    // TODO: need to know when train information has been updated
+    if (updated && guiCourierReady) {
+        // TODO: refactor this to send as many updates as needed, and all relevant information
+        trainmsg.prev = trainmsg.next;
+        trainmsg.next = trains[1].nextSensor[0];
+        // Faking a sensor
+        trainmsg.prev = Sensor('A', 15);
+        trainmsg.next = Sensor('E', 10);
+        trainmsg.predDist = 100;
+        trainmsg.predTime = 29;
+        trainmsg.realDist = 1200;
+        trainmsg.realTime = 26;
+        trainmsg.train = 24;
+        guiCourierReady = false;
+        Reply(guiCourier, (char*)&trainmsg, trainmsg.size());
+        updated = false;
+    }
 }
 
 void TrainServer::init() {
@@ -122,6 +139,8 @@ void TrainServer::init() {
     navCourierReady = false;
     guiCourier = Create(8, trainGUICourier);
     guiCourierReady = false;
+
+    updated = true;
 }
 
 void trainServer() {
@@ -200,6 +219,7 @@ void trainServer() {
             } else {
                 Reply(tid, (char*)&rdymsg, rdymsg.size());
             }
+            ts.sendGUI(); // Send updated information to GUI Server
         } else {
             bwprintf(COM2, "Train Server - Unrecognized message type received %d", mh->type);
         }

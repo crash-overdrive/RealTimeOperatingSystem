@@ -6,6 +6,7 @@
 #include "user/message/SensorDiffMessage.hpp"
 #include "user/message/SensorPredMessage.hpp"
 #include "user/message/TRMessage.hpp"
+#include "user/message/TrainMessage.hpp"
 
 void trainServer();
 
@@ -15,6 +16,7 @@ public:
     SensorAttrMessage samsg;
     SensorDiffMessage *sdmsg = (SensorDiffMessage *)&msg;
     SensorPredMessage *spmsg = (SensorPredMessage *)&msg;
+    TrainMessage trainmsg;
 
     Train trains[5];
     DataStructures::RingBuffer<TRMessage, 32> trbuf[5];
@@ -24,6 +26,7 @@ public:
     bool navCourierReady;
     int guiCourier;
     bool guiCourierReady;
+    bool updated;
 
     void init();
     TRINDEX getTrainIndex(char number);
