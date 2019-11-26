@@ -1,4 +1,4 @@
-#include "user/trains/Track.hpp"
+#include "user/model/Track.hpp"
 
 void Track::initializeTrack(char trackIdentifier) {
     switch (trackIdentifier) {
