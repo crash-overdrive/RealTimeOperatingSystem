@@ -149,7 +149,7 @@ void GUI::drawTrain(char *msg) {
     int xpos = 9;
     int ypos = 14;
 
-    int index = Train::getTrainIndex(tm->train);
+    int index = Train::getTrainIndex(tm->trainInfo[0].number);
     int diff;
 
     ypos += index;
@@ -173,46 +173,46 @@ void GUI::drawTrain(char *msg) {
     }
 
     // Draw next sensor
-    if (tm->next.number == 0) {
-        drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "N/A       ", tm->next.bank ,tm->next.number);
-    } else if (tm->next.number / 10 == 0) {
-        drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%c0%d       ", tm->next.bank ,tm->next.number);
+    if (tm->trainInfo[0].next.number == 0) {
+        drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "N/A       ", tm->trainInfo[0].next.bank ,tm->trainInfo[0].next.number);
+    } else if (tm->trainInfo[0].next.number / 10 == 0) {
+        drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%c0%d       ", tm->trainInfo[0].next.bank ,tm->trainInfo[0].next.number);
     } else {
-        drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%c%d       ", tm->next.bank ,tm->next.number);
+        drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%c%d       ", tm->trainInfo[0].next.bank ,tm->trainInfo[0].next.number);
     }
 
     // Draw estimate time
-    diff = format(&drawmsg.msg[drawmsg.msglen], "%d", tm->predTime);
+    diff = format(&drawmsg.msg[drawmsg.msglen], "%d", tm->trainInfo[0].predictedTime);
     drawmsg.msglen += diff;
     for (int i = 0; i < 10 - diff; ++i) {
         drawmsg.msg[drawmsg.msglen++] = ' ';
     }
 
     // Draw estimate dist
-    diff = format(&drawmsg.msg[drawmsg.msglen], "%d", tm->predDist);
+    diff = format(&drawmsg.msg[drawmsg.msglen], "%d", tm->trainInfo[0].predictedDist);
     drawmsg.msglen += diff;
     for (int i = 0; i < 10 - diff; ++i) {
         drawmsg.msg[drawmsg.msglen++] = ' ';
     }
 
     // Draw prev sensor
-    if (tm->prev.number == 0) {
-        drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "N/A       ", tm->prev.bank ,tm->prev.number);
-    } else if (tm->prev.number / 10 == 0) {
-        drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%c0%d       ", tm->prev.bank ,tm->prev.number);
+    if (tm->trainInfo[0].prev.number == 0) {
+        drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "N/A       ", tm->trainInfo[0].prev.bank ,tm->trainInfo[0].prev.number);
+    } else if (tm->trainInfo[0].prev.number / 10 == 0) {
+        drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%c0%d       ", tm->trainInfo[0].prev.bank ,tm->trainInfo[0].prev.number);
     } else {
-        drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%c%d       ", tm->prev.bank ,tm->prev.number);
+        drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%c%d       ", tm->trainInfo[0].prev.bank ,tm->trainInfo[0].prev.number);
     }
 
     // Draw actual time
-    diff = format(&drawmsg.msg[drawmsg.msglen], "%d", tm->realTime);
+    diff = format(&drawmsg.msg[drawmsg.msglen], "%d", tm->trainInfo[0].realTime);
     drawmsg.msglen += diff;
     for (int i = 0; i < 10 - diff; ++i) {
         drawmsg.msg[drawmsg.msglen++] = ' ';
     }
 
     // Draw actual dist
-    diff = format(&drawmsg.msg[drawmsg.msglen], "%d", tm->realDist);
+    diff = format(&drawmsg.msg[drawmsg.msglen], "%d", tm->trainInfo[0].realDist);
     drawmsg.msglen += diff;
     for (int i = 0; i < 10 - diff; ++i) {
         drawmsg.msg[drawmsg.msglen++] = ' ';

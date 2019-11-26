@@ -26,7 +26,6 @@ public:
     bool navCourierReady;
     int guiCourier;
     bool guiCourierReady;
-    bool updated;
 
     void init();
     TRINDEX getTrainIndex(char number);
@@ -40,6 +39,7 @@ public:
     void sendSensorAttr();
     void updatePredictions();
     void sendGUI();
+    bool updated();
 };
 
 #endif

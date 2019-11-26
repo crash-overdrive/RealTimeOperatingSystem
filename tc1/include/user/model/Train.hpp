@@ -23,6 +23,8 @@ public:
     unsigned int position;
     Sensor nextSensor[2];
 
+    bool updated;
+
     Train();
     Train(char n);
     static TRINDEX getTrainIndex(char number);

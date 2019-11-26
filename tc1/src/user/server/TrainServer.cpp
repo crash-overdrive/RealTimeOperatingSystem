@@ -106,23 +106,33 @@ void TrainServer::updatePredictions() {
     }
 }
 
+bool TrainServer::updated() {
+    for (int i = 0; i < 5; ++i) {
+        if (trains[i].updated) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void TrainServer::sendGUI() {
     // TODO: need to know when train information has been updated
-    if (updated && guiCourierReady) {
+    if (updated() && guiCourierReady) {
         // TODO: refactor this to send as many updates as needed, and all relevant information
-        trainmsg.prev = trainmsg.next;
-        trainmsg.next = trains[1].nextSensor[0];
+        trainmsg.trainInfo[0].prev = trainmsg.trainInfo[0].next;
+        trainmsg.trainInfo[0].next = trains[1].nextSensor[0];
         // Faking a sensor
-        trainmsg.prev = Sensor('A', 15);
-        trainmsg.next = Sensor('E', 10);
-        trainmsg.predDist = 100;
-        trainmsg.predTime = 29;
-        trainmsg.realDist = 1200;
-        trainmsg.realTime = 26;
-        trainmsg.train = 24;
+        trainmsg.trainInfo[0].prev = Sensor('A', 15);
+        trainmsg.trainInfo[0].next = Sensor('E', 10);
+        trainmsg.trainInfo[0].predictedDist = 100;
+        trainmsg.trainInfo[0].predictedTime = 29;
+        trainmsg.trainInfo[0].realDist = 1200;
+        trainmsg.trainInfo[0].realTime = 26;
+        trainmsg.trainInfo[0].number = 24;
+        trainmsg.count = 1;
         guiCourierReady = false;
         Reply(guiCourier, (char*)&trainmsg, trainmsg.size());
-        updated = false;
+        trains[0].updated = false;
     }
 }
 
@@ -140,7 +150,7 @@ void TrainServer::init() {
     guiCourier = Create(8, trainGUICourier);
     guiCourierReady = false;
 
-    updated = true;
+    trains[0].updated = true;
 }
 
 void trainServer() {
