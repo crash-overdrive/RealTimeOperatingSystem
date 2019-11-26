@@ -417,7 +417,7 @@ void navigationServer() {
             ns.predictSensors();
             Assert(ns.trainCourierReady); // This should always be true because it's impossible for lower priority command server to run before the train server gets back to us.
             Reply(ns.trainCourier, (char*)&ns.spmsg, ns.spmsg.size());
-            ns.trainCourierReady == false;
+            ns.trainCourierReady = false;
 
             // TODO(sgaweda): Can this courier be blocked when this happens? I suspect it's possible so we should probably check
             // Maybe refactor this to a start train function?
