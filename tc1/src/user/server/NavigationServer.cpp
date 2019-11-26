@@ -295,7 +295,6 @@ void NavigationServer::predictSensors() {
             // TODO: refactor this logic out of here
             if (sensorLists[index].peek().bank == 0) {
                 // STOP TRAIN
-                bwprintf(COM2, "{train - setting speed 0}");
                 trmsg.speed = 0;
                 trmsg.train = train;
                 Reply(commandCourier, (char*)&trmsg, trmsg.size());
