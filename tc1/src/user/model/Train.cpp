@@ -18,7 +18,7 @@ TRINDEX Train::getTrainIndex(char number) {
         case 78:
             return TRINDEX::T78;
         default:
-            bwprintf(COM2, "static getTrainIndex() - Request for invalid train index! %d", number);
+            bwprintf(COM2, "static getTrainIndex() - Request for invalid train index! Train number: %d\r\n", number);
             return TRINDEX::T1;
     }
 }

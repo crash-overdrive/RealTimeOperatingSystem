@@ -75,7 +75,7 @@ void TrainServer::attributeSensors() {
             if (sdmsg->sensors[i] == trains[j].nextSensor[0]) {
                 // handle first sensor attr
                 samsg.sensorAttrs[samsg.count].sensor = sdmsg->sensors[i];
-                samsg.sensorAttrs[samsg.count].train = j;
+                samsg.sensorAttrs[samsg.count].train = trains[j].number;
                 samsg.count++;
                 // TODO: update the expected sensors for first match
                 trains[j].nextSensor[0].bank = 0;
@@ -83,7 +83,7 @@ void TrainServer::attributeSensors() {
                 break;
             } else if (sdmsg->sensors[i] == trains[j].nextSensor[1]) {
                 samsg.sensorAttrs[samsg.count].sensor = sdmsg->sensors[i];
-                samsg.sensorAttrs[samsg.count].train = j;
+                samsg.sensorAttrs[samsg.count].train = trains[j].number;
                 samsg.count++;
                 // TODO: update the expected sensors for second match
                 trains[j].nextSensor[0].bank = 0;
@@ -99,8 +99,9 @@ void TrainServer::attributeSensors() {
 void TrainServer::updatePredictions() {
     for (int i = 0; i < spmsg->count; ++i) {
         int train = spmsg->predictions[i].train;
-        trains[train].nextSensor[0] = spmsg->predictions[i].nextSensor[0];
-        trains[train].nextSensor[1] = spmsg->predictions[i].nextSensor[1];
+        int index = Train::getTrainIndex(train);
+        trains[index].nextSensor[0] = spmsg->predictions[i].nextSensor[0];
+        trains[index].nextSensor[1] = spmsg->predictions[i].nextSensor[1];
     }
 }
 

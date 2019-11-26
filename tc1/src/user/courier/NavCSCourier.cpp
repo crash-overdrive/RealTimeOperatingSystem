@@ -1,6 +1,6 @@
 #include "Constants.hpp"
 #include "io/bwio.hpp"
-#include "user/courier/NavCommandCourier.hpp"
+#include "user/courier/NavCSCourier.hpp"
 #include "user/message/MessageHeader.hpp"
 #include "user/message/RVMessage.hpp"
 #include "user/message/SWMessage.hpp"
@@ -10,7 +10,7 @@
 
 #define FOREVER for (;;)
 
-void navCommandCourier() {
+void navCSCourier() {
     int NAV = WhoIs("NAV");
     int CS = WhoIs("CS");
     int result;
