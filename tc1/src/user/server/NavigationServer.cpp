@@ -25,6 +25,15 @@
 
 #define FOREVER for(;;)
 
+Sensor convertToSensor(const Track* track, int index) {
+    if (track->trackNodes[index].type != NODE_TYPE::NODE_SENSOR) {
+        return Sensor(0,0);
+    } else {
+        int num = track->trackNodes[index].num;
+        return Sensor(num / 16 + 'A',num % 16 + 1);
+    }
+}
+
 int nextNodeToBeConsidered(const Track* track, bool visitedNodes[], int dist[]) {
     int noOfNodes = track->noOfNodes;
     int i = 0;
@@ -202,6 +211,9 @@ void djikstra(const Track* track, int srcIndex, int destIndex, int lastHop[]) {
                 }
                 break;
             }
+            default: {
+                break;
+            }
         }
     } while(!djikstraFinished(track, visitedNodes));
 }
@@ -216,9 +228,6 @@ void NavigationServer::findPath() {
             srcIndex = i;
         } else if(!strcmp(track.trackNodes[i].name, rtmsg->dest)) {
             destIndex = i;
-        }
-        if (track.trackNodes[i].reserved) {
-            bwprintf(COM2, "%d res ", i); // What does this mean?
         }
     }
 
@@ -247,9 +256,11 @@ void NavigationServer::findPath() {
             char n = (char)(num % 16 + 1);
             sensorLists[trainIndex].push(Sensor(b,n));
         }
+        // bwprintf(COM2, "%s <- ", track.trackNodes[index].name);
         index = lastHop[index];
     } while (index != srcIndex);
     paths[trainIndex].push(index);
+    // bwprintf(COM2, "%s\n\r", track.trackNodes[index].name);
     if (track.trackNodes[index].type == NODE_SENSOR) {
         int num = track.trackNodes[index].num;
         int b = num / 16 + 'A';
@@ -263,14 +274,13 @@ void NavigationServer::findPath() {
 void NavigationServer::predictSensors() {
     // check what type of message wants us to predict
     if (mh->type == Constants::SENSOR_ATTR) {
-        //TODO:(spratap) pop stuff off from path too
         for (int i = 0; i < samsg->count; ++i) {
             char train = samsg->sensorAttrs[i].train;
             int index = Train::getTrainIndex(train);
             if (sensorLists[index].peek() == samsg->sensorAttrs[i].sensor) {
-                // TODO(sgaweda): Test that sensor attribute message is same as first thing in path!
-                // Assert(paths[index].peek() == samsg->sensorAttrs[i].sensor)
-                paths[index].pop();
+                Assert((samsg->sensorAttrs[i].sensor == convertToSensor(&track, paths[index].peek())));
+                int temp = paths[index].pop();
+                // bwprintf(COM2, "Sensor %s tripped\n\r", track.trackNodes[temp].name);
                 sensorLists[index].pop();
                 spmsg.predictions[spmsg.count].nextSensor[0] = sensorLists[index].peek();
                 spmsg.predictions[spmsg.count].nextSensor[1] = sensorLists[index].peekSecond();
@@ -298,11 +308,15 @@ void NavigationServer::predictSensors() {
                 trmsg.speed = 0;
                 trmsg.train = train;
                 Reply(commandCourier, (char*)&trmsg, trmsg.size());
+                commandCourierReady = false;
+                // bwprintf(COM2, "CC not ready\n\r");
             } else if (sensorLists[index].peekSecond().bank == 0) {
                 // SLOW TRAIN
                 trmsg.speed = 8;
                 trmsg.train = train;
                 Reply(commandCourier, (char*)&trmsg, trmsg.size());
+                commandCourierReady = false;
+                // bwprintf(COM2, "CC not ready\n\r");
             }
 
 
@@ -318,69 +332,101 @@ void NavigationServer::predictSensors() {
 }
 
 void NavigationServer::navigate() {
+    Assert(commandCourierReady == true);
+    // bwprintf(COM2, "Navigate Called!!\n\r");
     for (int train = 0; train < 5; ++train) {
         // Do nothing if there's no path
-        if (paths[train].empty()) { continue; }
-        int top = paths[train].peek();
-
-        // Sensor handling currently occurs in predictSensors()
-        if (track.trackNodes[top].type == NODE_TYPE::NODE_SENSOR) { continue; }
-
-        paths[train].pop();
-        Assert(paths[train].empty() == false);
-        switch(track.trackNodes[top].type) {
-            case NODE_TYPE::NODE_BRANCH:
-            {
-                int nextNodeIndex = paths[train].peek();
-                const char* nextNodeName = track.trackNodes[nextNodeIndex].name;
-                const char* straightDirectionName = track.trackNodes[top].edges[DIR_STRAIGHT].destNode->name;
-                const char* curvedDirectionName = track.trackNodes[top].edges[DIR_CURVED].destNode->name;
-
-                if (!strcmp(nextNodeName, straightDirectionName)) {
-                    // bwprintf(COM2, "Straight SW %s -> ", track.trackNodes[top].name);
-                    swmsg.sw = track.trackNodes[top].edges[DIR_STRAIGHT].destNode->num;
-                    swmsg.state = 'S';
-                } else if(!strcmp(nextNodeName, curvedDirectionName)) {
-                    // bwprintf(COM2, "Curved SW %s -> ", track.trackNodes[top].name);
-                    swmsg.sw = track.trackNodes[top].edges[DIR_CURVED].destNode->num;
-                    swmsg.state = 'C';
-                } else {
-                    bwprintf(COM2, "Navigation Server - Branch direction selection failed!\n\r");
-                }
-                Reply(commandCourier, (char*)&trmsg, trmsg.size());
-                commandCourierReady = false;
-                break;
-            }
-            case NODE_TYPE::NODE_MERGE:
-            {
-                int nextNodeIndex = paths[train].peek();
-                const char* nextNodeName = track.trackNodes[nextNodeIndex].name;
-                const char* aheadDirectionName = track.trackNodes[top].edges[DIR_AHEAD].destNode->name;
-                const char* reverseDirectionName = track.trackNodes[top].reverseNode->name;
-                if (!strcmp(nextNodeName, aheadDirectionName)) {
-                    // bwprintf(COM2, "Straight %s -> ", track.trackNodes[top].name);
-                } else if(!strcmp(nextNodeName, reverseDirectionName)) {
-                    // bwprintf(COM2, "Reverse %s -> ", track.trackNodes[top].name);
-                    rvmsg.train = train;
-                    rvmsg.speed = 14;
-                    Reply(commandCourier, (char*)&rvmsg, rvmsg.size());
-                    commandCourierReady = false;
-                } else {
-                    // bwprintf(COM2, track.trackNodes[top].name);
-                }
-                break;
-            }
-            // TODO: Implement these?
-            case NODE_TYPE::NODE_ENTER:
-            case NODE_TYPE::NODE_EXIT:
-            case NODE_TYPE::NODE_NONE:
-            default: {
-                // bwprintf(COM2, "%s ->", track.trackNodes[top].name);
-                break;
-            }
+        if (paths[train].empty()) {
+            continue;
         }
-        // top = paths[samsg->sensorAttrs[i].train].pop();
+
+        const TrackNode* currentLandmark = &track.trackNodes[paths[train].peek()];
+        const char* currentLandmarkName = currentLandmark->name;
+
+        if (currentLandmark->type == NODE_TYPE::NODE_SENSOR) {
+            //TODO: implement me for reversing
+            // bwprintf(COM2, "Train %d Waiting for Sensor %s\n\r", train, currentLandmarkName);
+            continue;
+        }
+
+        while(currentLandmark->type != NODE_TYPE::NODE_SENSOR) {
+            int temp = paths[train].pop();
+            // bwprintf(COM2, "Popped %s\n\r", track.trackNodes[temp].name);
+            Assert(paths[train].empty() == false);
+            const TrackNode* nextLandmark =  &track.trackNodes[paths[train].peek()];
+            const char* nextLandmarkName = nextLandmark->name;
+
+            switch (currentLandmark->type) {
+                case NODE_TYPE::NODE_BRANCH:
+                {
+                    const char* straightDirectionLandmarkName = currentLandmark->edges[DIR_STRAIGHT].destNode->name;
+                    const char* curvedDirectionLandmarkName = currentLandmark->edges[DIR_CURVED].destNode->name;
+
+                    if (!strcmp(nextLandmarkName, straightDirectionLandmarkName)) {
+                        swmsg.sw = currentLandmark->num;
+                        swmsg.state = 'S';
+                        int result = Reply(commandCourier, (char*)&swmsg, swmsg.size());
+                        commandCourierReady = false;
+                        // bwprintf(COM2, "CC not ready\n\r");
+                        // bwprintf(COM2, "[%d %d %c swmsg]\n\r", result, swmsg.sw, swmsg.state);
+                        // bwprintf(COM2, "[Straight SW %s]\n\r", currentLandmarkName);
+                        return;
+                    } else if (!strcmp(nextLandmarkName, curvedDirectionLandmarkName)) {
+                        swmsg.sw = currentLandmark->num;
+                        swmsg.state = 'C';
+                        int result = Reply(commandCourier, (char*)&swmsg, swmsg.size());
+                        commandCourierReady = false;
+                        // bwprintf(COM2, "CC not ready\n\r");
+                        // bwprintf(COM2, "[%d %d %c swmsg]\n\r", result, swmsg.sw, swmsg.state);
+                        // bwprintf(COM2, "[Curved SW %s]\n\r", currentLandmarkName);
+                        return;
+                    } else {
+                        bwprintf(COM2, "Navigation Server - Branch direction selection failed!\n\r");
+                    }
+                    break;
+                }
+                case NODE_TYPE::NODE_MERGE:
+                {
+                    const char* aheadDirectionLandmarkName = currentLandmark->edges[DIR_AHEAD].destNode->name;
+                    const char* reverseDirectionLandmarkName = currentLandmark->reverseNode->name;
+                    if (!strcmp(nextLandmarkName, aheadDirectionLandmarkName)) {
+                        // bwprintf(COM2, "[Ahead %s]\n\r", aheadDirectionLandmarkName);
+                    } else if(!strcmp(nextLandmarkName, reverseDirectionLandmarkName)) {
+                        rvmsg.train = Train::getTrainNumber(train);
+                        Reply(commandCourier, (char*)&rvmsg, rvmsg.size());
+                        commandCourierReady = false;
+                        // bwprintf(COM2, "CC not ready\n\r");
+                        // bwprintf(COM2, "[Reverse %s]\n\r", reverseDirectionLandmarkName);
+                        return;
+                    } else {
+                        bwprintf(COM2, "Navigation Server - Merge direction selection failed!\n\r");
+                    }
+                    break;
+                }
+                case NODE_TYPE::NODE_ENTER:
+                {
+                    break;
+                }
+                case NODE_TYPE::NODE_EXIT:
+                {
+                    break;
+                }
+                case NODE_TYPE::NODE_NONE:
+                {
+                    break;
+                }
+                default:
+                {
+                    bwprintf(COM2, "Navigation Server - Invalid Node type %d encountered\n\r", currentLandmark->type);
+                    break;
+                }
+            }
+            currentLandmark = nextLandmark;
+            currentLandmarkName = nextLandmarkName;
+        }
+        // bwprintf(COM2, "Out of while loop %s\n\r", currentLandmarkName);
     }
+    // bwprintf(COM2, "Navigate Returning\n\r");
 }
 
 void NavigationServer::init() {
@@ -405,6 +451,7 @@ void navigationServer() {
 
         if (ns.mh->type == Constants::MSG::RDY) {
             if (tid == ns.commandCourier) {
+                // bwprintf(COM2, "CC Ready\n\r");
                 ns.commandCourierReady = true;
                 ns.navigate();
             } else if (tid == ns.trainCourier) {
@@ -412,19 +459,20 @@ void navigationServer() {
             }
         } else if (ns.mh->type == Constants::MSG::RT) {
             ns.findPath();
-            // TODO: (spratap) start the train here
 
             ns.predictSensors();
             Assert(ns.trainCourierReady); // This should always be true because it's impossible for lower priority command server to run before the train server gets back to us.
             Reply(ns.trainCourier, (char*)&ns.spmsg, ns.spmsg.size());
-            ns.trainCourierReady == false;
+            ns.trainCourierReady = false;
 
             // TODO(sgaweda): Can this courier be blocked when this happens? I suspect it's possible so we should probably check
             // Maybe refactor this to a start train function?
-            // TODO (gaweda): train control will be responsible for determining if this train speed change needs to occur. We can assume train is stopped here.
+            // TODO(sgaweda): train control will be responsible for determining if this train speed change needs to occur. We can assume train is stopped here.
             ns.trmsg.train = ns.rtmsg->train;
             ns.trmsg.speed = 14;
             Reply(ns.commandCourier, (char*)&ns.trmsg, ns.trmsg.size());
+            ns.commandCourierReady = false;
+            // bwprintf(COM2, "CC not ready\n\r");
 
             // We always reply to the requesting task last. Yes it blocks for longer but we're not ready to process another parsed command anyway. Plus no one types that fast!
             Reply(tid, (char*)&rdymsg, rdymsg.size());
@@ -437,6 +485,7 @@ void navigationServer() {
             ns.predictSensors();
             Reply(tid, (char*)&ns.spmsg, ns.spmsg.size());
             ns.spmsg.count = 0;
+
             if (ns.commandCourierReady) {
                 ns.navigate();
             }

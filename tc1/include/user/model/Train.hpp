@@ -26,6 +26,7 @@ public:
     Train();
     Train(char n);
     static TRINDEX getTrainIndex(char number);
+    static char getTrainNumber(char trainIndex);
 };
 
 #endif

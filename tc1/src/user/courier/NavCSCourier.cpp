@@ -23,27 +23,29 @@ void navCSCourier() {
     ThinMessage rdymsg(Constants::MSG::RDY);
 
     FOREVER {
-        // Get train message from command server
-        result = Send(CS, (char *)&rdymsg, rdymsg.size(), msg, 10);
+        // Get command from NAV Server
+        result = Send(NAV, (char *)&rdymsg, rdymsg.size(), msg, 10);
         if (result < 0) {
             bwprintf(COM2, "NAV->CS Courier - Send to Command Server failed\r\n");
         }
         if (mh->type == Constants::MSG::TR) {
             result = Send(CS, (char*)trmsg, trmsg->size(), (char *)&rdymsg, rdymsg.size());
+            // bwprintf(COM2, "<tr %d %d>\n\r", trmsg->train, trmsg->speed);
         } else if (mh->type == Constants::MSG::RV) {
             result = Send(CS, (char*)rvmsg, rvmsg->size(), (char *)&rdymsg, rdymsg.size());
+            // bwprintf(COM2, "<rv %d>\n\r", rvmsg->train);
         } else if (mh->type == Constants::MSG::SW) {
+            // bwprintf(COM2, "<sw %d %c>\n\r", swmsg->sw, swmsg->state);
             result = Send(CS, (char*)swmsg, swmsg->size(), (char *)&rdymsg, rdymsg.size());
         } else {
-            bwprintf(COM2, "NAV->CS  Courier - Expected TR,RV,SW message but received unexpected message type %d\r\n", mh->type);
+            bwprintf(COM2, "NAV->CS Courier - Expected TR,RV,SW message but received unexpected message type %d\r\n", mh->type);
         }
 
-        // Send train message to train server
         if (result < 0) {
-            bwprintf(COM2, "NAV->CS  Courier - Send to Train Server failed\r\n");
+            bwprintf(COM2, "NAV->CS Courier - Send to Command Server failed\r\n");
         }
         if (rdymsg.mh.type != Constants::MSG::RDY) {
-            bwprintf(COM2, "NAV->CS  Courier - Expected RDY message type but received unexpected message type %d\r\n", rdymsg.mh.type);
+            bwprintf(COM2, "NAV->CS Courier - Expected RDY message type but received unexpected message type %d\r\n", rdymsg.mh.type);
         }
     }
 }
