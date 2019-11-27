@@ -21,7 +21,7 @@
 #include "user/model/Train.hpp"
 #include "user/server/NavigationServer.hpp"
 #include "user/syscall/UserSyscall.hpp"
-#include "user/trains/Track.hpp"
+#include "user/model/Track.hpp"
 
 #define FOREVER for(;;)
 

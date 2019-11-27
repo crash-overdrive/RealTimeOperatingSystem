@@ -10,6 +10,7 @@
 #include "user/message/SensorDiffMessage.hpp"
 #include "user/message/ThinMessage.hpp"
 #include "user/message/TRMessage.hpp"
+#include "user/message/TrainMessage.hpp"
 #include "user/model/Train.hpp"
 #include "user/server/TrainServer.hpp"
 #include "user/syscall/UserSyscall.hpp"
@@ -105,8 +106,34 @@ void TrainServer::updatePredictions() {
     }
 }
 
+bool TrainServer::updated() {
+    for (int i = 0; i < 5; ++i) {
+        if (trains[i].updated) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void TrainServer::sendGUI() {
-    // TODO: add prediction update logic
+    // TODO: need to know when train information has been updated
+    if (updated() && guiCourierReady) {
+        // TODO: refactor this to send as many updates as needed, and all relevant information
+        trainmsg.trainInfo[0].prev = trainmsg.trainInfo[0].next;
+        trainmsg.trainInfo[0].next = trains[1].nextSensor[0];
+        // Faking a sensor
+        trainmsg.trainInfo[0].prev = Sensor('A', 15);
+        trainmsg.trainInfo[0].next = Sensor('E', 10);
+        trainmsg.trainInfo[0].predictedDist = 100;
+        trainmsg.trainInfo[0].predictedTime = 29;
+        trainmsg.trainInfo[0].realDist = 1200;
+        trainmsg.trainInfo[0].realTime = 26;
+        trainmsg.trainInfo[0].number = 24;
+        trainmsg.count = 1;
+        guiCourierReady = false;
+        Reply(guiCourier, (char*)&trainmsg, trainmsg.size());
+        trains[0].updated = false;
+    }
 }
 
 void TrainServer::init() {
@@ -122,6 +149,8 @@ void TrainServer::init() {
     navCourierReady = false;
     guiCourier = Create(8, trainGUICourier);
     guiCourierReady = false;
+
+    trains[0].updated = true;
 }
 
 void trainServer() {
@@ -200,6 +229,7 @@ void trainServer() {
             } else {
                 Reply(tid, (char*)&rdymsg, rdymsg.size());
             }
+            ts.sendGUI(); // Send updated information to GUI Server
         } else {
             bwprintf(COM2, "Train Server - Unrecognized message type received %d", mh->type);
         }

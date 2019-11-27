@@ -3,7 +3,7 @@
 
 Train::Train() : number{0}, speed{0} {}
 
-Train::Train(char n) : number{n}, speed{0} {}
+Train::Train(char n) : number{n}, speed{0}, headlights{false}, reverse{false}, updated{false} {}
 
 TRINDEX Train::getTrainIndex(char number) {
     switch (number) {

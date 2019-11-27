@@ -9,7 +9,7 @@
 #include "user/message/SensorPredMessage.hpp"
 #include "user/message/TRMessage.hpp"
 #include "user/message/TRMessage.hpp"
-#include "user/trains/Track.hpp"
+#include "user/model/Track.hpp"
 
 void navigationServer();
 
