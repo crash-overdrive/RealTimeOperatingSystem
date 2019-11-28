@@ -261,7 +261,7 @@ void NavigationServer::transmitToCommandServer(int msgType) {
 }
 
 void NavigationServer::transmitToTrainServer(int msgType) {
-    Assert(trainCourierReady == true);
+    ASSERT(trainCourierReady == true);
     if (msgType == Constants::MSG::SENSOR_PRED) {
         trainCourierReady = false;
         Reply(trainCourier, (char*)&spmsg, spmsg.size());
