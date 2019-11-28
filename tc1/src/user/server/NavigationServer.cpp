@@ -278,7 +278,7 @@ void NavigationServer::predictSensors() {
             char train = samsg->sensorAttrs[i].train;
             int index = Train::getTrainIndex(train);
             if (sensorLists[index].peek() == samsg->sensorAttrs[i].sensor) {
-                Assert((samsg->sensorAttrs[i].sensor == convertToSensor(&track, paths[index].peek())));
+                ASSERT((samsg->sensorAttrs[i].sensor == convertToSensor(&track, paths[index].peek())));
                 int temp = paths[index].pop();
                 // bwprintf(COM2, "Sensor %s tripped\n\r", track.trackNodes[temp].name);
                 sensorLists[index].pop();
@@ -332,7 +332,7 @@ void NavigationServer::predictSensors() {
 }
 
 void NavigationServer::navigate() {
-    Assert(commandCourierReady == true);
+    ASSERT(commandCourierReady == true);
     // bwprintf(COM2, "Navigate Called!!\n\r");
     for (int train = 0; train < 5; ++train) {
         // Do nothing if there's no path
@@ -352,7 +352,7 @@ void NavigationServer::navigate() {
         while(currentLandmark->type != NODE_TYPE::NODE_SENSOR) {
             int temp = paths[train].pop();
             // bwprintf(COM2, "Popped %s\n\r", track.trackNodes[temp].name);
-            Assert(paths[train].empty() == false);
+            ASSERT(paths[train].empty() == false);
             const TrackNode* nextLandmark =  &track.trackNodes[paths[train].peek()];
             const char* nextLandmarkName = nextLandmark->name;
 
@@ -461,7 +461,7 @@ void navigationServer() {
             ns.findPath();
 
             ns.predictSensors();
-            Assert(ns.trainCourierReady); // This should always be true because it's impossible for lower priority command server to run before the train server gets back to us.
+            ASSERT(ns.trainCourierReady); // This should always be true because it's impossible for lower priority command server to run before the train server gets back to us.
             Reply(ns.trainCourier, (char*)&ns.spmsg, ns.spmsg.size());
             ns.trainCourierReady = false;
 

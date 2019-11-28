@@ -1,4 +1,7 @@
+#include <cstring>
+
 #include "Constants.hpp"
+#include "Util.hpp"
 #include "data-structures/RingBuffer.hpp"
 #include "io/bwio.hpp"
 #include "io/ts7200.h"
@@ -11,6 +14,7 @@
 #include "user/message/ThinMessage.hpp"
 #include "user/message/TRMessage.hpp"
 #include "user/message/TrainMessage.hpp"
+#include "user/notifier/TrainNotifier.hpp"
 #include "user/model/Train.hpp"
 #include "user/server/TrainServer.hpp"
 #include "user/syscall/UserSyscall.hpp"
@@ -74,19 +78,18 @@ void TrainServer::attributeSensors() {
     for (int i = 0; i < sdmsg->count; ++i) {
         for (int j = 0; j < 5; ++j) {
             if (sdmsg->sensors[i] == trains[j].nextSensor[0]) {
-                // handle first sensor attr
+                // TODO: handle updates determined by sensor attribution
                 samsg.sensorAttrs[samsg.count].sensor = sdmsg->sensors[i];
                 samsg.sensorAttrs[samsg.count].train = trains[j].number;
                 samsg.count++;
-                // TODO: update the expected sensors for first match
                 trains[j].nextSensor[0].bank = 0;
                 trains[j].nextSensor[0].number = 0;
                 break;
             } else if (sdmsg->sensors[i] == trains[j].nextSensor[1]) {
+                // TODO: handle updates determined by sensor attribution
                 samsg.sensorAttrs[samsg.count].sensor = sdmsg->sensors[i];
                 samsg.sensorAttrs[samsg.count].train = trains[j].number;
                 samsg.count++;
-                // TODO: update the expected sensors for second match
                 trains[j].nextSensor[0].bank = 0;
                 trains[j].nextSensor[0].number = 0;
                 trains[j].nextSensor[1].bank = 0;
@@ -98,6 +101,7 @@ void TrainServer::attributeSensors() {
 }
 
 void TrainServer::updatePredictions() {
+    // TODO: determine what (if any) updates need to happen here
     for (int i = 0; i < spmsg->count; ++i) {
         int train = spmsg->predictions[i].train;
         int index = Train::getTrainIndex(train);
@@ -113,6 +117,30 @@ bool TrainServer::updated() {
         }
     }
     return false;
+}
+
+void TrainServer::updateLocation() {
+    prevtime = currtime;
+    currtime = Time(CLOCK);
+    int delta = currtime - prevtime; // Number of ticks, should always be 1
+    ASSERT(delta == 1);
+    for (int i = 0; i < 5; ++i) {
+        if (trains[i].speed != 0) {
+            // Calculate distance travelled since last tick
+            // TODO: improve logic to account for acceleration
+            int dist = trains[i].vel[trains[i].speed];
+
+            // Add train to location message
+            locmsg.locationInfo[locmsg.count].train = trains[i].number;
+            locmsg.locationInfo[locmsg.count].location = trains[i].location;
+            locmsg.count++;
+        }
+        // bwprintf(COM2, "(%d %d)", dist, trains[i].speed);
+    }
+
+    // Reply(locNavCourier, (char *)&locmsg, locmsg.size());
+    // Reply(locGUICourier, (char *)&locmsg, locmsg.size());
+    locmsg.count = 0;
 }
 
 void TrainServer::sendGUI() {
@@ -149,8 +177,34 @@ void TrainServer::init() {
     navCourierReady = false;
     guiCourier = Create(8, trainGUICourier);
     guiCourierReady = false;
+    notifier = Create(5, trainNotifier);
 
     trains[0].updated = true;
+
+    // Set the speed measurements for the trains
+    int velocities[5][15] = {
+        { 0, 0, 0, 0, 0, 0, 99000, 171000, 221000, 279000, 337000, 411000, 478000, 545000, 594000 },
+        { 0, 0, 0, 0, 0, 0, 99000, 171000, 221000, 279000, 337000, 411000, 478000, 545000, 594000 },
+        { 0, 0, 0, 0, 0, 0, 99000, 171000, 221000, 279000, 337000, 411000, 478000, 545000, 594000 },
+        { 0, 0, 0, 0, 0, 0, 99000, 171000, 221000, 279000, 337000, 411000, 478000, 545000, 594000 },
+        { 0, 0, 0, 0, 0, 0, 99000, 171000, 221000, 279000, 337000, 411000, 478000, 545000, 594000 },
+    };
+    for (int i = 0; i < 5; ++i) {
+        memcpy(trains[i].vel, velocities[i], 15*sizeof(int));
+    }
+
+    prevtime = 0;
+    currtime = 0;
+
+    trains[1].speed = 14;
+    trains[1].location.landmark = 4;
+    trains[1].location.offset = 1000;
+    // trains[1].speed = 5;
+    // trains[2].speed = 6;
+    // trains[3].speed = 13;
+    // trains[4].speed = 14;
+
+    CLOCK = WhoIs("CLOCK SERVER");
 }
 
 void trainServer() {
@@ -173,7 +227,10 @@ void trainServer() {
             // TODO: handle empty message
         }
 
-        if (mh->type == Constants::MSG::RDY) {
+        if (mh->type == Constants::MSG::TICK) {
+            ts.updateLocation();
+            Reply(tid, (char*)&rdymsg, rdymsg.size());
+        } else if (mh->type == Constants::MSG::RDY) {
             int index = ts.queueIndex();
             if (tid == ts.marklinCourier) {
                 if (index < 0) {
