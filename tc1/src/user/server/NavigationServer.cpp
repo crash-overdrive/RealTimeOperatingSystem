@@ -241,7 +241,7 @@ void NavigationServer::reserveTrack() {
 }
 
 void NavigationServer::transmitToCommandServer(int msgType) {
-    Assert(commandCourierReady = true);
+    ASSERT(commandCourierReady = true);
     commandCourierReady = false;
     switch (msgType) {
         case Constants::MSG::TR:
@@ -331,7 +331,7 @@ void NavigationServer::predictSensors() {
         char train = samsg->sensorAttrs[i].train;
         int trainIndex = Train::getTrainIndex(train);
         if (sensorLists[trainIndex].peek() == samsg->sensorAttrs[i].sensor) {
-            Assert(samsg->sensorAttrs[i].sensor == convertToSensor(paths[trainIndex].peek()));
+            ASSERT(samsg->sensorAttrs[i].sensor == convertToSensor(paths[trainIndex].peek()));
 
             int sensorIndex = paths[trainIndex].pop();
             // bwprintf(COM2, "Sensor %s tripped\n\r", track.trackNodes[sensorIndex].name);
@@ -347,7 +347,7 @@ void NavigationServer::predictSensors() {
             // TODO: handle recovery logic if needed
             Sensor sensor1 = sensorLists[trainIndex].pop();
             int sensor1Index = paths[trainIndex].pop();
-            Assert((sensor1 == convertToSensor(sensor1Index)));
+            ASSERT((sensor1 == convertToSensor(sensor1Index)));
             freeReservationsList[trainIndex].push(sensor1Index);
 
             Sensor sensor2 = sensorLists[trainIndex].pop();
@@ -356,7 +356,7 @@ void NavigationServer::predictSensors() {
                 trackIndex = paths[trainIndex].pop();
                 freeReservationsList[trainIndex].push(trackIndex);
             } while (track.trackNodes[trackIndex].type != NODE_TYPE::NODE_SENSOR);
-            Assert((sensor2 == convertToSensor(trackIndex)));
+            ASSERT((sensor2 == convertToSensor(trackIndex)));
             freeReservationsForTrain(trainIndex);
 
             spmsg.predictions[spmsg.count].nextSensor[0] = sensorLists[trainIndex].peek();
@@ -388,7 +388,7 @@ void NavigationServer::predictSensors() {
 }
 
 void NavigationServer::navigate() {
-    Assert(commandCourierReady == true);
+    ASSERT(commandCourierReady == true);
     // bwprintf(COM2, "Navigate Called!!\n\r");
     for (int trainIndex = 0; trainIndex < 5; ++trainIndex) {
         // Do nothing if there's no path
@@ -421,7 +421,7 @@ void NavigationServer::navigate() {
             int landmarkIndex = paths[trainIndex].pop();
             freeReservationsList[trainIndex].push(landmarkIndex);
             // bwprintf(COM2, "Popped %s\n\r", track.trackNodes[landmarkIndex].name);
-            Assert(paths[trainIndex].empty() == false);
+            ASSERT(paths[trainIndex].empty() == false);
             const TrackNode* nextLandmark =  &track.trackNodes[paths[trainIndex].peek()];
             const char* nextLandmarkName = nextLandmark->name;
 

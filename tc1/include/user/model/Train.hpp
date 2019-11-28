@@ -2,6 +2,7 @@
 #define TRAIN_HPP
 
 #include "user/model/Sensor.hpp"
+#include "user/model/Location.hpp"
 
 enum TRINDEX {
     T1 = 0,
@@ -20,10 +21,11 @@ public:
 
     unsigned int vel[15];
     unsigned int acc[15];
-    unsigned int position;
+    Location location;
     Sensor nextSensor[2];
 
     bool updated;
+    bool locationUpdated; // Do we need this?
 
     Train();
     Train(char n);

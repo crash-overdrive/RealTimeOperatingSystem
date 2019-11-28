@@ -208,6 +208,8 @@ namespace Constants {
         SENSOR_ATTR,
         SENSOR_PRED,
         TRAIN,
+        TICK,
+        LOCATION,
         TIME,
         IDLE,
     };

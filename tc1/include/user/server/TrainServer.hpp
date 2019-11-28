@@ -3,6 +3,7 @@
 
 #include "data-structures/RingBuffer.hpp"
 #include "user/model/Train.hpp"
+#include "user/message/LocationMessage.hpp"
 #include "user/message/SensorDiffMessage.hpp"
 #include "user/message/SensorPredMessage.hpp"
 #include "user/message/TRMessage.hpp"
@@ -17,6 +18,7 @@ public:
     SensorDiffMessage *sdmsg = (SensorDiffMessage *)&msg;
     SensorPredMessage *spmsg = (SensorPredMessage *)&msg;
     TrainMessage trainmsg;
+    LocationMessage locmsg;
 
     Train trains[5];
     DataStructures::RingBuffer<TRMessage, 32> trbuf[5];
@@ -26,6 +28,8 @@ public:
     bool navCourierReady;
     int guiCourier;
     bool guiCourierReady;
+    int notifier;
+    int CLOCK, currtime, prevtime;
 
     void init();
     TRINDEX getTrainIndex(char number);
@@ -36,10 +40,11 @@ public:
     void setTrainSpeed(int train, char s);
     TRMessage popTRMessage(int i);
     void attributeSensors();
-    void sendSensorAttr();
     void updatePredictions();
     void sendGUI();
     bool updated();
+    void updateLocation();
+    void sendLocation();
 };
 
 #endif
