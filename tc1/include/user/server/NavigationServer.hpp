@@ -33,12 +33,19 @@ class NavigationServer {
         Track track;
 
         DataStructures::Stack<int, TRACK_MAX> paths[5];
-        DataStructures::Stack<Sensor, 20> sensorLists[5];
+        DataStructures::Stack<Sensor, 40> sensorLists[5];
+        DataStructures::Stack<int, 40> freeReservationsList[5];
+        DataStructures::Stack<int, 40> reservationsList;
 
         void init();
+        void transmitToCommandServer(int msgType);
+        void transmitToTrainServer(int msgType);
         void predictSensors();
-        void findPath();
+        void initSensorPredictions();
+        bool findPath();
         void navigate();
+        void freeReservationsForTrain(int trainIndex);
+        void reserveTrack();
 };
 
 #endif

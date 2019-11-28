@@ -25,13 +25,12 @@
 
 #define FOREVER for(;;)
 
-Sensor convertToSensor(const Track* track, int index) {
-    if (track->trackNodes[index].type != NODE_TYPE::NODE_SENSOR) {
-        return Sensor(0,0);
-    } else {
-        int num = track->trackNodes[index].num;
-        return Sensor(num / 16 + 'A',num % 16 + 1);
-    }
+int convertToIndex(Sensor sensor) {
+    return sensor.bank - 'A' * 16 + sensor.bank - 1;
+}
+
+Sensor convertToSensor(int trackIndex) {
+    return Sensor(trackIndex / 16 + 'A',trackIndex % 16 + 1);
 }
 
 int nextNodeToBeConsidered(const Track* track, bool visitedNodes[], int dist[]) {
@@ -84,20 +83,25 @@ void djikstra(const Track* track, int srcIndex, int destIndex, int lastHop[]) {
     switch(track->trackNodes[srcIndex].type) {
         case NODE_TYPE::NODE_SENSOR:
         {
-            int indexAhead = track->trackNodes[srcIndex].edges[DIR_AHEAD].destNode - &track->trackNodes[0];
-            if (!track->trackNodes[indexAhead].reserved) {
-                dist[indexAhead] = track->trackNodes[srcIndex].edges[DIR_AHEAD].dist;
-                lastHop[indexAhead] = srcIndex;
-            } else {
-                bwprintf(COM2, "Navigation Server - Initial Starting point straight is reserved\n\r");
+            if (track->trackNodes[srcIndex].reserved) {
+                bwprintf(COM2, "Navigation Server - Djikstra failed, starting point %s reserved\n\r", track->trackNodes[srcIndex].name);
+                return;
             }
 
-            int indexReverse = track->trackNodes[srcIndex].reverseNode - &track->trackNodes[0];
-            if (!track->trackNodes[indexReverse].reserved) {
-                dist[indexReverse] = 0;
-                lastHop[indexReverse] = srcIndex;
+            int trackIndexAhead = track->trackNodes[srcIndex].edges[DIR_AHEAD].destNode - &track->trackNodes[0];
+            if (!track->trackNodes[trackIndexAhead].reserved) {
+                dist[trackIndexAhead] = track->trackNodes[srcIndex].edges[DIR_AHEAD].dist;
+                lastHop[trackIndexAhead] = srcIndex;
             } else {
-                bwprintf(COM2, "Navigation Server - Initial Starting point reverse is reserved\n\r");
+                bwprintf(COM2, "Navigation Server - Djikstra initiliaztion in ahead direction failed %s reserved\n\r", track->trackNodes[trackIndexAhead].name);
+            }
+
+            int trackIndexReverse = track->trackNodes[srcIndex].reverseNode - &track->trackNodes[0];
+            if (!track->trackNodes[trackIndexReverse].reserved) {
+                dist[trackIndexReverse] = 0;
+                lastHop[trackIndexReverse] = srcIndex;
+            } else {
+                bwprintf(COM2, "Navigation Server - Djikstra initiliaztion in reverse direction failed %s reserved\n\r", track->trackNodes[trackIndexReverse].name);
             }
             break;
         }
@@ -117,20 +121,20 @@ void djikstra(const Track* track, int srcIndex, int destIndex, int lastHop[]) {
         switch(track->trackNodes[minVertexNotVisited].type) {
             case NODE_TYPE::NODE_SENSOR:
             {
-                int indexAhead = track->trackNodes[minVertexNotVisited].edges[DIR_AHEAD].destNode - &track->trackNodes[0];
-                if (visitedNodes[indexAhead] == false && !track->trackNodes[indexAhead].reserved) {
+                int trackIndexAhead = track->trackNodes[minVertexNotVisited].edges[DIR_AHEAD].destNode - &track->trackNodes[0];
+                if (visitedNodes[trackIndexAhead] == false && !track->trackNodes[trackIndexAhead].reserved) {
                     int distToNeighbour = track->trackNodes[minVertexNotVisited].edges[DIR_AHEAD].dist;
-                    if (dist[minVertexNotVisited] + distToNeighbour < dist[indexAhead]) {
-                        dist[indexAhead] = dist[minVertexNotVisited] + distToNeighbour;
-                        lastHop[indexAhead] = minVertexNotVisited;
+                    if (dist[minVertexNotVisited] + distToNeighbour < dist[trackIndexAhead]) {
+                        dist[trackIndexAhead] = dist[minVertexNotVisited] + distToNeighbour;
+                        lastHop[trackIndexAhead] = minVertexNotVisited;
                     }
                 }
-                int indexReverse = track->trackNodes[minVertexNotVisited].reverseNode - &track->trackNodes[0];
-                if (visitedNodes[indexReverse] == false && !track->trackNodes[indexReverse].reserved) {
+                int trackIndexReverse = track->trackNodes[minVertexNotVisited].reverseNode - &track->trackNodes[0];
+                if (visitedNodes[trackIndexReverse] == false && !track->trackNodes[trackIndexReverse].reserved) {
                     int distToNeighbour = 0;
-                    if (dist[minVertexNotVisited] + distToNeighbour < dist[indexReverse]) {
-                        dist[indexReverse] = dist[minVertexNotVisited] + distToNeighbour;
-                        lastHop[indexReverse] = minVertexNotVisited;
+                    if (dist[minVertexNotVisited] + distToNeighbour < dist[trackIndexReverse]) {
+                        dist[trackIndexReverse] = dist[minVertexNotVisited] + distToNeighbour;
+                        lastHop[trackIndexReverse] = minVertexNotVisited;
                     }
                 }
                 break;
@@ -138,28 +142,28 @@ void djikstra(const Track* track, int srcIndex, int destIndex, int lastHop[]) {
 
             case NODE_TYPE::NODE_BRANCH:
             {
-                int indexStraight = track->trackNodes[minVertexNotVisited].edges[DIR_STRAIGHT].destNode - &track->trackNodes[0];
-                if (visitedNodes[indexStraight] == false && !track->trackNodes[indexStraight].reserved) {
+                int trackIndexStraight = track->trackNodes[minVertexNotVisited].edges[DIR_STRAIGHT].destNode - &track->trackNodes[0];
+                if (visitedNodes[trackIndexStraight] == false && !track->trackNodes[trackIndexStraight].reserved) {
                     int distToNeighbour = track->trackNodes[minVertexNotVisited].edges[DIR_STRAIGHT].dist;
-                    if (dist[minVertexNotVisited] + distToNeighbour < dist[indexStraight]) {
-                        dist[indexStraight] = dist[minVertexNotVisited] + distToNeighbour;
-                        lastHop[indexStraight] = minVertexNotVisited;
+                    if (dist[minVertexNotVisited] + distToNeighbour < dist[trackIndexStraight]) {
+                        dist[trackIndexStraight] = dist[minVertexNotVisited] + distToNeighbour;
+                        lastHop[trackIndexStraight] = minVertexNotVisited;
                     }
                 }
-                int indexCurved = track->trackNodes[minVertexNotVisited].edges[DIR_CURVED].destNode - &track->trackNodes[0];
-                if (visitedNodes[indexCurved] == false && !track->trackNodes[indexCurved].reserved) {
+                int trackIndexCurved = track->trackNodes[minVertexNotVisited].edges[DIR_CURVED].destNode - &track->trackNodes[0];
+                if (visitedNodes[trackIndexCurved] == false && !track->trackNodes[trackIndexCurved].reserved) {
                     int distToNeighbour = track->trackNodes[minVertexNotVisited].edges[DIR_CURVED].dist;
-                    if (dist[minVertexNotVisited] + distToNeighbour < dist[indexCurved]) {
-                        dist[indexCurved] = dist[minVertexNotVisited] + distToNeighbour;
-                        lastHop[indexCurved] = minVertexNotVisited;
+                    if (dist[minVertexNotVisited] + distToNeighbour < dist[trackIndexCurved]) {
+                        dist[trackIndexCurved] = dist[minVertexNotVisited] + distToNeighbour;
+                        lastHop[trackIndexCurved] = minVertexNotVisited;
                     }
                 }
-                int indexReverse = track->trackNodes[minVertexNotVisited].reverseNode - &track->trackNodes[0];
-                if (visitedNodes[indexReverse] == false && !track->trackNodes[indexReverse].reserved) {
+                int trackIndexReverse = track->trackNodes[minVertexNotVisited].reverseNode - &track->trackNodes[0];
+                if (visitedNodes[trackIndexReverse] == false && !track->trackNodes[trackIndexReverse].reserved) {
                     int distToNeighbour = 0;
-                    if (dist[minVertexNotVisited] + distToNeighbour < dist[indexReverse]) {
-                        dist[indexReverse] = dist[minVertexNotVisited] + distToNeighbour;
-                        lastHop[indexReverse] = minVertexNotVisited;
+                    if (dist[minVertexNotVisited] + distToNeighbour < dist[trackIndexReverse]) {
+                        dist[trackIndexReverse] = dist[minVertexNotVisited] + distToNeighbour;
+                        lastHop[trackIndexReverse] = minVertexNotVisited;
                     }
                 }
                 break;
@@ -167,20 +171,20 @@ void djikstra(const Track* track, int srcIndex, int destIndex, int lastHop[]) {
 
             case NODE_TYPE::NODE_MERGE:
             {
-                int indexAhead = track->trackNodes[minVertexNotVisited].edges[DIR_AHEAD].destNode - &track->trackNodes[0];
-                if (visitedNodes[indexAhead] == false && !track->trackNodes[indexAhead].reserved) {
+                int trackIndexAhead = track->trackNodes[minVertexNotVisited].edges[DIR_AHEAD].destNode - &track->trackNodes[0];
+                if (visitedNodes[trackIndexAhead] == false && !track->trackNodes[trackIndexAhead].reserved) {
                     int distToNeighbour = track->trackNodes[minVertexNotVisited].edges[DIR_AHEAD].dist;
-                    if (dist[minVertexNotVisited] + distToNeighbour < dist[indexAhead]) {
-                        dist[indexAhead] = dist[minVertexNotVisited] + distToNeighbour;
-                        lastHop[indexAhead] = minVertexNotVisited;
+                    if (dist[minVertexNotVisited] + distToNeighbour < dist[trackIndexAhead]) {
+                        dist[trackIndexAhead] = dist[minVertexNotVisited] + distToNeighbour;
+                        lastHop[trackIndexAhead] = minVertexNotVisited;
                     }
                 }
-                int indexReverse = track->trackNodes[minVertexNotVisited].reverseNode - &track->trackNodes[0];
-                if (visitedNodes[indexReverse] == false && !track->trackNodes[indexReverse].reserved) {
+                int trackIndexReverse = track->trackNodes[minVertexNotVisited].reverseNode - &track->trackNodes[0];
+                if (visitedNodes[trackIndexReverse] == false && !track->trackNodes[trackIndexReverse].reserved) {
                     int distToNeighbour = 0;
-                    if (dist[minVertexNotVisited] + distToNeighbour < dist[indexReverse]) {
-                        dist[indexReverse] = dist[minVertexNotVisited] + distToNeighbour;
-                        lastHop[indexReverse] = minVertexNotVisited;
+                    if (dist[minVertexNotVisited] + distToNeighbour < dist[trackIndexReverse]) {
+                        dist[trackIndexReverse] = dist[minVertexNotVisited] + distToNeighbour;
+                        lastHop[trackIndexReverse] = minVertexNotVisited;
                     }
                 }
                 break;
@@ -188,12 +192,12 @@ void djikstra(const Track* track, int srcIndex, int destIndex, int lastHop[]) {
 
             case NODE_TYPE::NODE_ENTER:
             {
-                int indexAhead = track->trackNodes[minVertexNotVisited].edges[DIR_AHEAD].destNode - &track->trackNodes[0];
-                if (visitedNodes[indexAhead] == false && !track->trackNodes[indexAhead].reserved) {
+                int trackIndexAhead = track->trackNodes[minVertexNotVisited].edges[DIR_AHEAD].destNode - &track->trackNodes[0];
+                if (visitedNodes[trackIndexAhead] == false && !track->trackNodes[trackIndexAhead].reserved) {
                     int distToNeighbour = track->trackNodes[minVertexNotVisited].edges[DIR_AHEAD].dist;
-                    if (dist[minVertexNotVisited] + distToNeighbour < dist[indexAhead]) {
-                        dist[indexAhead] = dist[minVertexNotVisited] + distToNeighbour;
-                        lastHop[indexAhead] = minVertexNotVisited;
+                    if (dist[minVertexNotVisited] + distToNeighbour < dist[trackIndexAhead]) {
+                        dist[trackIndexAhead] = dist[minVertexNotVisited] + distToNeighbour;
+                        lastHop[trackIndexAhead] = minVertexNotVisited;
                     }
                 }
                 break;
@@ -201,12 +205,12 @@ void djikstra(const Track* track, int srcIndex, int destIndex, int lastHop[]) {
 
             case NODE_TYPE::NODE_EXIT:
             {
-                int indexReverse = track->trackNodes[minVertexNotVisited].reverseNode - &track->trackNodes[0];
-                if (visitedNodes[indexReverse] == false && !track->trackNodes[indexReverse].reserved) {
+                int trackIndexReverse = track->trackNodes[minVertexNotVisited].reverseNode - &track->trackNodes[0];
+                if (visitedNodes[trackIndexReverse] == false && !track->trackNodes[trackIndexReverse].reserved) {
                     int distToNeighbour = 0;
-                    if (dist[minVertexNotVisited] + distToNeighbour < dist[indexReverse]) {
-                        dist[indexReverse] = dist[minVertexNotVisited] + distToNeighbour;
-                        lastHop[indexReverse] = minVertexNotVisited;
+                    if (dist[minVertexNotVisited] + distToNeighbour < dist[trackIndexReverse]) {
+                        dist[trackIndexReverse] = dist[minVertexNotVisited] + distToNeighbour;
+                        lastHop[trackIndexReverse] = minVertexNotVisited;
                     }
                 }
                 break;
@@ -218,7 +222,55 @@ void djikstra(const Track* track, int srcIndex, int destIndex, int lastHop[]) {
     } while(!djikstraFinished(track, visitedNodes));
 }
 
-void NavigationServer::findPath() {
+void NavigationServer::freeReservationsForTrain(int trainIndex) {
+    while(!freeReservationsList[trainIndex].empty()) {
+        int trackIndex = freeReservationsList[trainIndex].pop();
+        track.trackNodes[trackIndex].reserved = false;
+        track.trackNodes[trackIndex].reverseNode->reserved = false;
+        // bwprintf(COM2, "Unreserved %s %s\n\r", track.trackNodes[trackIndex].name, track.trackNodes[trackIndex].reverseNode->name);
+    }
+}
+
+void NavigationServer::reserveTrack() {
+    while(!reservationsList.empty()) {
+        int trackIndex = reservationsList.pop();
+        track.trackNodes[trackIndex].reserved = true;
+        track.trackNodes[trackIndex].reverseNode->reserved = true;
+        // bwprintf(COM2, "Reserved %s %s\n\r", track.trackNodes[trackIndex].name, track.trackNodes[trackIndex].reverseNode->name);
+    }
+}
+
+void NavigationServer::transmitToCommandServer(int msgType) {
+    Assert(commandCourierReady = true);
+    commandCourierReady = false;
+    switch (msgType) {
+        case Constants::MSG::TR:
+            Reply(commandCourier, (char*)&trmsg, trmsg.size());
+            break;
+        case Constants::MSG::RV:
+            Reply(commandCourier, (char*)&rvmsg, rvmsg.size());
+            break;
+        case Constants::MSG::SW:
+            Reply(commandCourier, (char*)&swmsg, swmsg.size());
+            break;
+        default:
+            commandCourierReady = true;
+            bwprintf(COM2, "Navigation Server - Tried to send invalid msg to Command Server: %d", msgType);
+            break;
+    }
+}
+
+void NavigationServer::transmitToTrainServer(int msgType) {
+    Assert(trainCourierReady == true);
+    if (msgType == Constants::MSG::SENSOR_PRED) {
+        trainCourierReady = false;
+        Reply(trainCourier, (char*)&spmsg, spmsg.size());
+    } else {
+        bwprintf(COM2, "Navigation Server - Tried to send invalid msg to Train Server: %d", msgType);
+    }
+}
+
+bool NavigationServer::findPath() {
     int srcIndex = -1;
     int destIndex = -1;
     int lastHop[track.noOfNodes];
@@ -232,128 +284,145 @@ void NavigationServer::findPath() {
     }
 
     if (srcIndex == -1 || destIndex == -1) {
-        // Note: enclosing in brackets ()[]{}<> is a debugging tactic, not intended for actual server messages/kernel panics!
-        bwprintf(COM2, "Navigation Server - Bad src <%s> [%d]  or dest <%s> [%d]\n\r", rtmsg->src, srcIndex, rtmsg->dest, destIndex);
-        return;
+        bwprintf(COM2, "Navigation Server - Bad src %s %d  or dest %s %d\n\r", rtmsg->src, srcIndex, rtmsg->dest, destIndex);
+        return false;
     }
 
     djikstra(&track, srcIndex, destIndex, lastHop);
 
-    // TODO: (spratap) Analyze if we need to turn off tracks here?
-    int index = destIndex;
+    int trackIndex = -1;
     int trainIndex = Train::getTrainIndex(rtmsg->train);
+
     do {
-        if (index == -1) {
+        trackIndex = trackIndex == -1 ? destIndex : lastHop[trackIndex];
+
+        if (trackIndex == -1) {
             bwprintf(COM2, "Navigation Server - No Path Exists from %s to %s\n\r", rtmsg->src, rtmsg->dest); // TODO(sgaweda): This actually shouldn't never happen and if it can we have to find a way around it!
             paths[trainIndex].reset();
+            reservationsList.reset();
             sensorLists[trainIndex].reset();
-            return;
+            return false;
         }
-        paths[trainIndex].push(index);
-        if (track.trackNodes[index].type == NODE_SENSOR) {
-            int num = track.trackNodes[index].num;
-            char b = (char)(num / 16 + 'A');
-            char n = (char)(num % 16 + 1);
-            sensorLists[trainIndex].push(Sensor(b,n));
+
+        paths[trainIndex].push(trackIndex);
+        reservationsList.push(trackIndex);
+        if (track.trackNodes[trackIndex].type == NODE_SENSOR) {
+            sensorLists[trainIndex].push(convertToSensor(trackIndex));
         }
-        // bwprintf(COM2, "%s <- ", track.trackNodes[index].name);
-        index = lastHop[index];
-    } while (index != srcIndex);
-    paths[trainIndex].push(index);
-    // bwprintf(COM2, "%s\n\r", track.trackNodes[index].name);
-    if (track.trackNodes[index].type == NODE_SENSOR) {
-        int num = track.trackNodes[index].num;
-        int b = num / 16 + 'A';
-        int n = num % 16 + 1;
-        sensorLists[trainIndex].push(Sensor(b,n));
-    } else {
-        bwprintf(COM2, "Navigation Server - Destination %s is not a sensor\n\r", rtmsg->dest); // TODO(sgaweda): If destinations must be sensors then we need to restrict the input too so we can save computation!
-    }
+    } while(trackIndex != srcIndex);
+
+    reserveTrack();
+    // -1 implies start of path
+    paths[trainIndex].push(-1);
+    return true;
+}
+
+void NavigationServer::initSensorPredictions() {
+    int trainIndex = Train::getTrainIndex(rtmsg->train);
+    spmsg.predictions[spmsg.count].nextSensor[0] = sensorLists[trainIndex].peek();
+    spmsg.predictions[spmsg.count].nextSensor[1] = sensorLists[trainIndex].peekSecond();
+    spmsg.predictions[spmsg.count].train = rtmsg->train;
+    spmsg.count++;
+    transmitToTrainServer(Constants::MSG::SENSOR_PRED);
 }
 
 void NavigationServer::predictSensors() {
-    // check what type of message wants us to predict
-    if (mh->type == Constants::SENSOR_ATTR) {
-        for (int i = 0; i < samsg->count; ++i) {
-            char train = samsg->sensorAttrs[i].train;
-            int index = Train::getTrainIndex(train);
-            if (sensorLists[index].peek() == samsg->sensorAttrs[i].sensor) {
-                Assert((samsg->sensorAttrs[i].sensor == convertToSensor(&track, paths[index].peek())));
-                int temp = paths[index].pop();
-                // bwprintf(COM2, "Sensor %s tripped\n\r", track.trackNodes[temp].name);
-                sensorLists[index].pop();
-                spmsg.predictions[spmsg.count].nextSensor[0] = sensorLists[index].peek();
-                spmsg.predictions[spmsg.count].nextSensor[1] = sensorLists[index].peekSecond();
-                spmsg.predictions[spmsg.count].train = train;
-                spmsg.count++;
-            } else if (sensorLists[index].peekSecond() == samsg->sensorAttrs->sensor) {
-                // TODO: handle recovery logic if needed
-                paths[index].pop();
-                paths[index].pop();
-                sensorLists[index].pop();
-                sensorLists[index].pop();
-                spmsg.predictions[spmsg.count].nextSensor[0] = sensorLists[index].peek();
-                spmsg.predictions[spmsg.count].nextSensor[1] = sensorLists[index].peekSecond();
-                spmsg.predictions[spmsg.count].train = train;
-                spmsg.count++;
-            } else {
-                bwprintf(COM2, "Nav Server - Bad Sensor Attribution.."); // NOTE(sgaweda): This should NEVER happen, if a train attributes a sensor incorrectly, it's because the Navigation Server told it to!
-            }
+    for (int i = 0; i < samsg->count; ++i) {
+        char train = samsg->sensorAttrs[i].train;
+        int trainIndex = Train::getTrainIndex(train);
+        if (sensorLists[trainIndex].peek() == samsg->sensorAttrs[i].sensor) {
+            Assert(samsg->sensorAttrs[i].sensor == convertToSensor(paths[trainIndex].peek()));
 
+            int sensorIndex = paths[trainIndex].pop();
+            // bwprintf(COM2, "Sensor %s tripped\n\r", track.trackNodes[sensorIndex].name);
+            freeReservationsList[trainIndex].push(sensorIndex);
+            freeReservationsForTrain(trainIndex);
 
+            sensorLists[trainIndex].pop();
+            spmsg.predictions[spmsg.count].nextSensor[0] = sensorLists[trainIndex].peek();
+            spmsg.predictions[spmsg.count].nextSensor[1] = sensorLists[trainIndex].peekSecond();
+            spmsg.predictions[spmsg.count].train = train;
+            spmsg.count++;
+        } else if (sensorLists[trainIndex].peekSecond() == samsg->sensorAttrs->sensor) {
+            // TODO: handle recovery logic if needed
+            Sensor sensor1 = sensorLists[trainIndex].pop();
+            int sensor1Index = paths[trainIndex].pop();
+            Assert((sensor1 == convertToSensor(sensor1Index)));
+            freeReservationsList[trainIndex].push(sensor1Index);
 
-            // TODO: refactor this logic out of here
-            if (sensorLists[index].peek().bank == 0) {
-                // STOP TRAIN
-                trmsg.speed = 0;
-                trmsg.train = train;
-                Reply(commandCourier, (char*)&trmsg, trmsg.size());
-                commandCourierReady = false;
-                // bwprintf(COM2, "CC not ready\n\r");
-            } else if (sensorLists[index].peekSecond().bank == 0) {
-                // SLOW TRAIN
-                trmsg.speed = 8;
-                trmsg.train = train;
-                Reply(commandCourier, (char*)&trmsg, trmsg.size());
-                commandCourierReady = false;
-                // bwprintf(COM2, "CC not ready\n\r");
-            }
+            Sensor sensor2 = sensorLists[trainIndex].pop();
+            int trackIndex = -1;
+            do {
+                trackIndex = paths[trainIndex].pop();
+                freeReservationsList[trainIndex].push(trackIndex);
+            } while (track.trackNodes[trackIndex].type != NODE_TYPE::NODE_SENSOR);
+            Assert((sensor2 == convertToSensor(trackIndex)));
+            freeReservationsForTrain(trainIndex);
 
-
-
+            spmsg.predictions[spmsg.count].nextSensor[0] = sensorLists[trainIndex].peek();
+            spmsg.predictions[spmsg.count].nextSensor[1] = sensorLists[trainIndex].peekSecond();
+            spmsg.predictions[spmsg.count].train = train;
+            spmsg.count++;
+        } else {
+            bwprintf(COM2, "Nav Server - Bad Sensor Attribution.."); // NOTE(sgaweda): This should NEVER happen, if a train attributes a sensor incorrectly, it's because the Navigation Server told it to!
         }
-    } else if (mh->type == Constants::RT) {
-        int index = Train::getTrainIndex(rtmsg->train);
-        spmsg.predictions[spmsg.count].nextSensor[0] = sensorLists[index].peek();
-        spmsg.predictions[spmsg.count].nextSensor[1] = sensorLists[index].peekSecond();
-        spmsg.predictions[spmsg.count].train = rtmsg->train;
-        spmsg.count++;
+
+
+
+        // TODO: refactor this logic out of here
+        if (sensorLists[trainIndex].peek().bank == 0) {
+            // STOP TRAIN
+            trmsg.speed = 0;
+            trmsg.train = train;
+            transmitToCommandServer(Constants::MSG::TR);
+        } else if (sensorLists[trainIndex].peekSecond().bank == 0) {
+            // SLOW TRAIN
+            trmsg.speed = 8;
+            trmsg.train = train;
+            transmitToCommandServer(Constants::MSG::TR);
+        }
+
+
+
     }
 }
 
 void NavigationServer::navigate() {
     Assert(commandCourierReady == true);
     // bwprintf(COM2, "Navigate Called!!\n\r");
-    for (int train = 0; train < 5; ++train) {
+    for (int trainIndex = 0; trainIndex < 5; ++trainIndex) {
         // Do nothing if there's no path
-        if (paths[train].empty()) {
+        if (paths[trainIndex].empty()) {
             continue;
         }
 
-        const TrackNode* currentLandmark = &track.trackNodes[paths[train].peek()];
+        int trackIndex = paths[trainIndex].peek();
+
+        if (trackIndex == -1) { //start the train
+            paths[trainIndex].pop();
+            int trainNumber = Train::getTrainNumber(trainIndex);
+            trmsg.train = trainNumber;
+            trmsg.speed = 14;
+            transmitToCommandServer(Constants::MSG::TR);
+            // bwprintf(COM2, "Starting train %d\n\r", trainNumber);
+            return;
+        }
+
+        const TrackNode* currentLandmark = &track.trackNodes[trackIndex];
         const char* currentLandmarkName = currentLandmark->name;
 
         if (currentLandmark->type == NODE_TYPE::NODE_SENSOR) {
             //TODO: implement me for reversing
-            // bwprintf(COM2, "Train %d Waiting for Sensor %s\n\r", train, currentLandmarkName);
+            // bwprintf(COM2, "Train %d Waiting for Sensor %s\n\r", trainIndex, currentLandmarkName);
             continue;
         }
 
         while(currentLandmark->type != NODE_TYPE::NODE_SENSOR) {
-            int temp = paths[train].pop();
-            // bwprintf(COM2, "Popped %s\n\r", track.trackNodes[temp].name);
-            Assert(paths[train].empty() == false);
-            const TrackNode* nextLandmark =  &track.trackNodes[paths[train].peek()];
+            int landmarkIndex = paths[trainIndex].pop();
+            freeReservationsList[trainIndex].push(landmarkIndex);
+            // bwprintf(COM2, "Popped %s\n\r", track.trackNodes[landmarkIndex].name);
+            Assert(paths[trainIndex].empty() == false);
+            const TrackNode* nextLandmark =  &track.trackNodes[paths[trainIndex].peek()];
             const char* nextLandmarkName = nextLandmark->name;
 
             switch (currentLandmark->type) {
@@ -365,19 +434,13 @@ void NavigationServer::navigate() {
                     if (!strcmp(nextLandmarkName, straightDirectionLandmarkName)) {
                         swmsg.sw = currentLandmark->num;
                         swmsg.state = 'S';
-                        int result = Reply(commandCourier, (char*)&swmsg, swmsg.size());
-                        commandCourierReady = false;
-                        // bwprintf(COM2, "CC not ready\n\r");
-                        // bwprintf(COM2, "[%d %d %c swmsg]\n\r", result, swmsg.sw, swmsg.state);
+                        transmitToCommandServer(Constants::MSG::SW);
                         // bwprintf(COM2, "[Straight SW %s]\n\r", currentLandmarkName);
                         return;
                     } else if (!strcmp(nextLandmarkName, curvedDirectionLandmarkName)) {
                         swmsg.sw = currentLandmark->num;
                         swmsg.state = 'C';
-                        int result = Reply(commandCourier, (char*)&swmsg, swmsg.size());
-                        commandCourierReady = false;
-                        // bwprintf(COM2, "CC not ready\n\r");
-                        // bwprintf(COM2, "[%d %d %c swmsg]\n\r", result, swmsg.sw, swmsg.state);
+                        transmitToCommandServer(Constants::MSG::SW);
                         // bwprintf(COM2, "[Curved SW %s]\n\r", currentLandmarkName);
                         return;
                     } else {
@@ -392,10 +455,8 @@ void NavigationServer::navigate() {
                     if (!strcmp(nextLandmarkName, aheadDirectionLandmarkName)) {
                         // bwprintf(COM2, "[Ahead %s]\n\r", aheadDirectionLandmarkName);
                     } else if(!strcmp(nextLandmarkName, reverseDirectionLandmarkName)) {
-                        rvmsg.train = Train::getTrainNumber(train);
-                        Reply(commandCourier, (char*)&rvmsg, rvmsg.size());
-                        commandCourierReady = false;
-                        // bwprintf(COM2, "CC not ready\n\r");
+                        rvmsg.train = Train::getTrainNumber(trainIndex);
+                        transmitToCommandServer(Constants::MSG::RV);
                         // bwprintf(COM2, "[Reverse %s]\n\r", reverseDirectionLandmarkName);
                         return;
                     } else {
@@ -431,7 +492,6 @@ void NavigationServer::navigate() {
 
 void NavigationServer::init() {
     // TODO: (spratap) add support for both tracks
-    // track = Track('A');
     commandCourier = Create(7, navCSCourier);
     trainCourier = Create(5, navTrainCourier);
 }
@@ -458,24 +518,13 @@ void navigationServer() {
                 ns.trainCourierReady = true;
             }
         } else if (ns.mh->type == Constants::MSG::RT) {
-            ns.findPath();
+            bool pathExist = ns.findPath();
+            if (pathExist) {
+                Reply(tid, (char*)&rdymsg, rdymsg.size());
 
-            ns.predictSensors();
-            Assert(ns.trainCourierReady); // This should always be true because it's impossible for lower priority command server to run before the train server gets back to us.
-            Reply(ns.trainCourier, (char*)&ns.spmsg, ns.spmsg.size());
-            ns.trainCourierReady = false;
-
-            // TODO(sgaweda): Can this courier be blocked when this happens? I suspect it's possible so we should probably check
-            // Maybe refactor this to a start train function?
-            // TODO(sgaweda): train control will be responsible for determining if this train speed change needs to occur. We can assume train is stopped here.
-            ns.trmsg.train = ns.rtmsg->train;
-            ns.trmsg.speed = 14;
-            Reply(ns.commandCourier, (char*)&ns.trmsg, ns.trmsg.size());
-            ns.commandCourierReady = false;
-            // bwprintf(COM2, "CC not ready\n\r");
-
-            // We always reply to the requesting task last. Yes it blocks for longer but we're not ready to process another parsed command anyway. Plus no one types that fast!
-            Reply(tid, (char*)&rdymsg, rdymsg.size());
+                ns.navigate(); // start nagivation (will start train)
+                ns.initSensorPredictions(); // initialize train predictions
+            }
         } else if (ns.mh->type == Constants::MSG::DT) {
             // TODO: Implement me
             // Once we have information it should be possible to change destination
@@ -489,6 +538,8 @@ void navigationServer() {
             if (ns.commandCourierReady) {
                 ns.navigate();
             }
+        } else {
+            bwprintf(COM2, "Navigation Server - Received an unexpected message: %d", ns.mh->type);
         }
     }
 }
