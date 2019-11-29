@@ -28,7 +28,7 @@ void Kernel::drawGUI() {
                    "║ %sSensor Predictions%s                                                                         ║\r\n"
                    "║                                                                                            ║\r\n"
                    "║       N Sensor  Est Time  Est Dist  P Sensor  Real Time Real Dist Current Loc              ║\r\n"
-                   "║   %sT1%s                                                          BR153+123mm                  ║\r\n"
+                   "║   %sT1%s                                                                                       ║\r\n"
                    "║   %sT24%s                                                                                      ║\r\n"
                    "║   %sT58%s                                                                                      ║\r\n"
                    "║   %sT74%s                                                                                      ║\r\n"

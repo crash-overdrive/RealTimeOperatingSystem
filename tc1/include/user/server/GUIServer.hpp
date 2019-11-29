@@ -2,6 +2,7 @@
 #define GUI_SERVER_HPP
 
 #include "user/message/TextMessage.hpp"
+#include "user/model/Track.hpp"
 
 void guiServer();
 
@@ -15,11 +16,14 @@ public:
     // bool drawingBase;
     int termCourier;
     TextMessage drawmsg;
+    Track track;
 
     int insertSetDisplayAttrs(char *str, int attr);
-    int insertSaveCursorAndAttrs(char *str, int index);
-    int insertRestorCursorAndAttrs(char *str, int index);
-    int insertForceCursorPos(char *str, int index, int row, int col);
+    int insertTrainColor(char *str, int index);
+
+    // int insertSaveCursorAndAttrs(char *str, int index);
+    // int insertRestorCursorAndAttrs(char *str, int index);
+    // int insertForceCursorPos(char *str, int index, int row, int col);
 
     void init();
     void drawTime(char *msg);
@@ -27,6 +31,7 @@ public:
     void drawSensors(char *msg);
     void drawSwitch(char *msg);
     void drawTrain(char *msg);
+    void drawLocation(char *msg);
 };
 
 #endif

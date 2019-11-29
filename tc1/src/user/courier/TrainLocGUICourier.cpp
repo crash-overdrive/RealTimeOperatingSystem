@@ -1,0 +1,37 @@
+#include "Constants.hpp"
+#include "io/bwio.hpp"
+#include "user/courier/TrainLocGUICourier.hpp"
+#include "user/message/LocationMessage.hpp"
+#include "user/message/ThinMessage.hpp"
+#include "user/syscall/UserSyscall.hpp"
+
+#define FOREVER for (;;)
+
+void trainLocGUICourier() {
+    int TRAIN = WhoIs("TRAIN");
+    int GUI = WhoIs("GUI");
+    int result;
+
+    LocationMessage locmsg;
+    ThinMessage rdymsg(Constants::MSG::RDY);
+
+    FOREVER {
+        // Get train location update from train server
+        result = Send(TRAIN, (char *)&rdymsg, rdymsg.size(), (char*)&locmsg, locmsg.maxSize());
+        if (result < 0) {
+            bwprintf(COM2, "TrainLoc->GUI Courier - Send to Train Server failed\r\n");
+        }
+        if (locmsg.mh.type != Constants::MSG::LOCATION) {
+            bwprintf(COM2, "TrainLoc->GUI Courier - Expected LOCATION message type but received unexpected message type %d\r\n", locmsg.mh.type);
+        }
+
+        // Send train location update to GUI server
+        result = Send(GUI, (char*)&locmsg, locmsg.size(), (char *)&rdymsg, rdymsg.size());
+        if (result < 0) {
+            bwprintf(COM2, "TrainLoc->GUI Courier - Send to GUI Server failed\r\n");
+        }
+        if (rdymsg.mh.type != Constants::MSG::RDY) {
+            bwprintf(COM2, "TrainLoc->GUI Courier - Expected RDY message type but received unexpected message type %d\r\n", rdymsg.mh.type);
+        }
+    }
+}

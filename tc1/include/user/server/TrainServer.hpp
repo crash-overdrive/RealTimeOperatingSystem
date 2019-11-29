@@ -2,6 +2,7 @@
 #define TRAIN_SERVER_HPP
 
 #include "data-structures/RingBuffer.hpp"
+#include "user/model/Track.hpp"
 #include "user/model/Train.hpp"
 #include "user/message/LocationMessage.hpp"
 #include "user/message/SensorDiffMessage.hpp"
@@ -22,14 +23,11 @@ public:
 
     Train trains[5];
     DataStructures::RingBuffer<TRMessage, 32> trbuf[5];
-    int marklinCourier;
-    bool marklinCourierReady;
-    int navCourier;
-    bool navCourierReady;
-    int guiCourier;
-    bool guiCourierReady;
-    int notifier;
-    int CLOCK, currtime, prevtime;
+    int marklinCourier, navCourier, guiCourier, locNavCourier, locGUICourier, notifier;
+    bool marklinCourierReady, navCourierReady, guiCourierReady, locNavCourierReady, locGUICourierReady;
+    int CLOCK, currtime, prevtime, tickCount;
+
+    Track track;
 
     void init();
     TRINDEX getTrainIndex(char number);
@@ -44,6 +42,7 @@ public:
     void sendGUI();
     bool updated();
     void updateLocation();
+    int getDirection(int i);
     void sendLocation();
 };
 

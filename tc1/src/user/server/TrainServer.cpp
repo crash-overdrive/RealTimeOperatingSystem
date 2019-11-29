@@ -6,6 +6,8 @@
 #include "io/bwio.hpp"
 #include "io/ts7200.h"
 #include "user/courier/TrainGUICourier.hpp"
+#include "user/courier/TrainLocGUICourier.hpp"
+#include "user/courier/TrainLocNavCourier.hpp"
 #include "user/courier/TrainMarklinCourier.hpp"
 #include "user/courier/TrainNavCourier.hpp"
 #include "user/message/RVMessage.hpp"
@@ -119,27 +121,91 @@ bool TrainServer::updated() {
     return false;
 }
 
+int TrainServer::getDirection(int i) {
+    // TODO: Improve direction to account for sensor attributions
+    switch (track.trackNodes[(int)trains[i].location.landmark].type) {
+        case NODE_SENSOR:
+        case NODE_MERGE:
+        case NODE_ENTER:
+            break;
+        case NODE_BRANCH:
+            {
+                const TrackNode *straight = track.trackNodes[(int)trains[i].location.landmark].edges[DIR_STRAIGHT].destNode;
+                const TrackNode *curved = track.trackNodes[(int)trains[i].location.landmark].edges[DIR_CURVED].destNode;
+                // if (straight->type == NODE_TYPE::NODE_SENSOR) {
+                //     if (straight->sensor != trains[i].nextSensor[0]) {
+                //         direction = DIR_CURVED;
+                //     } else {
+                //         direction = DIR_STRAIGHT;
+                //     }
+                // } else if (curved->type == NODE_TYPE::NODE_SENSOR) {
+                //     if (curved->sensor == trains[i].nextSensor[0]) {
+                //         direction = DIR_CURVED;
+                //     } else {
+                //         direction = DIR_STRAIGHT;
+                //     }
+                // }
+                if (track.trackNodes[(int)trains[i].location.landmark].num == 154 || track.trackNodes[(int)trains[i].location.landmark].num == 156) {
+                    return DIR_STRAIGHT;
+                } else {
+                    return DIR_CURVED; // TODO: remove
+                }
+            }
+            break;
+        case NODE_EXIT:
+            bwprintf(COM2, "Train Server - Unexpected EXIT direction request");
+            // bwprintf(COM2, "Train Server - Do we even support EXIT location updates? %d %d %s", trains[i].number, trains[i].location.landmark, track.trackNodes[(int)trains[i].location.landmark].name);
+            SwitchOff();
+            break;
+        case NODE_NONE:
+            bwprintf(COM2, "Train Server - Unexpected NONE direction request");
+            // bwprintf(COM2, "Train Server - Do we even support NONE location updates? %d %d %s", trains[i].number, trains[i].location.landmark, track.trackNodes[(int)trains[i].location.landmark].name);
+            SwitchOff();
+            break;
+        default:
+            bwprintf(COM2, "Train Server - Unexpected NODE_TYPE received in location update");
+            break;
+    }
+    return DIR_STRAIGHT;
+}
+
 void TrainServer::updateLocation() {
     prevtime = currtime;
     currtime = Time(CLOCK);
     int delta = currtime - prevtime; // Number of ticks, should always be 1
-    ASSERT(delta == 1);
+    ASSERT(delta > 0);
     for (int i = 0; i < 5; ++i) {
         if (trains[i].speed != 0) {
             // Calculate distance travelled since last tick
             // TODO: improve logic to account for acceleration
-            int dist = trains[i].vel[trains[i].speed];
+            int dist = trains[i].vel[(int)trains[i].speed] * delta / 100;
+
+            // Update train location
+            trains[i].location.offset += dist;
+            int direction = DIR_AHEAD;
+            direction = getDirection(i);
+            dist = trains[i].location.offset - track.trackNodes[(int)trains[i].location.landmark].edges[direction].dist * 1000;
+            while (dist >= 0) {
+                int index = (track.trackNodes[(int)trains[i].location.landmark].edges[direction].destNode - track.trackNodes);
+                trains[i].location.landmark = (char)index;
+                trains[i].location.offset = dist;
+                direction = getDirection(i);
+                dist = trains[i].location.offset - track.trackNodes[(int)trains[i].location.landmark].edges[direction].dist * 1000;
+            }
 
             // Add train to location message
             locmsg.locationInfo[locmsg.count].train = trains[i].number;
             locmsg.locationInfo[locmsg.count].location = trains[i].location;
             locmsg.count++;
         }
-        // bwprintf(COM2, "(%d %d)", dist, trains[i].speed);
     }
+}
 
+void TrainServer::sendLocation() {
     // Reply(locNavCourier, (char *)&locmsg, locmsg.size());
-    // Reply(locGUICourier, (char *)&locmsg, locmsg.size());
+    if (currtime % 10 == 0) {
+        Reply(locGUICourier, (char *)&locmsg, locmsg.size());
+    }
     locmsg.count = 0;
 }
 
@@ -150,8 +216,8 @@ void TrainServer::sendGUI() {
         trainmsg.trainInfo[0].prev = trainmsg.trainInfo[0].next;
         trainmsg.trainInfo[0].next = trains[1].nextSensor[0];
         // Faking a sensor
-        trainmsg.trainInfo[0].prev = Sensor('A', 15);
-        trainmsg.trainInfo[0].next = Sensor('E', 10);
+        trainmsg.trainInfo[0].prev = Sensor('B', 7);
+        trainmsg.trainInfo[0].next = Sensor('B', 8);
         trainmsg.trainInfo[0].predictedDist = 100;
         trainmsg.trainInfo[0].predictedTime = 29;
         trainmsg.trainInfo[0].realDist = 1200;
@@ -170,7 +236,7 @@ void TrainServer::init() {
     trains[T58] = Train(58);
     trains[T74] = Train(74);
     trains[T78] = Train(78);
-    // TODO: init train estimates
+
     marklinCourier = Create(5, trainMarklinCourier);
     marklinCourierReady = false;
     navCourier = Create(5, trainNavCourier);
@@ -178,12 +244,15 @@ void TrainServer::init() {
     guiCourier = Create(8, trainGUICourier);
     guiCourierReady = false;
     notifier = Create(5, trainNotifier);
+    // locNavCourier = Create(5, trainLocNavCourier);
+    locNavCourierReady = false;
+    locGUICourier = Create(8, trainLocGUICourier);
+    locGUICourierReady = false;
 
-    trains[0].updated = true;
 
     // Set the speed measurements for the trains
     int velocities[5][15] = {
-        { 0, 0, 0, 0, 0, 0, 99000, 171000, 221000, 279000, 337000, 411000, 478000, 545000, 594000 },
+        { 0, 40000, 0, 0, 0, 0, 99000, 171000, 221000, 279000, 337000, 411000, 478000, 545000, 594000 },
         { 0, 0, 0, 0, 0, 0, 99000, 171000, 221000, 279000, 337000, 411000, 478000, 545000, 594000 },
         { 0, 0, 0, 0, 0, 0, 99000, 171000, 221000, 279000, 337000, 411000, 478000, 545000, 594000 },
         { 0, 0, 0, 0, 0, 0, 99000, 171000, 221000, 279000, 337000, 411000, 478000, 545000, 594000 },
@@ -195,10 +264,18 @@ void TrainServer::init() {
 
     prevtime = 0;
     currtime = 0;
+    tickCount = 0;
 
-    trains[1].speed = 14;
-    trains[1].location.landmark = 4;
-    trains[1].location.offset = 1000;
+    trains[0].speed = 14;
+    trains[0].location.landmark = (char)4;
+    trains[0].location.offset = 100000;
+
+    trains[2].speed = 14;
+    trains[2].location.landmark = (char)3;
+    trains[2].location.offset = 10000;
+
+    trains[0].updated = true;
+
     // trains[1].speed = 5;
     // trains[2].speed = 6;
     // trains[3].speed = 13;
@@ -229,6 +306,7 @@ void trainServer() {
 
         if (mh->type == Constants::MSG::TICK) {
             ts.updateLocation();
+            ts.sendLocation();
             Reply(tid, (char*)&rdymsg, rdymsg.size());
         } else if (mh->type == Constants::MSG::RDY) {
             int index = ts.queueIndex();
@@ -243,6 +321,8 @@ void trainServer() {
             } else if (tid == ts.guiCourier) {
                 ts.guiCourierReady = true;
                 ts.sendGUI();
+            } else if (tid == ts.locGUICourier) {
+                ts.locGUICourierReady = true;
             } else {
                 bwprintf(COM2, "Train Server - Unexpected ready message!");
             }

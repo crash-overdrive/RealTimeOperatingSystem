@@ -10,6 +10,7 @@ public:
     Sensor(char b, char n);
 
     bool operator==(const Sensor& other) const;
+    bool operator!=(const Sensor& other) const;
 };
 
 // inline bool operator==(const Sensor& lhs, const Sensor& rhs) {}
