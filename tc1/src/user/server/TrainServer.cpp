@@ -132,38 +132,33 @@ int TrainServer::getDirection(int i) {
             {
                 const TrackNode *straight = track.trackNodes[(int)trains[i].location.landmark].edges[DIR_STRAIGHT].destNode;
                 const TrackNode *curved = track.trackNodes[(int)trains[i].location.landmark].edges[DIR_CURVED].destNode;
-                // if (straight->type == NODE_TYPE::NODE_SENSOR) {
-                //     if (straight->sensor != trains[i].nextSensor[0]) {
-                //         direction = DIR_CURVED;
-                //     } else {
-                //         direction = DIR_STRAIGHT;
-                //     }
-                // } else if (curved->type == NODE_TYPE::NODE_SENSOR) {
-                //     if (curved->sensor == trains[i].nextSensor[0]) {
-                //         direction = DIR_CURVED;
-                //     } else {
-                //         direction = DIR_STRAIGHT;
-                //     }
-                // }
-                if (track.trackNodes[(int)trains[i].location.landmark].num == 154 || track.trackNodes[(int)trains[i].location.landmark].num == 156) {
+                if (straight->type == NODE_TYPE::NODE_SENSOR && straight->sensor == trains[i].nextSensor[0]) {
                     return DIR_STRAIGHT;
+                } else if (curved->type == NODE_TYPE::NODE_SENSOR && curved->sensor == trains[i].nextSensor[0]) {
+                    return DIR_CURVED;
+                } else if (track.trackNodes[(int)trains[i].location.landmark].num == 11) {
+                    if (Sensor('A', 4) == trains[i].nextSensor[0]) {
+                        return DIR_CURVED;
+                    } else {
+                        return DIR_STRAIGHT;
+                    }
                 } else {
-                    return DIR_CURVED; // TODO: remove
+                    bwprintf(COM2, "Train Server - Unexpected direction scenario from %s", track.trackNodes[(int)trains[i].location.landmark].name);
                 }
             }
             break;
         case NODE_EXIT:
-            bwprintf(COM2, "Train Server - Unexpected EXIT direction request");
+            bwprintf(COM2, "Train Server - Unexpected EXIT direction request from %s", track.trackNodes[(int)trains[i].location.landmark].name);
             // bwprintf(COM2, "Train Server - Do we even support EXIT location updates? %d %d %s", trains[i].number, trains[i].location.landmark, track.trackNodes[(int)trains[i].location.landmark].name);
             SwitchOff();
             break;
         case NODE_NONE:
-            bwprintf(COM2, "Train Server - Unexpected NONE direction request");
+            bwprintf(COM2, "Train Server - Unexpected NONE direction request from %s", track.trackNodes[(int)trains[i].location.landmark].name);
             // bwprintf(COM2, "Train Server - Do we even support NONE location updates? %d %d %s", trains[i].number, trains[i].location.landmark, track.trackNodes[(int)trains[i].location.landmark].name);
             SwitchOff();
             break;
         default:
-            bwprintf(COM2, "Train Server - Unexpected NODE_TYPE received in location update");
+            bwprintf(COM2, "Train Server - Unexpected NODE_TYPE received in location update from %s", track.trackNodes[(int)trains[i].location.landmark].name);
             break;
     }
     return DIR_STRAIGHT;
@@ -252,7 +247,7 @@ void TrainServer::init() {
 
     // Set the speed measurements for the trains
     int velocities[5][15] = {
-        { 0, 40000, 0, 0, 0, 0, 99000, 171000, 221000, 279000, 337000, 411000, 478000, 545000, 594000 },
+        { 0, 0, 0, 0, 0, 0, 99000, 171000, 221000, 279000, 337000, 411000, 478000, 545000, 594000 },
         { 0, 0, 0, 0, 0, 0, 99000, 171000, 221000, 279000, 337000, 411000, 478000, 545000, 594000 },
         { 0, 0, 0, 0, 0, 0, 99000, 171000, 221000, 279000, 337000, 411000, 478000, 545000, 594000 },
         { 0, 0, 0, 0, 0, 0, 99000, 171000, 221000, 279000, 337000, 411000, 478000, 545000, 594000 },
