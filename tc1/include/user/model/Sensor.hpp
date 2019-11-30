@@ -27,6 +27,7 @@ public:
 class SensorPred {
 public:
     Sensor nextSensor[2];
+    int nextSensorDistance[2];
     char train;
 
     SensorPred();
