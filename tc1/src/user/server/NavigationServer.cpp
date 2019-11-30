@@ -25,6 +25,8 @@
 
 #define FOREVER for(;;)
 
+constexpr int reverseClearance = 250;
+
 int convertToIndex(Sensor sensor) {
     return sensor.bank - 'A' * 16 + sensor.bank - 1;
 }
@@ -227,7 +229,6 @@ void NavigationServer::freeReservationsForTrain(int trainIndex) {
         int trackIndex = freeReservationsList[trainIndex].pop();
         track.trackNodes[trackIndex].reserved = false;
         track.trackNodes[trackIndex].reverseNode->reserved = false;
-        // bwprintf(COM2, "Unreserved %s %s\n\r", track.trackNodes[trackIndex].name, track.trackNodes[trackIndex].reverseNode->name);
     }
 }
 
@@ -236,7 +237,6 @@ void NavigationServer::reserveTrack() {
         int trackIndex = reservationsList.pop();
         track.trackNodes[trackIndex].reserved = true;
         track.trackNodes[trackIndex].reverseNode->reserved = true;
-        // bwprintf(COM2, "Reserved %s %s\n\r", track.trackNodes[trackIndex].name, track.trackNodes[trackIndex].reverseNode->name);
     }
 }
 
@@ -290,13 +290,13 @@ bool NavigationServer::findPath() {
 
     djikstra(&track, srcIndex, destIndex, lastHop);
 
-    int trackIndex = -1;
+    int currentTrackIndex = -1;
     int trainIndex = Train::getTrainIndex(rtmsg->train);
 
     do {
-        trackIndex = trackIndex == -1 ? destIndex : lastHop[trackIndex];
+        currentTrackIndex = currentTrackIndex == -1 ? destIndex : lastHop[currentTrackIndex];
 
-        if (trackIndex == -1) {
+        if (currentTrackIndex == -1) {
             bwprintf(COM2, "Navigation Server - No Path Exists from %s to %s\n\r", rtmsg->src, rtmsg->dest); // TODO(sgaweda): This actually shouldn't never happen and if it can we have to find a way around it!
             paths[trainIndex].reset();
             reservationsList.reset();
@@ -304,26 +304,125 @@ bool NavigationServer::findPath() {
             return false;
         }
 
-        paths[trainIndex].push(trackIndex);
-        reservationsList.push(trackIndex);
-        if (track.trackNodes[trackIndex].type == NODE_SENSOR) {
-            sensorLists[trainIndex].push(convertToSensor(trackIndex));
+        paths[trainIndex].push(currentTrackIndex);
+        reservationsList.push(currentTrackIndex);
+        if (track.trackNodes[currentTrackIndex].type == NODE_SENSOR) {
+            sensorLists[trainIndex].push(convertToSensor(currentTrackIndex));
         }
-    } while(trackIndex != srcIndex);
+    } while(currentTrackIndex != srcIndex);
 
     reserveTrack();
     // -1 implies start of path
     paths[trainIndex].push(-1);
+    initializeSensorDistanceList(trainIndex);
     return true;
 }
 
+void NavigationServer::initializeSensorDistanceList(int trainIndex) {
+    DataStructures::Stack<int, TRACK_MAX> tempPath;
+    DataStructures::Stack<int, TRACK_MAX> tempDist;
+    int distance = 0;
+    int currentTrackIndex = -1;
+    int prevTrackIndex = -1;
+    while (!paths[trainIndex].empty()) {
+        prevTrackIndex = currentTrackIndex;
+        currentTrackIndex = paths[trainIndex].pop();
+        tempPath.push(currentTrackIndex);
+
+        if (prevTrackIndex == -1) {
+            distance = 0;
+        } else {
+            switch (track.trackNodes[prevTrackIndex].type) {
+                case NODE_TYPE::NODE_SENSOR:
+                {
+                    tempDist.push(distance);
+                    distance = 0;
+                    int trackIndexAhead = track.trackNodes[prevTrackIndex].edges[DIR_AHEAD].destNode - &track.trackNodes[0];
+                    int trackIndexReverse = track.trackNodes[prevTrackIndex].reverseNode - &track.trackNodes[0];
+                    if (trackIndexAhead == currentTrackIndex) {
+                        distance += track.trackNodes[prevTrackIndex].edges[DIR_AHEAD].dist;
+                    } else if (trackIndexReverse == currentTrackIndex) {
+                        distance += reverseClearance;
+                    } else {
+                        bwprintf(COM2, "Navigation Server - Error initializing Sensor distance list, node merge\n\r");
+                    }
+                    break;
+                }
+                case NODE_TYPE::NODE_BRANCH:
+                {
+                    int trackIndexStraight = track.trackNodes[prevTrackIndex].edges[DIR_STRAIGHT].destNode - &track.trackNodes[0];
+                    int trackIndexCurved = track.trackNodes[prevTrackIndex].edges[DIR_CURVED].destNode - &track.trackNodes[0];
+                    if (trackIndexStraight == currentTrackIndex) {
+                        distance += track.trackNodes[prevTrackIndex].edges[DIR_STRAIGHT].dist;
+                    } else if (trackIndexCurved == currentTrackIndex) {
+                        distance += track.trackNodes[prevTrackIndex].edges[DIR_CURVED].dist;
+                    } else {
+                        bwprintf(COM2, "Navigation Server - Error initializing Sensor distance list, branch selection\n\r");
+                    }
+                    break;
+                }
+                case NODE_TYPE::NODE_MERGE:
+                {
+                    int trackIndexAhead = track.trackNodes[prevTrackIndex].edges[DIR_AHEAD].destNode - &track.trackNodes[0];
+                    int trackIndexReverse = track.trackNodes[prevTrackIndex].reverseNode - &track.trackNodes[0];
+                    if (trackIndexAhead == currentTrackIndex) {
+                        distance += track.trackNodes[prevTrackIndex].edges[DIR_AHEAD].dist;
+                    } else if (trackIndexReverse == currentTrackIndex) {
+                        distance += reverseClearance;
+                    } else {
+                        bwprintf(COM2, "Navigation Server - Error initializing Sensor distance list, node merge\n\r");
+                    }
+                    break;
+                }
+                case NODE_TYPE::NODE_ENTER:
+                {
+                    int trackIndexAhead = track.trackNodes[prevTrackIndex].edges[DIR_AHEAD].destNode - &track.trackNodes[0];
+                    if (trackIndexAhead == currentTrackIndex) {
+                        distance += track.trackNodes[prevTrackIndex].edges[DIR_AHEAD].dist;
+                    } else {
+                        bwprintf(COM2, "Navigation Server - Error initializing Sensor distance list, node enter\n\r");
+                    }
+                    break;
+                }
+                case NODE_TYPE::NODE_EXIT:
+                {
+                    int trackIndexReverse = track.trackNodes[prevTrackIndex].reverseNode - &track.trackNodes[0];
+                    if (trackIndexReverse == currentTrackIndex) {
+                        distance += reverseClearance;
+                    } else {
+                        bwprintf(COM2, "Navigation Server - Error initializing Sensor distance list, node exit\n\r");
+                    }
+                    break;
+                }
+                default:
+                {
+                    bwprintf(COM2, "Navigation Server - Error initializing sensorDistanceList\n\r");
+                    break;
+                }
+            }
+        }
+    }
+    tempDist.push(distance);
+
+    sensorDistanceLists[trainIndex].push(0);
+    while (tempDist.size() > 1) {
+        sensorDistanceLists[trainIndex].push(tempDist.pop());
+    }
+    while (!tempPath.empty()) {
+        paths[trainIndex].push(tempPath.pop());
+    }
+    ASSERT(sensorLists[trainIndex].size() == sensorDistanceLists[trainIndex].size());
+}
 void NavigationServer::initSensorPredictions() {
     int trainIndex = Train::getTrainIndex(rtmsg->train);
     spmsg.predictions[spmsg.count].nextSensor[0] = sensorLists[trainIndex].peek();
     spmsg.predictions[spmsg.count].nextSensor[1] = sensorLists[trainIndex].peekSecond();
+    spmsg.predictions[spmsg.count].nextSensorDistance[0] = sensorDistanceLists[trainIndex].peek();
+    spmsg.predictions[spmsg.count].nextSensorDistance[1] = sensorDistanceLists[trainIndex].peekSecond();
     spmsg.predictions[spmsg.count].train = rtmsg->train;
     spmsg.count++;
     transmitToTrainServer(Constants::MSG::SENSOR_PRED);
+    spmsg.count = 0;
 }
 
 void NavigationServer::predictSensors() {
@@ -334,13 +433,15 @@ void NavigationServer::predictSensors() {
             ASSERT(samsg->sensorAttrs[i].sensor == convertToSensor(paths[trainIndex].peek()));
 
             int sensorIndex = paths[trainIndex].pop();
-            // bwprintf(COM2, "Sensor %s tripped\n\r", track.trackNodes[sensorIndex].name);
             freeReservationsList[trainIndex].push(sensorIndex);
             freeReservationsForTrain(trainIndex);
 
             sensorLists[trainIndex].pop();
+            sensorDistanceLists[trainIndex].pop();
             spmsg.predictions[spmsg.count].nextSensor[0] = sensorLists[trainIndex].peek();
             spmsg.predictions[spmsg.count].nextSensor[1] = sensorLists[trainIndex].peekSecond();
+            spmsg.predictions[spmsg.count].nextSensorDistance[0] = sensorDistanceLists[trainIndex].peek();
+            spmsg.predictions[spmsg.count].nextSensorDistance[1] = sensorDistanceLists[trainIndex].peekSecond();
             spmsg.predictions[spmsg.count].train = train;
             spmsg.count++;
         } else if (sensorLists[trainIndex].peekSecond() == samsg->sensorAttrs->sensor) {
@@ -359,8 +460,13 @@ void NavigationServer::predictSensors() {
             ASSERT((sensor2 == convertToSensor(trackIndex)));
             freeReservationsForTrain(trainIndex);
 
+            sensorDistanceLists[trainIndex].pop();
+            sensorDistanceLists[trainIndex].pop();
+
             spmsg.predictions[spmsg.count].nextSensor[0] = sensorLists[trainIndex].peek();
             spmsg.predictions[spmsg.count].nextSensor[1] = sensorLists[trainIndex].peekSecond();
+            spmsg.predictions[spmsg.count].nextSensorDistance[0] = sensorDistanceLists[trainIndex].peek();
+            spmsg.predictions[spmsg.count].nextSensorDistance[1] = sensorDistanceLists[trainIndex].peekSecond();
             spmsg.predictions[spmsg.count].train = train;
             spmsg.count++;
         } else {
@@ -389,7 +495,6 @@ void NavigationServer::predictSensors() {
 
 void NavigationServer::navigate() {
     ASSERT(commandCourierReady == true);
-    // bwprintf(COM2, "Navigate Called!!\n\r");
     for (int trainIndex = 0; trainIndex < 5; ++trainIndex) {
         // Do nothing if there's no path
         if (paths[trainIndex].empty()) {
@@ -404,7 +509,6 @@ void NavigationServer::navigate() {
             trmsg.train = trainNumber;
             trmsg.speed = 14;
             transmitToCommandServer(Constants::MSG::TR);
-            // bwprintf(COM2, "Starting train %d\n\r", trainNumber);
             return;
         }
 
@@ -413,14 +517,12 @@ void NavigationServer::navigate() {
 
         if (currentLandmark->type == NODE_TYPE::NODE_SENSOR) {
             //TODO: implement me for reversing
-            // bwprintf(COM2, "Train %d Waiting for Sensor %s\n\r", trainIndex, currentLandmarkName);
             continue;
         }
 
         while(currentLandmark->type != NODE_TYPE::NODE_SENSOR) {
             int landmarkIndex = paths[trainIndex].pop();
             freeReservationsList[trainIndex].push(landmarkIndex);
-            // bwprintf(COM2, "Popped %s\n\r", track.trackNodes[landmarkIndex].name);
             ASSERT(paths[trainIndex].empty() == false);
             const TrackNode* nextLandmark =  &track.trackNodes[paths[trainIndex].peek()];
             const char* nextLandmarkName = nextLandmark->name;
@@ -435,13 +537,11 @@ void NavigationServer::navigate() {
                         swmsg.sw = currentLandmark->num;
                         swmsg.state = 'S';
                         transmitToCommandServer(Constants::MSG::SW);
-                        // bwprintf(COM2, "[Straight SW %s]\n\r", currentLandmarkName);
                         return;
                     } else if (!strcmp(nextLandmarkName, curvedDirectionLandmarkName)) {
                         swmsg.sw = currentLandmark->num;
                         swmsg.state = 'C';
                         transmitToCommandServer(Constants::MSG::SW);
-                        // bwprintf(COM2, "[Curved SW %s]\n\r", currentLandmarkName);
                         return;
                     } else {
                         bwprintf(COM2, "Navigation Server - Branch direction selection failed!\n\r");
@@ -453,11 +553,9 @@ void NavigationServer::navigate() {
                     const char* aheadDirectionLandmarkName = currentLandmark->edges[DIR_AHEAD].destNode->name;
                     const char* reverseDirectionLandmarkName = currentLandmark->reverseNode->name;
                     if (!strcmp(nextLandmarkName, aheadDirectionLandmarkName)) {
-                        // bwprintf(COM2, "[Ahead %s]\n\r", aheadDirectionLandmarkName);
                     } else if(!strcmp(nextLandmarkName, reverseDirectionLandmarkName)) {
                         rvmsg.train = Train::getTrainNumber(trainIndex);
                         transmitToCommandServer(Constants::MSG::RV);
-                        // bwprintf(COM2, "[Reverse %s]\n\r", reverseDirectionLandmarkName);
                         return;
                     } else {
                         bwprintf(COM2, "Navigation Server - Merge direction selection failed!\n\r");
@@ -485,9 +583,7 @@ void NavigationServer::navigate() {
             currentLandmark = nextLandmark;
             currentLandmarkName = nextLandmarkName;
         }
-        // bwprintf(COM2, "Out of while loop %s\n\r", currentLandmarkName);
     }
-    // bwprintf(COM2, "Navigate Returning\n\r");
 }
 
 void NavigationServer::init() {
@@ -511,16 +607,15 @@ void navigationServer() {
 
         if (ns.mh->type == Constants::MSG::RDY) {
             if (tid == ns.commandCourier) {
-                // bwprintf(COM2, "CC Ready\n\r");
                 ns.commandCourierReady = true;
                 ns.navigate();
             } else if (tid == ns.trainCourier) {
                 ns.trainCourierReady = true;
             }
         } else if (ns.mh->type == Constants::MSG::RT) {
+            Reply(tid, (char*)&rdymsg, rdymsg.size());
             bool pathExist = ns.findPath();
             if (pathExist) {
-                Reply(tid, (char*)&rdymsg, rdymsg.size());
 
                 ns.navigate(); // start nagivation (will start train)
                 ns.initSensorPredictions(); // initialize train predictions

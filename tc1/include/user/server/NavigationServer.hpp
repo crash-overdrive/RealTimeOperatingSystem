@@ -34,6 +34,7 @@ class NavigationServer {
 
         DataStructures::Stack<int, TRACK_MAX> paths[5];
         DataStructures::Stack<Sensor, 40> sensorLists[5];
+        DataStructures::Stack<int, 40> sensorDistanceLists[5];
         DataStructures::Stack<int, 40> freeReservationsList[5];
         DataStructures::Stack<int, 40> reservationsList;
 
@@ -46,6 +47,7 @@ class NavigationServer {
         void navigate();
         void freeReservationsForTrain(int trainIndex);
         void reserveTrack();
+        void initializeSensorDistanceList(int trainIndex);
 };
 
 #endif
