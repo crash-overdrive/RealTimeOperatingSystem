@@ -513,7 +513,7 @@ void NavigationServer::navigate() {
         }
 
         const TrackNode* currentLandmark = &track.trackNodes[trackIndex];
-        const char* currentLandmarkName = currentLandmark->name;
+        const char* currentLandmarkName = currentLandmark->name; // TODO: Are you sure this works the way you think it does? How the does while loop know how to allocate space for each string? This looks wrong, and you're STILL ignoring warnings!!!
 
         if (currentLandmark->type == NODE_TYPE::NODE_SENSOR) {
             //TODO: implement me for reversing
