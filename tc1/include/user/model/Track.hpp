@@ -1,6 +1,8 @@
 #ifndef TRACK_HPP
 #define TRACK_HPP
 
+#include "user/model/Sensor.hpp"
+
 #define DIR_AHEAD 0
 #define DIR_STRAIGHT 0
 #define DIR_CURVED 1
@@ -31,6 +33,7 @@ class TrackNode {
     public:
         const char *name;
         NODE_TYPE type;
+        Sensor sensor;
         int num;              /* sensor or switch number */
         TrackNode *reverseNode;  /* same location, but opposite direction */
         TrackEdge edges[2];

@@ -1,4 +1,5 @@
 #include "user/model/Track.hpp"
+#include "user/model/Sensor.hpp"
 
 void Track::initializeTrack(char trackIdentifier) {
     switch (trackIdentifier) {
@@ -7,6 +8,7 @@ void Track::initializeTrack(char trackIdentifier) {
         noOfNodes = 144;
         trackNodes[0].name = "A1";
         trackNodes[0].type = NODE_SENSOR;
+        trackNodes[0].sensor = Sensor('A', (char)1);
         trackNodes[0].num = 0;
         trackNodes[0].reverseNode = &trackNodes[1];
         trackNodes[0].edges[DIR_AHEAD].reverseEdge = &trackNodes[102].edges[DIR_STRAIGHT];
@@ -16,6 +18,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[0].reserved = false;
         trackNodes[1].name = "A2";
         trackNodes[1].type = NODE_SENSOR;
+        trackNodes[1].sensor = Sensor('A', (char)2);
         trackNodes[1].num = 1;
         trackNodes[1].reverseNode = &trackNodes[0];
         trackNodes[1].edges[DIR_AHEAD].reverseEdge = &trackNodes[132].edges[DIR_AHEAD];
@@ -25,6 +28,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[1].reserved = false;
         trackNodes[2].name = "A3";
         trackNodes[2].type = NODE_SENSOR;
+        trackNodes[2].sensor = Sensor('A', (char)3);
         trackNodes[2].num = 2;
         trackNodes[2].reverseNode = &trackNodes[3];
         trackNodes[2].edges[DIR_AHEAD].reverseEdge = &trackNodes[107].edges[DIR_AHEAD];
@@ -34,6 +38,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[2].reserved = false;
         trackNodes[3].name = "A4";
         trackNodes[3].type = NODE_SENSOR;
+        trackNodes[3].sensor = Sensor('A', (char)4);
         trackNodes[3].num = 3;
         trackNodes[3].reverseNode = &trackNodes[2];
         trackNodes[3].edges[DIR_AHEAD].reverseEdge = &trackNodes[30].edges[DIR_AHEAD];
@@ -43,6 +48,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[3].reserved = false;
         trackNodes[4].name = "A5";
         trackNodes[4].type = NODE_SENSOR;
+        trackNodes[4].sensor = Sensor('A', (char)5);
         trackNodes[4].num = 4;
         trackNodes[4].reverseNode = &trackNodes[5];
         trackNodes[4].edges[DIR_AHEAD].reverseEdge = &trackNodes[84].edges[DIR_STRAIGHT];
@@ -52,6 +58,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[4].reserved = false;
         trackNodes[5].name = "A6";
         trackNodes[5].type = NODE_SENSOR;
+        trackNodes[5].sensor = Sensor('A', (char)6);
         trackNodes[5].num = 5;
         trackNodes[5].reverseNode = &trackNodes[4];
         trackNodes[5].edges[DIR_AHEAD].reverseEdge = &trackNodes[24].edges[DIR_AHEAD];
@@ -61,6 +68,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[5].reserved = false;
         trackNodes[6].name = "A7";
         trackNodes[6].type = NODE_SENSOR;
+        trackNodes[6].sensor = Sensor('A', (char)7);
         trackNodes[6].num = 6;
         trackNodes[6].reverseNode = &trackNodes[7];
         trackNodes[6].edges[DIR_AHEAD].reverseEdge = &trackNodes[26].edges[DIR_AHEAD];
@@ -70,6 +78,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[6].reserved = false;
         trackNodes[7].name = "A8";
         trackNodes[7].type = NODE_SENSOR;
+        trackNodes[7].sensor = Sensor('A', (char)8);
         trackNodes[7].num = 7;
         trackNodes[7].reverseNode = &trackNodes[6];
         trackNodes[7].edges[DIR_AHEAD].reverseEdge = &trackNodes[82].edges[DIR_CURVED];
@@ -79,6 +88,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[7].reserved = false;
         trackNodes[8].name = "A9";
         trackNodes[8].type = NODE_SENSOR;
+        trackNodes[8].sensor = Sensor('A', (char)9);
         trackNodes[8].num = 8;
         trackNodes[8].reverseNode = &trackNodes[9];
         trackNodes[8].edges[DIR_AHEAD].reverseEdge = &trackNodes[22].edges[DIR_AHEAD];
@@ -88,6 +98,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[8].reserved = false;
         trackNodes[9].name = "A10";
         trackNodes[9].type = NODE_SENSOR;
+        trackNodes[9].sensor = Sensor('A', (char)10);
         trackNodes[9].num = 9;
         trackNodes[9].reverseNode = &trackNodes[8];
         trackNodes[9].edges[DIR_AHEAD].reverseEdge = &trackNodes[80].edges[DIR_CURVED];
@@ -97,6 +108,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[9].reserved = false;
         trackNodes[10].name = "A11";
         trackNodes[10].type = NODE_SENSOR;
+        trackNodes[10].sensor = Sensor('A', (char)11);
         trackNodes[10].num = 10;
         trackNodes[10].reverseNode = &trackNodes[11];
         trackNodes[10].edges[DIR_AHEAD].reverseEdge = &trackNodes[80].edges[DIR_STRAIGHT];
@@ -106,6 +118,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[10].reserved = false;
         trackNodes[11].name = "A12";
         trackNodes[11].type = NODE_SENSOR;
+        trackNodes[11].sensor = Sensor('A', (char)12);
         trackNodes[11].num = 11;
         trackNodes[11].reverseNode = &trackNodes[10];
         trackNodes[11].edges[DIR_AHEAD].reverseEdge = &trackNodes[138].edges[DIR_AHEAD];
@@ -115,6 +128,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[11].reserved = false;
         trackNodes[12].name = "A13";
         trackNodes[12].type = NODE_SENSOR;
+        trackNodes[12].sensor = Sensor('A', (char)13);
         trackNodes[12].num = 12;
         trackNodes[12].reverseNode = &trackNodes[13];
         trackNodes[12].edges[DIR_AHEAD].reverseEdge = &trackNodes[86].edges[DIR_CURVED];
@@ -124,6 +138,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[12].reserved = false;
         trackNodes[13].name = "A14";
         trackNodes[13].type = NODE_SENSOR;
+        trackNodes[13].sensor = Sensor('A', (char)14);
         trackNodes[13].num = 13;
         trackNodes[13].reverseNode = &trackNodes[12];
         trackNodes[13].edges[DIR_AHEAD].reverseEdge = &trackNodes[130].edges[DIR_AHEAD];
@@ -133,6 +148,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[13].reserved = false;
         trackNodes[14].name = "A15";
         trackNodes[14].type = NODE_SENSOR;
+        trackNodes[14].sensor = Sensor('A', (char)15);
         trackNodes[14].num = 14;
         trackNodes[14].reverseNode = &trackNodes[15];
         trackNodes[14].edges[DIR_AHEAD].reverseEdge = &trackNodes[134].edges[DIR_AHEAD];
@@ -142,6 +158,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[14].reserved = false;
         trackNodes[15].name = "A16";
         trackNodes[15].type = NODE_SENSOR;
+        trackNodes[15].sensor = Sensor('A', (char)16);
         trackNodes[15].num = 15;
         trackNodes[15].reverseNode = &trackNodes[14];
         trackNodes[15].edges[DIR_AHEAD].reverseEdge = &trackNodes[86].edges[DIR_STRAIGHT];
@@ -151,6 +168,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[15].reserved = false;
         trackNodes[16].name = "B1";
         trackNodes[16].type = NODE_SENSOR;
+        trackNodes[16].sensor = Sensor('B', (char)1);
         trackNodes[16].num = 16;
         trackNodes[16].reverseNode = &trackNodes[17];
         trackNodes[16].edges[DIR_AHEAD].reverseEdge = &trackNodes[60].edges[DIR_AHEAD];
@@ -160,6 +178,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[16].reserved = false;
         trackNodes[17].name = "B2";
         trackNodes[17].type = NODE_SENSOR;
+        trackNodes[17].sensor = Sensor('B', (char)2);
         trackNodes[17].num = 17;
         trackNodes[17].reverseNode = &trackNodes[16];
         trackNodes[17].edges[DIR_AHEAD].reverseEdge = &trackNodes[110].edges[DIR_STRAIGHT];
@@ -169,6 +188,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[17].reserved = false;
         trackNodes[18].name = "B3";
         trackNodes[18].type = NODE_SENSOR;
+        trackNodes[18].sensor = Sensor('B', (char)3);
         trackNodes[18].num = 18;
         trackNodes[18].reverseNode = &trackNodes[19];
         trackNodes[18].edges[DIR_AHEAD].reverseEdge = &trackNodes[32].edges[DIR_AHEAD];
@@ -178,6 +198,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[18].reserved = false;
         trackNodes[19].name = "B4";
         trackNodes[19].type = NODE_SENSOR;
+        trackNodes[19].sensor = Sensor('B', (char)4);
         trackNodes[19].num = 19;
         trackNodes[19].reverseNode = &trackNodes[18];
         trackNodes[19].edges[DIR_AHEAD].reverseEdge = &trackNodes[110].edges[DIR_CURVED];
@@ -187,6 +208,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[19].reserved = false;
         trackNodes[20].name = "B5";
         trackNodes[20].type = NODE_SENSOR;
+        trackNodes[20].sensor = Sensor('B', (char)5);
         trackNodes[20].num = 20;
         trackNodes[20].reverseNode = &trackNodes[21];
         trackNodes[20].edges[DIR_AHEAD].reverseEdge = &trackNodes[51].edges[DIR_AHEAD];
@@ -196,6 +218,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[20].reserved = false;
         trackNodes[21].name = "B6";
         trackNodes[21].type = NODE_SENSOR;
+        trackNodes[21].sensor = Sensor('B', (char)6);
         trackNodes[21].num = 21;
         trackNodes[21].reverseNode = &trackNodes[20];
         trackNodes[21].edges[DIR_AHEAD].reverseEdge = &trackNodes[104].edges[DIR_STRAIGHT];
@@ -205,6 +228,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[21].reserved = false;
         trackNodes[22].name = "B7";
         trackNodes[22].type = NODE_SENSOR;
+        trackNodes[22].sensor = Sensor('B', (char)7);
         trackNodes[22].num = 22;
         trackNodes[22].reverseNode = &trackNodes[23];
         trackNodes[22].edges[DIR_AHEAD].reverseEdge = &trackNodes[8].edges[DIR_AHEAD];
@@ -214,6 +238,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[22].reserved = false;
         trackNodes[23].name = "B8";
         trackNodes[23].type = NODE_SENSOR;
+        trackNodes[23].sensor = Sensor('B', (char)8);
         trackNodes[23].num = 23;
         trackNodes[23].reverseNode = &trackNodes[22];
         trackNodes[23].edges[DIR_AHEAD].reverseEdge = &trackNodes[136].edges[DIR_AHEAD];
@@ -223,6 +248,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[23].reserved = false;
         trackNodes[24].name = "B9";
         trackNodes[24].type = NODE_SENSOR;
+        trackNodes[24].sensor = Sensor('B', (char)9);
         trackNodes[24].num = 24;
         trackNodes[24].reverseNode = &trackNodes[25];
         trackNodes[24].edges[DIR_AHEAD].reverseEdge = &trackNodes[5].edges[DIR_AHEAD];
@@ -232,6 +258,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[24].reserved = false;
         trackNodes[25].name = "B10";
         trackNodes[25].type = NODE_SENSOR;
+        trackNodes[25].sensor = Sensor('B', (char)10);
         trackNodes[25].num = 25;
         trackNodes[25].reverseNode = &trackNodes[24];
         trackNodes[25].edges[DIR_AHEAD].reverseEdge = &trackNodes[140].edges[DIR_AHEAD];
@@ -241,6 +268,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[25].reserved = false;
         trackNodes[26].name = "B11";
         trackNodes[26].type = NODE_SENSOR;
+        trackNodes[26].sensor = Sensor('B', (char)11);
         trackNodes[26].num = 26;
         trackNodes[26].reverseNode = &trackNodes[27];
         trackNodes[26].edges[DIR_AHEAD].reverseEdge = &trackNodes[6].edges[DIR_AHEAD];
@@ -250,6 +278,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[26].reserved = false;
         trackNodes[27].name = "B12";
         trackNodes[27].type = NODE_SENSOR;
+        trackNodes[27].sensor = Sensor('B', (char)12);
         trackNodes[27].num = 27;
         trackNodes[27].reverseNode = &trackNodes[26];
         trackNodes[27].edges[DIR_AHEAD].reverseEdge = &trackNodes[142].edges[DIR_AHEAD];
@@ -259,6 +288,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[27].reserved = false;
         trackNodes[28].name = "B13";
         trackNodes[28].type = NODE_SENSOR;
+        trackNodes[28].sensor = Sensor('B', (char)13);
         trackNodes[28].num = 28;
         trackNodes[28].reverseNode = &trackNodes[29];
         trackNodes[28].edges[DIR_AHEAD].reverseEdge = &trackNodes[118].edges[DIR_CURVED];
@@ -268,6 +298,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[28].reserved = false;
         trackNodes[29].name = "B14";
         trackNodes[29].type = NODE_SENSOR;
+        trackNodes[29].sensor = Sensor('B', (char)14);
         trackNodes[29].num = 29;
         trackNodes[29].reverseNode = &trackNodes[28];
         trackNodes[29].edges[DIR_AHEAD].reverseEdge = &trackNodes[62].edges[DIR_AHEAD];
@@ -277,6 +308,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[29].reserved = false;
         trackNodes[30].name = "B15";
         trackNodes[30].type = NODE_SENSOR;
+        trackNodes[30].sensor = Sensor('B', (char)15);
         trackNodes[30].num = 30;
         trackNodes[30].reverseNode = &trackNodes[31];
         trackNodes[30].edges[DIR_AHEAD].reverseEdge = &trackNodes[3].edges[DIR_AHEAD];
@@ -286,6 +318,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[30].reserved = false;
         trackNodes[31].name = "B16";
         trackNodes[31].type = NODE_SENSOR;
+        trackNodes[31].sensor = Sensor('B', (char)16);
         trackNodes[31].num = 31;
         trackNodes[31].reverseNode = &trackNodes[30];
         trackNodes[31].edges[DIR_AHEAD].reverseEdge = &trackNodes[109].edges[DIR_AHEAD];
@@ -295,6 +328,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[31].reserved = false;
         trackNodes[32].name = "C1";
         trackNodes[32].type = NODE_SENSOR;
+        trackNodes[32].sensor = Sensor('C', (char)1);
         trackNodes[32].num = 32;
         trackNodes[32].reverseNode = &trackNodes[33];
         trackNodes[32].edges[DIR_AHEAD].reverseEdge = &trackNodes[18].edges[DIR_AHEAD];
@@ -304,6 +338,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[32].reserved = false;
         trackNodes[33].name = "C2";
         trackNodes[33].type = NODE_SENSOR;
+        trackNodes[33].sensor = Sensor('C', (char)2);
         trackNodes[33].num = 33;
         trackNodes[33].reverseNode = &trackNodes[32];
         trackNodes[33].edges[DIR_AHEAD].reverseEdge = &trackNodes[116].edges[DIR_CURVED];
@@ -313,6 +348,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[33].reserved = false;
         trackNodes[34].name = "C3";
         trackNodes[34].type = NODE_SENSOR;
+        trackNodes[34].sensor = Sensor('C', (char)3);
         trackNodes[34].num = 34;
         trackNodes[34].reverseNode = &trackNodes[35];
         trackNodes[34].edges[DIR_AHEAD].reverseEdge = &trackNodes[128].edges[DIR_AHEAD];
@@ -322,6 +358,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[34].reserved = false;
         trackNodes[35].name = "C4";
         trackNodes[35].type = NODE_SENSOR;
+        trackNodes[35].sensor = Sensor('C', (char)4);
         trackNodes[35].num = 35;
         trackNodes[35].reverseNode = &trackNodes[34];
         trackNodes[35].edges[DIR_AHEAD].reverseEdge = &trackNodes[88].edges[DIR_STRAIGHT];
@@ -331,6 +368,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[35].reserved = false;
         trackNodes[36].name = "C5";
         trackNodes[36].type = NODE_SENSOR;
+        trackNodes[36].sensor = Sensor('C', (char)5);
         trackNodes[36].num = 36;
         trackNodes[36].reverseNode = &trackNodes[37];
         trackNodes[36].edges[DIR_AHEAD].reverseEdge = &trackNodes[91].edges[DIR_AHEAD];
@@ -340,6 +378,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[36].reserved = false;
         trackNodes[37].name = "C6";
         trackNodes[37].type = NODE_SENSOR;
+        trackNodes[37].sensor = Sensor('C', (char)6);
         trackNodes[37].num = 37;
         trackNodes[37].reverseNode = &trackNodes[36];
         trackNodes[37].edges[DIR_AHEAD].reverseEdge = &trackNodes[108].edges[DIR_STRAIGHT];
@@ -349,6 +388,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[37].reserved = false;
         trackNodes[38].name = "C7";
         trackNodes[38].type = NODE_SENSOR;
+        trackNodes[38].sensor = Sensor('C', (char)7);
         trackNodes[38].num = 38;
         trackNodes[38].reverseNode = &trackNodes[39];
         trackNodes[38].edges[DIR_AHEAD].reverseEdge = &trackNodes[114].edges[DIR_STRAIGHT];
@@ -358,6 +398,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[38].reserved = false;
         trackNodes[39].name = "C8";
         trackNodes[39].type = NODE_SENSOR;
+        trackNodes[39].sensor = Sensor('C', (char)8);
         trackNodes[39].num = 39;
         trackNodes[39].reverseNode = &trackNodes[38];
         trackNodes[39].edges[DIR_AHEAD].reverseEdge = &trackNodes[85].edges[DIR_AHEAD];
@@ -367,6 +408,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[39].reserved = false;
         trackNodes[40].name = "C9";
         trackNodes[40].type = NODE_SENSOR;
+        trackNodes[40].sensor = Sensor('C', (char)9);
         trackNodes[40].num = 40;
         trackNodes[40].reverseNode = &trackNodes[41];
         trackNodes[40].edges[DIR_AHEAD].reverseEdge = &trackNodes[108].edges[DIR_CURVED];
@@ -376,6 +418,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[40].reserved = false;
         trackNodes[41].name = "C10";
         trackNodes[41].type = NODE_SENSOR;
+        trackNodes[41].sensor = Sensor('C', (char)10);
         trackNodes[41].num = 41;
         trackNodes[41].reverseNode = &trackNodes[40];
         trackNodes[41].edges[DIR_AHEAD].reverseEdge = &trackNodes[111].edges[DIR_AHEAD];
@@ -385,6 +428,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[41].reserved = false;
         trackNodes[42].name = "C11";
         trackNodes[42].type = NODE_SENSOR;
+        trackNodes[42].sensor = Sensor('C', (char)11);
         trackNodes[42].num = 42;
         trackNodes[42].reverseNode = &trackNodes[43];
         trackNodes[42].edges[DIR_AHEAD].reverseEdge = &trackNodes[105].edges[DIR_AHEAD];
@@ -394,6 +438,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[42].reserved = false;
         trackNodes[43].name = "C12";
         trackNodes[43].type = NODE_SENSOR;
+        trackNodes[43].sensor = Sensor('C', (char)12);
         trackNodes[43].num = 43;
         trackNodes[43].reverseNode = &trackNodes[42];
         trackNodes[43].edges[DIR_AHEAD].reverseEdge = &trackNodes[106].edges[DIR_CURVED];
@@ -403,6 +448,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[43].reserved = false;
         trackNodes[44].name = "C13";
         trackNodes[44].type = NODE_SENSOR;
+        trackNodes[44].sensor = Sensor('C', (char)13);
         trackNodes[44].num = 44;
         trackNodes[44].reverseNode = &trackNodes[45];
         trackNodes[44].edges[DIR_AHEAD].reverseEdge = &trackNodes[71].edges[DIR_AHEAD];
@@ -412,6 +458,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[44].reserved = false;
         trackNodes[45].name = "C14";
         trackNodes[45].type = NODE_SENSOR;
+        trackNodes[45].sensor = Sensor('C', (char)14);
         trackNodes[45].num = 45;
         trackNodes[45].reverseNode = &trackNodes[44];
         trackNodes[45].edges[DIR_AHEAD].reverseEdge = &trackNodes[101].edges[DIR_AHEAD];
@@ -421,6 +468,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[45].reserved = false;
         trackNodes[46].name = "C15";
         trackNodes[46].type = NODE_SENSOR;
+        trackNodes[46].sensor = Sensor('C', (char)15);
         trackNodes[46].num = 46;
         trackNodes[46].reverseNode = &trackNodes[47];
         trackNodes[46].edges[DIR_AHEAD].reverseEdge = &trackNodes[58].edges[DIR_AHEAD];
@@ -430,6 +478,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[46].reserved = false;
         trackNodes[47].name = "C16";
         trackNodes[47].type = NODE_SENSOR;
+        trackNodes[47].sensor = Sensor('C', (char)16);
         trackNodes[47].num = 47;
         trackNodes[47].reverseNode = &trackNodes[46];
         trackNodes[47].edges[DIR_AHEAD].reverseEdge = &trackNodes[90].edges[DIR_STRAIGHT];
@@ -439,6 +488,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[47].reserved = false;
         trackNodes[48].name = "D1";
         trackNodes[48].type = NODE_SENSOR;
+        trackNodes[48].sensor = Sensor('D', (char)1);
         trackNodes[48].num = 48;
         trackNodes[48].reverseNode = &trackNodes[49];
         trackNodes[48].edges[DIR_AHEAD].reverseEdge = &trackNodes[120].edges[DIR_CURVED];
@@ -448,6 +498,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[48].reserved = false;
         trackNodes[49].name = "D2";
         trackNodes[49].type = NODE_SENSOR;
+        trackNodes[49].sensor = Sensor('D', (char)2);
         trackNodes[49].num = 49;
         trackNodes[49].reverseNode = &trackNodes[48];
         trackNodes[49].edges[DIR_AHEAD].reverseEdge = &trackNodes[66].edges[DIR_AHEAD];
@@ -457,6 +508,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[49].reserved = false;
         trackNodes[50].name = "D3";
         trackNodes[50].type = NODE_SENSOR;
+        trackNodes[50].sensor = Sensor('D', (char)3);
         trackNodes[50].num = 50;
         trackNodes[50].reverseNode = &trackNodes[51];
         trackNodes[50].edges[DIR_AHEAD].reverseEdge = &trackNodes[98].edges[DIR_STRAIGHT];
@@ -466,6 +518,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[50].reserved = false;
         trackNodes[51].name = "D4";
         trackNodes[51].type = NODE_SENSOR;
+        trackNodes[51].sensor = Sensor('D', (char)4);
         trackNodes[51].num = 51;
         trackNodes[51].reverseNode = &trackNodes[50];
         trackNodes[51].edges[DIR_AHEAD].reverseEdge = &trackNodes[20].edges[DIR_AHEAD];
@@ -475,6 +528,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[51].reserved = false;
         trackNodes[52].name = "D5";
         trackNodes[52].type = NODE_SENSOR;
+        trackNodes[52].sensor = Sensor('D', (char)5);
         trackNodes[52].num = 52;
         trackNodes[52].reverseNode = &trackNodes[53];
         trackNodes[52].edges[DIR_AHEAD].reverseEdge = &trackNodes[68].edges[DIR_AHEAD];
@@ -484,6 +538,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[52].reserved = false;
         trackNodes[53].name = "D6";
         trackNodes[53].type = NODE_SENSOR;
+        trackNodes[53].sensor = Sensor('D', (char)6);
         trackNodes[53].num = 53;
         trackNodes[53].reverseNode = &trackNodes[52];
         trackNodes[53].edges[DIR_AHEAD].reverseEdge = &trackNodes[96].edges[DIR_CURVED];
@@ -493,6 +548,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[53].reserved = false;
         trackNodes[54].name = "D7";
         trackNodes[54].type = NODE_SENSOR;
+        trackNodes[54].sensor = Sensor('D', (char)7);
         trackNodes[54].num = 54;
         trackNodes[54].reverseNode = &trackNodes[55];
         trackNodes[54].edges[DIR_AHEAD].reverseEdge = &trackNodes[96].edges[DIR_STRAIGHT];
@@ -502,6 +558,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[54].reserved = false;
         trackNodes[55].name = "D8";
         trackNodes[55].type = NODE_SENSOR;
+        trackNodes[55].sensor = Sensor('D', (char)8);
         trackNodes[55].num = 55;
         trackNodes[55].reverseNode = &trackNodes[54];
         trackNodes[55].edges[DIR_AHEAD].reverseEdge = &trackNodes[70].edges[DIR_AHEAD];
@@ -511,6 +568,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[55].reserved = false;
         trackNodes[56].name = "D9";
         trackNodes[56].type = NODE_SENSOR;
+        trackNodes[56].sensor = Sensor('D', (char)9);
         trackNodes[56].num = 56;
         trackNodes[56].reverseNode = &trackNodes[57];
         trackNodes[56].edges[DIR_AHEAD].reverseEdge = &trackNodes[74].edges[DIR_AHEAD];
@@ -520,6 +578,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[56].reserved = false;
         trackNodes[57].name = "D10";
         trackNodes[57].type = NODE_SENSOR;
+        trackNodes[57].sensor = Sensor('D', (char)10);
         trackNodes[57].num = 57;
         trackNodes[57].reverseNode = &trackNodes[56];
         trackNodes[57].edges[DIR_AHEAD].reverseEdge = &trackNodes[94].edges[DIR_STRAIGHT];
@@ -529,6 +588,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[57].reserved = false;
         trackNodes[58].name = "D11";
         trackNodes[58].type = NODE_SENSOR;
+        trackNodes[58].sensor = Sensor('D', (char)11);
         trackNodes[58].num = 58;
         trackNodes[58].reverseNode = &trackNodes[59];
         trackNodes[58].edges[DIR_AHEAD].reverseEdge = &trackNodes[46].edges[DIR_AHEAD];
@@ -538,6 +598,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[58].reserved = false;
         trackNodes[59].name = "D12";
         trackNodes[59].type = NODE_SENSOR;
+        trackNodes[59].sensor = Sensor('D', (char)12);
         trackNodes[59].num = 59;
         trackNodes[59].reverseNode = &trackNodes[58];
         trackNodes[59].edges[DIR_AHEAD].reverseEdge = &trackNodes[92].edges[DIR_STRAIGHT];
@@ -547,6 +608,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[59].reserved = false;
         trackNodes[60].name = "D13";
         trackNodes[60].type = NODE_SENSOR;
+        trackNodes[60].sensor = Sensor('D', (char)13);
         trackNodes[60].num = 60;
         trackNodes[60].reverseNode = &trackNodes[61];
         trackNodes[60].edges[DIR_AHEAD].reverseEdge = &trackNodes[16].edges[DIR_AHEAD];
@@ -556,6 +618,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[60].reserved = false;
         trackNodes[61].name = "D14";
         trackNodes[61].type = NODE_SENSOR;
+        trackNodes[61].sensor = Sensor('D', (char)14);
         trackNodes[61].num = 61;
         trackNodes[61].reverseNode = &trackNodes[60];
         trackNodes[61].edges[DIR_AHEAD].reverseEdge = &trackNodes[112].edges[DIR_STRAIGHT];
@@ -565,6 +628,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[61].reserved = false;
         trackNodes[62].name = "D15";
         trackNodes[62].type = NODE_SENSOR;
+        trackNodes[62].sensor = Sensor('D', (char)15);
         trackNodes[62].num = 62;
         trackNodes[62].reverseNode = &trackNodes[63];
         trackNodes[62].edges[DIR_AHEAD].reverseEdge = &trackNodes[29].edges[DIR_AHEAD];
@@ -574,6 +638,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[62].reserved = false;
         trackNodes[63].name = "D16";
         trackNodes[63].type = NODE_SENSOR;
+        trackNodes[63].sensor = Sensor('D', (char)16);
         trackNodes[63].num = 63;
         trackNodes[63].reverseNode = &trackNodes[62];
         trackNodes[63].edges[DIR_AHEAD].reverseEdge = &trackNodes[112].edges[DIR_CURVED];
@@ -583,6 +648,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[63].reserved = false;
         trackNodes[64].name = "E1";
         trackNodes[64].type = NODE_SENSOR;
+        trackNodes[64].sensor = Sensor('E', (char)1);
         trackNodes[64].num = 64;
         trackNodes[64].reverseNode = &trackNodes[65];
         trackNodes[64].edges[DIR_AHEAD].reverseEdge = &trackNodes[122].edges[DIR_CURVED];
@@ -592,6 +658,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[64].reserved = false;
         trackNodes[65].name = "E2";
         trackNodes[65].type = NODE_SENSOR;
+        trackNodes[65].sensor = Sensor('E', (char)2);
         trackNodes[65].num = 65;
         trackNodes[65].reverseNode = &trackNodes[64];
         trackNodes[65].edges[DIR_AHEAD].reverseEdge = &trackNodes[79].edges[DIR_AHEAD];
@@ -601,6 +668,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[65].reserved = false;
         trackNodes[66].name = "E3";
         trackNodes[66].type = NODE_SENSOR;
+        trackNodes[66].sensor = Sensor('E', (char)3);
         trackNodes[66].num = 66;
         trackNodes[66].reverseNode = &trackNodes[67];
         trackNodes[66].edges[DIR_AHEAD].reverseEdge = &trackNodes[49].edges[DIR_AHEAD];
@@ -610,6 +678,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[66].reserved = false;
         trackNodes[67].name = "E4";
         trackNodes[67].type = NODE_SENSOR;
+        trackNodes[67].sensor = Sensor('E', (char)4);
         trackNodes[67].num = 67;
         trackNodes[67].reverseNode = &trackNodes[66];
         trackNodes[67].edges[DIR_AHEAD].reverseEdge = &trackNodes[98].edges[DIR_CURVED];
@@ -619,6 +688,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[67].reserved = false;
         trackNodes[68].name = "E5";
         trackNodes[68].type = NODE_SENSOR;
+        trackNodes[68].sensor = Sensor('E', (char)5);
         trackNodes[68].num = 68;
         trackNodes[68].reverseNode = &trackNodes[69];
         trackNodes[68].edges[DIR_AHEAD].reverseEdge = &trackNodes[52].edges[DIR_AHEAD];
@@ -628,6 +698,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[68].reserved = false;
         trackNodes[69].name = "E6";
         trackNodes[69].type = NODE_SENSOR;
+        trackNodes[69].sensor = Sensor('E', (char)6);
         trackNodes[69].num = 69;
         trackNodes[69].reverseNode = &trackNodes[68];
         trackNodes[69].edges[DIR_AHEAD].reverseEdge = &trackNodes[99].edges[DIR_AHEAD];
@@ -637,6 +708,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[69].reserved = false;
         trackNodes[70].name = "E7";
         trackNodes[70].type = NODE_SENSOR;
+        trackNodes[70].sensor = Sensor('E', (char)7);
         trackNodes[70].num = 70;
         trackNodes[70].reverseNode = &trackNodes[71];
         trackNodes[70].edges[DIR_AHEAD].reverseEdge = &trackNodes[55].edges[DIR_AHEAD];
@@ -646,6 +718,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[70].reserved = false;
         trackNodes[71].name = "E8";
         trackNodes[71].type = NODE_SENSOR;
+        trackNodes[71].sensor = Sensor('E', (char)8);
         trackNodes[71].num = 71;
         trackNodes[71].reverseNode = &trackNodes[70];
         trackNodes[71].edges[DIR_AHEAD].reverseEdge = &trackNodes[44].edges[DIR_AHEAD];
@@ -655,6 +728,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[71].reserved = false;
         trackNodes[72].name = "E9";
         trackNodes[72].type = NODE_SENSOR;
+        trackNodes[72].sensor = Sensor('E', (char)9);
         trackNodes[72].num = 72;
         trackNodes[72].reverseNode = &trackNodes[73];
         trackNodes[72].edges[DIR_AHEAD].reverseEdge = &trackNodes[94].edges[DIR_CURVED];
@@ -664,6 +738,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[72].reserved = false;
         trackNodes[73].name = "E10";
         trackNodes[73].type = NODE_SENSOR;
+        trackNodes[73].sensor = Sensor('E', (char)10);
         trackNodes[73].num = 73;
         trackNodes[73].reverseNode = &trackNodes[72];
         trackNodes[73].edges[DIR_AHEAD].reverseEdge = &trackNodes[77].edges[DIR_AHEAD];
@@ -673,6 +748,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[73].reserved = false;
         trackNodes[74].name = "E11";
         trackNodes[74].type = NODE_SENSOR;
+        trackNodes[74].sensor = Sensor('E', (char)11);
         trackNodes[74].num = 74;
         trackNodes[74].reverseNode = &trackNodes[75];
         trackNodes[74].edges[DIR_AHEAD].reverseEdge = &trackNodes[56].edges[DIR_AHEAD];
@@ -682,6 +758,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[74].reserved = false;
         trackNodes[75].name = "E12";
         trackNodes[75].type = NODE_SENSOR;
+        trackNodes[75].sensor = Sensor('E', (char)12);
         trackNodes[75].num = 75;
         trackNodes[75].reverseNode = &trackNodes[74];
         trackNodes[75].edges[DIR_AHEAD].reverseEdge = &trackNodes[93].edges[DIR_AHEAD];
@@ -691,6 +768,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[75].reserved = false;
         trackNodes[76].name = "E13";
         trackNodes[76].type = NODE_SENSOR;
+        trackNodes[76].sensor = Sensor('E', (char)13);
         trackNodes[76].num = 76;
         trackNodes[76].reverseNode = &trackNodes[77];
         trackNodes[76].edges[DIR_AHEAD].reverseEdge = &trackNodes[113].edges[DIR_AHEAD];
@@ -700,6 +778,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[76].reserved = false;
         trackNodes[77].name = "E14";
         trackNodes[77].type = NODE_SENSOR;
+        trackNodes[77].sensor = Sensor('E', (char)14);
         trackNodes[77].num = 77;
         trackNodes[77].reverseNode = &trackNodes[76];
         trackNodes[77].edges[DIR_AHEAD].reverseEdge = &trackNodes[73].edges[DIR_AHEAD];
@@ -709,6 +788,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[77].reserved = false;
         trackNodes[78].name = "E15";
         trackNodes[78].type = NODE_SENSOR;
+        trackNodes[78].sensor = Sensor('E', (char)15);
         trackNodes[78].num = 78;
         trackNodes[78].reverseNode = &trackNodes[79];
         trackNodes[78].edges[DIR_AHEAD].reverseEdge = &trackNodes[104].edges[DIR_CURVED];
@@ -718,6 +798,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[78].reserved = false;
         trackNodes[79].name = "E16";
         trackNodes[79].type = NODE_SENSOR;
+        trackNodes[79].sensor = Sensor('E', (char)16);
         trackNodes[79].num = 79;
         trackNodes[79].reverseNode = &trackNodes[78];
         trackNodes[79].edges[DIR_AHEAD].reverseEdge = &trackNodes[65].edges[DIR_AHEAD];
@@ -1335,6 +1416,7 @@ void Track::initializeTrack(char trackIdentifier) {
         noOfNodes = 140;
         trackNodes[0].name = "A1";
         trackNodes[0].type = NODE_SENSOR;
+        trackNodes[0].sensor = Sensor('A', (char)1);
         trackNodes[0].num = 0;
         trackNodes[0].reverseNode = &trackNodes[1];
         trackNodes[0].edges[DIR_AHEAD].reverseEdge = &trackNodes[102].edges[DIR_STRAIGHT];
@@ -1344,6 +1426,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[0].reserved = false;
         trackNodes[1].name = "A2";
         trackNodes[1].type = NODE_SENSOR;
+        trackNodes[1].sensor = Sensor('A', (char)2);
         trackNodes[1].num = 1;
         trackNodes[1].reverseNode = &trackNodes[0];
         trackNodes[1].edges[DIR_AHEAD].reverseEdge = &trackNodes[132].edges[DIR_AHEAD];
@@ -1353,6 +1436,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[1].reserved = false;
         trackNodes[2].name = "A3";
         trackNodes[2].type = NODE_SENSOR;
+        trackNodes[2].sensor = Sensor('A', (char)3);
         trackNodes[2].num = 2;
         trackNodes[2].reverseNode = &trackNodes[3];
         trackNodes[2].edges[DIR_AHEAD].reverseEdge = &trackNodes[107].edges[DIR_AHEAD];
@@ -1362,6 +1446,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[2].reserved = false;
         trackNodes[3].name = "A4";
         trackNodes[3].type = NODE_SENSOR;
+        trackNodes[3].sensor = Sensor('A', (char)4);
         trackNodes[3].num = 3;
         trackNodes[3].reverseNode = &trackNodes[2];
         trackNodes[3].edges[DIR_AHEAD].reverseEdge = &trackNodes[30].edges[DIR_AHEAD];
@@ -1371,6 +1456,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[3].reserved = false;
         trackNodes[4].name = "A5";
         trackNodes[4].type = NODE_SENSOR;
+        trackNodes[4].sensor = Sensor('A', (char)5);
         trackNodes[4].num = 4;
         trackNodes[4].reverseNode = &trackNodes[5];
         trackNodes[4].edges[DIR_AHEAD].reverseEdge = &trackNodes[84].edges[DIR_STRAIGHT];
@@ -1380,6 +1466,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[4].reserved = false;
         trackNodes[5].name = "A6";
         trackNodes[5].type = NODE_SENSOR;
+        trackNodes[5].sensor = Sensor('A', (char)6);
         trackNodes[5].num = 5;
         trackNodes[5].reverseNode = &trackNodes[4];
         trackNodes[5].edges[DIR_AHEAD].reverseEdge = &trackNodes[24].edges[DIR_AHEAD];
@@ -1389,6 +1476,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[5].reserved = false;
         trackNodes[6].name = "A7";
         trackNodes[6].type = NODE_SENSOR;
+        trackNodes[6].sensor = Sensor('A', (char)7);
         trackNodes[6].num = 6;
         trackNodes[6].reverseNode = &trackNodes[7];
         trackNodes[6].edges[DIR_AHEAD].reverseEdge = &trackNodes[26].edges[DIR_AHEAD];
@@ -1398,6 +1486,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[6].reserved = false;
         trackNodes[7].name = "A8";
         trackNodes[7].type = NODE_SENSOR;
+        trackNodes[7].sensor = Sensor('A', (char)8);
         trackNodes[7].num = 7;
         trackNodes[7].reverseNode = &trackNodes[6];
         trackNodes[7].edges[DIR_AHEAD].reverseEdge = &trackNodes[82].edges[DIR_CURVED];
@@ -1407,6 +1496,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[7].reserved = false;
         trackNodes[8].name = "A9";
         trackNodes[8].type = NODE_SENSOR;
+        trackNodes[8].sensor = Sensor('A', (char)9);
         trackNodes[8].num = 8;
         trackNodes[8].reverseNode = &trackNodes[9];
         trackNodes[8].edges[DIR_AHEAD].reverseEdge = &trackNodes[22].edges[DIR_AHEAD];
@@ -1416,6 +1506,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[8].reserved = false;
         trackNodes[9].name = "A10";
         trackNodes[9].type = NODE_SENSOR;
+        trackNodes[9].sensor = Sensor('A', (char)10);
         trackNodes[9].num = 9;
         trackNodes[9].reverseNode = &trackNodes[8];
         trackNodes[9].edges[DIR_AHEAD].reverseEdge = &trackNodes[80].edges[DIR_CURVED];
@@ -1425,6 +1516,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[9].reserved = false;
         trackNodes[10].name = "A11";
         trackNodes[10].type = NODE_SENSOR;
+        trackNodes[10].sensor = Sensor('A', (char)11);
         trackNodes[10].num = 10;
         trackNodes[10].reverseNode = &trackNodes[11];
         trackNodes[10].edges[DIR_AHEAD].reverseEdge = &trackNodes[80].edges[DIR_STRAIGHT];
@@ -1434,6 +1526,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[10].reserved = false;
         trackNodes[11].name = "A12";
         trackNodes[11].type = NODE_SENSOR;
+        trackNodes[11].sensor = Sensor('A', (char)12);
         trackNodes[11].num = 11;
         trackNodes[11].reverseNode = &trackNodes[10];
         trackNodes[11].edges[DIR_AHEAD].reverseEdge = &trackNodes[14].edges[DIR_AHEAD];
@@ -1443,6 +1536,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[11].reserved = false;
         trackNodes[12].name = "A13";
         trackNodes[12].type = NODE_SENSOR;
+        trackNodes[12].sensor = Sensor('A', (char)13);
         trackNodes[12].num = 12;
         trackNodes[12].reverseNode = &trackNodes[13];
         trackNodes[12].edges[DIR_AHEAD].reverseEdge = &trackNodes[86].edges[DIR_CURVED];
@@ -1452,6 +1546,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[12].reserved = false;
         trackNodes[13].name = "A14";
         trackNodes[13].type = NODE_SENSOR;
+        trackNodes[13].sensor = Sensor('A', (char)14);
         trackNodes[13].num = 13;
         trackNodes[13].reverseNode = &trackNodes[12];
         trackNodes[13].edges[DIR_AHEAD].reverseEdge = &trackNodes[130].edges[DIR_AHEAD];
@@ -1461,6 +1556,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[13].reserved = false;
         trackNodes[14].name = "A15";
         trackNodes[14].type = NODE_SENSOR;
+        trackNodes[14].sensor = Sensor('A', (char)15);
         trackNodes[14].num = 14;
         trackNodes[14].reverseNode = &trackNodes[15];
         trackNodes[14].edges[DIR_AHEAD].reverseEdge = &trackNodes[11].edges[DIR_AHEAD];
@@ -1470,6 +1566,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[14].reserved = false;
         trackNodes[15].name = "A16";
         trackNodes[15].type = NODE_SENSOR;
+        trackNodes[15].sensor = Sensor('A', (char)16);
         trackNodes[15].num = 15;
         trackNodes[15].reverseNode = &trackNodes[14];
         trackNodes[15].edges[DIR_AHEAD].reverseEdge = &trackNodes[86].edges[DIR_STRAIGHT];
@@ -1479,6 +1576,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[15].reserved = false;
         trackNodes[16].name = "B1";
         trackNodes[16].type = NODE_SENSOR;
+        trackNodes[16].sensor = Sensor('B', (char)1);
         trackNodes[16].num = 16;
         trackNodes[16].reverseNode = &trackNodes[17];
         trackNodes[16].edges[DIR_AHEAD].reverseEdge = &trackNodes[60].edges[DIR_AHEAD];
@@ -1488,6 +1586,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[16].reserved = false;
         trackNodes[17].name = "B2";
         trackNodes[17].type = NODE_SENSOR;
+        trackNodes[17].sensor = Sensor('B', (char)2);
         trackNodes[17].num = 17;
         trackNodes[17].reverseNode = &trackNodes[16];
         trackNodes[17].edges[DIR_AHEAD].reverseEdge = &trackNodes[110].edges[DIR_STRAIGHT];
@@ -1497,6 +1596,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[17].reserved = false;
         trackNodes[18].name = "B3";
         trackNodes[18].type = NODE_SENSOR;
+        trackNodes[18].sensor = Sensor('B', (char)3);
         trackNodes[18].num = 18;
         trackNodes[18].reverseNode = &trackNodes[19];
         trackNodes[18].edges[DIR_AHEAD].reverseEdge = &trackNodes[32].edges[DIR_AHEAD];
@@ -1506,6 +1606,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[18].reserved = false;
         trackNodes[19].name = "B4";
         trackNodes[19].type = NODE_SENSOR;
+        trackNodes[19].sensor = Sensor('B', (char)4);
         trackNodes[19].num = 19;
         trackNodes[19].reverseNode = &trackNodes[18];
         trackNodes[19].edges[DIR_AHEAD].reverseEdge = &trackNodes[110].edges[DIR_CURVED];
@@ -1515,6 +1616,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[19].reserved = false;
         trackNodes[20].name = "B5";
         trackNodes[20].type = NODE_SENSOR;
+        trackNodes[20].sensor = Sensor('B', (char)5);
         trackNodes[20].num = 20;
         trackNodes[20].reverseNode = &trackNodes[21];
         trackNodes[20].edges[DIR_AHEAD].reverseEdge = &trackNodes[51].edges[DIR_AHEAD];
@@ -1524,6 +1626,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[20].reserved = false;
         trackNodes[21].name = "B6";
         trackNodes[21].type = NODE_SENSOR;
+        trackNodes[21].sensor = Sensor('B', (char)6);
         trackNodes[21].num = 21;
         trackNodes[21].reverseNode = &trackNodes[20];
         trackNodes[21].edges[DIR_AHEAD].reverseEdge = &trackNodes[104].edges[DIR_STRAIGHT];
@@ -1533,6 +1636,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[21].reserved = false;
         trackNodes[22].name = "B7";
         trackNodes[22].type = NODE_SENSOR;
+        trackNodes[22].sensor = Sensor('B', (char)7);
         trackNodes[22].num = 22;
         trackNodes[22].reverseNode = &trackNodes[23];
         trackNodes[22].edges[DIR_AHEAD].reverseEdge = &trackNodes[8].edges[DIR_AHEAD];
@@ -1542,6 +1646,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[22].reserved = false;
         trackNodes[23].name = "B8";
         trackNodes[23].type = NODE_SENSOR;
+        trackNodes[23].sensor = Sensor('B', (char)8);
         trackNodes[23].num = 23;
         trackNodes[23].reverseNode = &trackNodes[22];
         trackNodes[23].edges[DIR_AHEAD].reverseEdge = &trackNodes[134].edges[DIR_AHEAD];
@@ -1551,6 +1656,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[23].reserved = false;
         trackNodes[24].name = "B9";
         trackNodes[24].type = NODE_SENSOR;
+        trackNodes[24].sensor = Sensor('B', (char)9);
         trackNodes[24].num = 24;
         trackNodes[24].reverseNode = &trackNodes[25];
         trackNodes[24].edges[DIR_AHEAD].reverseEdge = &trackNodes[5].edges[DIR_AHEAD];
@@ -1560,6 +1666,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[24].reserved = false;
         trackNodes[25].name = "B10";
         trackNodes[25].type = NODE_SENSOR;
+        trackNodes[25].sensor = Sensor('B', (char)10);
         trackNodes[25].num = 25;
         trackNodes[25].reverseNode = &trackNodes[24];
         trackNodes[25].edges[DIR_AHEAD].reverseEdge = &trackNodes[136].edges[DIR_AHEAD];
@@ -1569,6 +1676,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[25].reserved = false;
         trackNodes[26].name = "B11";
         trackNodes[26].type = NODE_SENSOR;
+        trackNodes[26].sensor = Sensor('B', (char)11);
         trackNodes[26].num = 26;
         trackNodes[26].reverseNode = &trackNodes[27];
         trackNodes[26].edges[DIR_AHEAD].reverseEdge = &trackNodes[6].edges[DIR_AHEAD];
@@ -1578,6 +1686,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[26].reserved = false;
         trackNodes[27].name = "B12";
         trackNodes[27].type = NODE_SENSOR;
+        trackNodes[27].sensor = Sensor('B', (char)12);
         trackNodes[27].num = 27;
         trackNodes[27].reverseNode = &trackNodes[26];
         trackNodes[27].edges[DIR_AHEAD].reverseEdge = &trackNodes[138].edges[DIR_AHEAD];
@@ -1587,6 +1696,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[27].reserved = false;
         trackNodes[28].name = "B13";
         trackNodes[28].type = NODE_SENSOR;
+        trackNodes[28].sensor = Sensor('B', (char)13);
         trackNodes[28].num = 28;
         trackNodes[28].reverseNode = &trackNodes[29];
         trackNodes[28].edges[DIR_AHEAD].reverseEdge = &trackNodes[118].edges[DIR_CURVED];
@@ -1596,6 +1706,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[28].reserved = false;
         trackNodes[29].name = "B14";
         trackNodes[29].type = NODE_SENSOR;
+        trackNodes[29].sensor = Sensor('B', (char)14);
         trackNodes[29].num = 29;
         trackNodes[29].reverseNode = &trackNodes[28];
         trackNodes[29].edges[DIR_AHEAD].reverseEdge = &trackNodes[62].edges[DIR_AHEAD];
@@ -1605,6 +1716,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[29].reserved = false;
         trackNodes[30].name = "B15";
         trackNodes[30].type = NODE_SENSOR;
+        trackNodes[30].sensor = Sensor('B', (char)15);
         trackNodes[30].num = 30;
         trackNodes[30].reverseNode = &trackNodes[31];
         trackNodes[30].edges[DIR_AHEAD].reverseEdge = &trackNodes[3].edges[DIR_AHEAD];
@@ -1614,6 +1726,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[30].reserved = false;
         trackNodes[31].name = "B16";
         trackNodes[31].type = NODE_SENSOR;
+        trackNodes[31].sensor = Sensor('B', (char)16);
         trackNodes[31].num = 31;
         trackNodes[31].reverseNode = &trackNodes[30];
         trackNodes[31].edges[DIR_AHEAD].reverseEdge = &trackNodes[109].edges[DIR_AHEAD];
@@ -1623,6 +1736,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[31].reserved = false;
         trackNodes[32].name = "C1";
         trackNodes[32].type = NODE_SENSOR;
+        trackNodes[32].sensor = Sensor('C', (char)1);
         trackNodes[32].num = 32;
         trackNodes[32].reverseNode = &trackNodes[33];
         trackNodes[32].edges[DIR_AHEAD].reverseEdge = &trackNodes[18].edges[DIR_AHEAD];
@@ -1632,6 +1746,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[32].reserved = false;
         trackNodes[33].name = "C2";
         trackNodes[33].type = NODE_SENSOR;
+        trackNodes[33].sensor = Sensor('C', (char)2);
         trackNodes[33].num = 33;
         trackNodes[33].reverseNode = &trackNodes[32];
         trackNodes[33].edges[DIR_AHEAD].reverseEdge = &trackNodes[116].edges[DIR_CURVED];
@@ -1641,6 +1756,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[33].reserved = false;
         trackNodes[34].name = "C3";
         trackNodes[34].type = NODE_SENSOR;
+        trackNodes[34].sensor = Sensor('C', (char)3);
         trackNodes[34].num = 34;
         trackNodes[34].reverseNode = &trackNodes[35];
         trackNodes[34].edges[DIR_AHEAD].reverseEdge = &trackNodes[128].edges[DIR_AHEAD];
@@ -1650,6 +1766,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[34].reserved = false;
         trackNodes[35].name = "C4";
         trackNodes[35].type = NODE_SENSOR;
+        trackNodes[35].sensor = Sensor('C', (char)4);
         trackNodes[35].num = 35;
         trackNodes[35].reverseNode = &trackNodes[34];
         trackNodes[35].edges[DIR_AHEAD].reverseEdge = &trackNodes[88].edges[DIR_STRAIGHT];
@@ -1659,6 +1776,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[35].reserved = false;
         trackNodes[36].name = "C5";
         trackNodes[36].type = NODE_SENSOR;
+        trackNodes[36].sensor = Sensor('C', (char)5);
         trackNodes[36].num = 36;
         trackNodes[36].reverseNode = &trackNodes[37];
         trackNodes[36].edges[DIR_AHEAD].reverseEdge = &trackNodes[91].edges[DIR_AHEAD];
@@ -1668,6 +1786,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[36].reserved = false;
         trackNodes[37].name = "C6";
         trackNodes[37].type = NODE_SENSOR;
+        trackNodes[37].sensor = Sensor('C', (char)6);
         trackNodes[37].num = 37;
         trackNodes[37].reverseNode = &trackNodes[36];
         trackNodes[37].edges[DIR_AHEAD].reverseEdge = &trackNodes[108].edges[DIR_STRAIGHT];
@@ -1677,6 +1796,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[37].reserved = false;
         trackNodes[38].name = "C7";
         trackNodes[38].type = NODE_SENSOR;
+        trackNodes[38].sensor = Sensor('C', (char)7);
         trackNodes[38].num = 38;
         trackNodes[38].reverseNode = &trackNodes[39];
         trackNodes[38].edges[DIR_AHEAD].reverseEdge = &trackNodes[114].edges[DIR_STRAIGHT];
@@ -1686,6 +1806,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[38].reserved = false;
         trackNodes[39].name = "C8";
         trackNodes[39].type = NODE_SENSOR;
+        trackNodes[39].sensor = Sensor('C', (char)8);
         trackNodes[39].num = 39;
         trackNodes[39].reverseNode = &trackNodes[38];
         trackNodes[39].edges[DIR_AHEAD].reverseEdge = &trackNodes[85].edges[DIR_AHEAD];
@@ -1695,6 +1816,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[39].reserved = false;
         trackNodes[40].name = "C9";
         trackNodes[40].type = NODE_SENSOR;
+        trackNodes[40].sensor = Sensor('C', (char)9);
         trackNodes[40].num = 40;
         trackNodes[40].reverseNode = &trackNodes[41];
         trackNodes[40].edges[DIR_AHEAD].reverseEdge = &trackNodes[108].edges[DIR_CURVED];
@@ -1704,6 +1826,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[40].reserved = false;
         trackNodes[41].name = "C10";
         trackNodes[41].type = NODE_SENSOR;
+        trackNodes[41].sensor = Sensor('C', (char)10);
         trackNodes[41].num = 41;
         trackNodes[41].reverseNode = &trackNodes[40];
         trackNodes[41].edges[DIR_AHEAD].reverseEdge = &trackNodes[111].edges[DIR_AHEAD];
@@ -1713,6 +1836,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[41].reserved = false;
         trackNodes[42].name = "C11";
         trackNodes[42].type = NODE_SENSOR;
+        trackNodes[42].sensor = Sensor('C', (char)11);
         trackNodes[42].num = 42;
         trackNodes[42].reverseNode = &trackNodes[43];
         trackNodes[42].edges[DIR_AHEAD].reverseEdge = &trackNodes[105].edges[DIR_AHEAD];
@@ -1722,6 +1846,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[42].reserved = false;
         trackNodes[43].name = "C12";
         trackNodes[43].type = NODE_SENSOR;
+        trackNodes[43].sensor = Sensor('C', (char)12);
         trackNodes[43].num = 43;
         trackNodes[43].reverseNode = &trackNodes[42];
         trackNodes[43].edges[DIR_AHEAD].reverseEdge = &trackNodes[106].edges[DIR_CURVED];
@@ -1731,6 +1856,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[43].reserved = false;
         trackNodes[44].name = "C13";
         trackNodes[44].type = NODE_SENSOR;
+        trackNodes[44].sensor = Sensor('C', (char)13);
         trackNodes[44].num = 44;
         trackNodes[44].reverseNode = &trackNodes[45];
         trackNodes[44].edges[DIR_AHEAD].reverseEdge = &trackNodes[71].edges[DIR_AHEAD];
@@ -1740,6 +1866,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[44].reserved = false;
         trackNodes[45].name = "C14";
         trackNodes[45].type = NODE_SENSOR;
+        trackNodes[45].sensor = Sensor('C', (char)14);
         trackNodes[45].num = 45;
         trackNodes[45].reverseNode = &trackNodes[44];
         trackNodes[45].edges[DIR_AHEAD].reverseEdge = &trackNodes[101].edges[DIR_AHEAD];
@@ -1749,6 +1876,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[45].reserved = false;
         trackNodes[46].name = "C15";
         trackNodes[46].type = NODE_SENSOR;
+        trackNodes[46].sensor = Sensor('C', (char)15);
         trackNodes[46].num = 46;
         trackNodes[46].reverseNode = &trackNodes[47];
         trackNodes[46].edges[DIR_AHEAD].reverseEdge = &trackNodes[58].edges[DIR_AHEAD];
@@ -1758,6 +1886,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[46].reserved = false;
         trackNodes[47].name = "C16";
         trackNodes[47].type = NODE_SENSOR;
+        trackNodes[47].sensor = Sensor('C', (char)16);
         trackNodes[47].num = 47;
         trackNodes[47].reverseNode = &trackNodes[46];
         trackNodes[47].edges[DIR_AHEAD].reverseEdge = &trackNodes[90].edges[DIR_STRAIGHT];
@@ -1767,6 +1896,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[47].reserved = false;
         trackNodes[48].name = "D1";
         trackNodes[48].type = NODE_SENSOR;
+        trackNodes[48].sensor = Sensor('D', (char)1);
         trackNodes[48].num = 48;
         trackNodes[48].reverseNode = &trackNodes[49];
         trackNodes[48].edges[DIR_AHEAD].reverseEdge = &trackNodes[120].edges[DIR_CURVED];
@@ -1776,6 +1906,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[48].reserved = false;
         trackNodes[49].name = "D2";
         trackNodes[49].type = NODE_SENSOR;
+        trackNodes[49].sensor = Sensor('D', (char)2);
         trackNodes[49].num = 49;
         trackNodes[49].reverseNode = &trackNodes[48];
         trackNodes[49].edges[DIR_AHEAD].reverseEdge = &trackNodes[66].edges[DIR_AHEAD];
@@ -1785,6 +1916,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[49].reserved = false;
         trackNodes[50].name = "D3";
         trackNodes[50].type = NODE_SENSOR;
+        trackNodes[50].sensor = Sensor('D', (char)3);
         trackNodes[50].num = 50;
         trackNodes[50].reverseNode = &trackNodes[51];
         trackNodes[50].edges[DIR_AHEAD].reverseEdge = &trackNodes[98].edges[DIR_STRAIGHT];
@@ -1794,6 +1926,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[50].reserved = false;
         trackNodes[51].name = "D4";
         trackNodes[51].type = NODE_SENSOR;
+        trackNodes[51].sensor = Sensor('D', (char)4);
         trackNodes[51].num = 51;
         trackNodes[51].reverseNode = &trackNodes[50];
         trackNodes[51].edges[DIR_AHEAD].reverseEdge = &trackNodes[20].edges[DIR_AHEAD];
@@ -1803,6 +1936,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[51].reserved = false;
         trackNodes[52].name = "D5";
         trackNodes[52].type = NODE_SENSOR;
+        trackNodes[52].sensor = Sensor('D', (char)5);
         trackNodes[52].num = 52;
         trackNodes[52].reverseNode = &trackNodes[53];
         trackNodes[52].edges[DIR_AHEAD].reverseEdge = &trackNodes[68].edges[DIR_AHEAD];
@@ -1812,6 +1946,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[52].reserved = false;
         trackNodes[53].name = "D6";
         trackNodes[53].type = NODE_SENSOR;
+        trackNodes[53].sensor = Sensor('D', (char)6);
         trackNodes[53].num = 53;
         trackNodes[53].reverseNode = &trackNodes[52];
         trackNodes[53].edges[DIR_AHEAD].reverseEdge = &trackNodes[96].edges[DIR_CURVED];
@@ -1821,6 +1956,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[53].reserved = false;
         trackNodes[54].name = "D7";
         trackNodes[54].type = NODE_SENSOR;
+        trackNodes[54].sensor = Sensor('D', (char)7);
         trackNodes[54].num = 54;
         trackNodes[54].reverseNode = &trackNodes[55];
         trackNodes[54].edges[DIR_AHEAD].reverseEdge = &trackNodes[96].edges[DIR_STRAIGHT];
@@ -1830,6 +1966,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[54].reserved = false;
         trackNodes[55].name = "D8";
         trackNodes[55].type = NODE_SENSOR;
+        trackNodes[55].sensor = Sensor('D', (char)8);
         trackNodes[55].num = 55;
         trackNodes[55].reverseNode = &trackNodes[54];
         trackNodes[55].edges[DIR_AHEAD].reverseEdge = &trackNodes[70].edges[DIR_AHEAD];
@@ -1839,6 +1976,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[55].reserved = false;
         trackNodes[56].name = "D9";
         trackNodes[56].type = NODE_SENSOR;
+        trackNodes[56].sensor = Sensor('D', (char)9);
         trackNodes[56].num = 56;
         trackNodes[56].reverseNode = &trackNodes[57];
         trackNodes[56].edges[DIR_AHEAD].reverseEdge = &trackNodes[74].edges[DIR_AHEAD];
@@ -1848,6 +1986,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[56].reserved = false;
         trackNodes[57].name = "D10";
         trackNodes[57].type = NODE_SENSOR;
+        trackNodes[57].sensor = Sensor('D', (char)10);
         trackNodes[57].num = 57;
         trackNodes[57].reverseNode = &trackNodes[56];
         trackNodes[57].edges[DIR_AHEAD].reverseEdge = &trackNodes[94].edges[DIR_STRAIGHT];
@@ -1857,6 +1996,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[57].reserved = false;
         trackNodes[58].name = "D11";
         trackNodes[58].type = NODE_SENSOR;
+        trackNodes[58].sensor = Sensor('D', (char)11);
         trackNodes[58].num = 58;
         trackNodes[58].reverseNode = &trackNodes[59];
         trackNodes[58].edges[DIR_AHEAD].reverseEdge = &trackNodes[46].edges[DIR_AHEAD];
@@ -1866,6 +2006,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[58].reserved = false;
         trackNodes[59].name = "D12";
         trackNodes[59].type = NODE_SENSOR;
+        trackNodes[59].sensor = Sensor('D', (char)12);
         trackNodes[59].num = 59;
         trackNodes[59].reverseNode = &trackNodes[58];
         trackNodes[59].edges[DIR_AHEAD].reverseEdge = &trackNodes[92].edges[DIR_STRAIGHT];
@@ -1875,6 +2016,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[59].reserved = false;
         trackNodes[60].name = "D13";
         trackNodes[60].type = NODE_SENSOR;
+        trackNodes[60].sensor = Sensor('D', (char)13);
         trackNodes[60].num = 60;
         trackNodes[60].reverseNode = &trackNodes[61];
         trackNodes[60].edges[DIR_AHEAD].reverseEdge = &trackNodes[16].edges[DIR_AHEAD];
@@ -1884,6 +2026,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[60].reserved = false;
         trackNodes[61].name = "D14";
         trackNodes[61].type = NODE_SENSOR;
+        trackNodes[61].sensor = Sensor('D', (char)14);
         trackNodes[61].num = 61;
         trackNodes[61].reverseNode = &trackNodes[60];
         trackNodes[61].edges[DIR_AHEAD].reverseEdge = &trackNodes[112].edges[DIR_STRAIGHT];
@@ -1893,6 +2036,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[61].reserved = false;
         trackNodes[62].name = "D15";
         trackNodes[62].type = NODE_SENSOR;
+        trackNodes[62].sensor = Sensor('D', (char)15);
         trackNodes[62].num = 62;
         trackNodes[62].reverseNode = &trackNodes[63];
         trackNodes[62].edges[DIR_AHEAD].reverseEdge = &trackNodes[29].edges[DIR_AHEAD];
@@ -1902,6 +2046,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[62].reserved = false;
         trackNodes[63].name = "D16";
         trackNodes[63].type = NODE_SENSOR;
+        trackNodes[63].sensor = Sensor('D', (char)16);
         trackNodes[63].num = 63;
         trackNodes[63].reverseNode = &trackNodes[62];
         trackNodes[63].edges[DIR_AHEAD].reverseEdge = &trackNodes[112].edges[DIR_CURVED];
@@ -1911,6 +2056,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[63].reserved = false;
         trackNodes[64].name = "E1";
         trackNodes[64].type = NODE_SENSOR;
+        trackNodes[64].sensor = Sensor('E', (char)1);
         trackNodes[64].num = 64;
         trackNodes[64].reverseNode = &trackNodes[65];
         trackNodes[64].edges[DIR_AHEAD].reverseEdge = &trackNodes[122].edges[DIR_CURVED];
@@ -1920,6 +2066,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[64].reserved = false;
         trackNodes[65].name = "E2";
         trackNodes[65].type = NODE_SENSOR;
+        trackNodes[65].sensor = Sensor('E', (char)2);
         trackNodes[65].num = 65;
         trackNodes[65].reverseNode = &trackNodes[64];
         trackNodes[65].edges[DIR_AHEAD].reverseEdge = &trackNodes[79].edges[DIR_AHEAD];
@@ -1929,6 +2076,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[65].reserved = false;
         trackNodes[66].name = "E3";
         trackNodes[66].type = NODE_SENSOR;
+        trackNodes[66].sensor = Sensor('E', (char)3);
         trackNodes[66].num = 66;
         trackNodes[66].reverseNode = &trackNodes[67];
         trackNodes[66].edges[DIR_AHEAD].reverseEdge = &trackNodes[49].edges[DIR_AHEAD];
@@ -1938,6 +2086,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[66].reserved = false;
         trackNodes[67].name = "E4";
         trackNodes[67].type = NODE_SENSOR;
+        trackNodes[67].sensor = Sensor('E', (char)4);
         trackNodes[67].num = 67;
         trackNodes[67].reverseNode = &trackNodes[66];
         trackNodes[67].edges[DIR_AHEAD].reverseEdge = &trackNodes[98].edges[DIR_CURVED];
@@ -1947,6 +2096,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[67].reserved = false;
         trackNodes[68].name = "E5";
         trackNodes[68].type = NODE_SENSOR;
+        trackNodes[68].sensor = Sensor('E', (char)5);
         trackNodes[68].num = 68;
         trackNodes[68].reverseNode = &trackNodes[69];
         trackNodes[68].edges[DIR_AHEAD].reverseEdge = &trackNodes[52].edges[DIR_AHEAD];
@@ -1956,6 +2106,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[68].reserved = false;
         trackNodes[69].name = "E6";
         trackNodes[69].type = NODE_SENSOR;
+        trackNodes[69].sensor = Sensor('E', (char)6);
         trackNodes[69].num = 69;
         trackNodes[69].reverseNode = &trackNodes[68];
         trackNodes[69].edges[DIR_AHEAD].reverseEdge = &trackNodes[99].edges[DIR_AHEAD];
@@ -1965,6 +2116,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[69].reserved = false;
         trackNodes[70].name = "E7";
         trackNodes[70].type = NODE_SENSOR;
+        trackNodes[70].sensor = Sensor('E', (char)7);
         trackNodes[70].num = 70;
         trackNodes[70].reverseNode = &trackNodes[71];
         trackNodes[70].edges[DIR_AHEAD].reverseEdge = &trackNodes[55].edges[DIR_AHEAD];
@@ -1974,6 +2126,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[70].reserved = false;
         trackNodes[71].name = "E8";
         trackNodes[71].type = NODE_SENSOR;
+        trackNodes[71].sensor = Sensor('E', (char)8);
         trackNodes[71].num = 71;
         trackNodes[71].reverseNode = &trackNodes[70];
         trackNodes[71].edges[DIR_AHEAD].reverseEdge = &trackNodes[44].edges[DIR_AHEAD];
@@ -1983,6 +2136,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[71].reserved = false;
         trackNodes[72].name = "E9";
         trackNodes[72].type = NODE_SENSOR;
+        trackNodes[72].sensor = Sensor('E', (char)9);
         trackNodes[72].num = 72;
         trackNodes[72].reverseNode = &trackNodes[73];
         trackNodes[72].edges[DIR_AHEAD].reverseEdge = &trackNodes[94].edges[DIR_CURVED];
@@ -1992,6 +2146,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[72].reserved = false;
         trackNodes[73].name = "E10";
         trackNodes[73].type = NODE_SENSOR;
+        trackNodes[73].sensor = Sensor('E', (char)10);
         trackNodes[73].num = 73;
         trackNodes[73].reverseNode = &trackNodes[72];
         trackNodes[73].edges[DIR_AHEAD].reverseEdge = &trackNodes[77].edges[DIR_AHEAD];
@@ -2001,6 +2156,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[73].reserved = false;
         trackNodes[74].name = "E11";
         trackNodes[74].type = NODE_SENSOR;
+        trackNodes[74].sensor = Sensor('E', (char)11);
         trackNodes[74].num = 74;
         trackNodes[74].reverseNode = &trackNodes[75];
         trackNodes[74].edges[DIR_AHEAD].reverseEdge = &trackNodes[56].edges[DIR_AHEAD];
@@ -2010,6 +2166,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[74].reserved = false;
         trackNodes[75].name = "E12";
         trackNodes[75].type = NODE_SENSOR;
+        trackNodes[75].sensor = Sensor('E', (char)12);
         trackNodes[75].num = 75;
         trackNodes[75].reverseNode = &trackNodes[74];
         trackNodes[75].edges[DIR_AHEAD].reverseEdge = &trackNodes[93].edges[DIR_AHEAD];
@@ -2019,6 +2176,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[75].reserved = false;
         trackNodes[76].name = "E13";
         trackNodes[76].type = NODE_SENSOR;
+        trackNodes[76].sensor = Sensor('E', (char)13);
         trackNodes[76].num = 76;
         trackNodes[76].reverseNode = &trackNodes[77];
         trackNodes[76].edges[DIR_AHEAD].reverseEdge = &trackNodes[113].edges[DIR_AHEAD];
@@ -2028,6 +2186,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[76].reserved = false;
         trackNodes[77].name = "E14";
         trackNodes[77].type = NODE_SENSOR;
+        trackNodes[77].sensor = Sensor('E', (char)14);
         trackNodes[77].num = 77;
         trackNodes[77].reverseNode = &trackNodes[76];
         trackNodes[77].edges[DIR_AHEAD].reverseEdge = &trackNodes[73].edges[DIR_AHEAD];
@@ -2037,6 +2196,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[77].reserved = false;
         trackNodes[78].name = "E15";
         trackNodes[78].type = NODE_SENSOR;
+        trackNodes[78].sensor = Sensor('E', (char)15);
         trackNodes[78].num = 78;
         trackNodes[78].reverseNode = &trackNodes[79];
         trackNodes[78].edges[DIR_AHEAD].reverseEdge = &trackNodes[104].edges[DIR_CURVED];
@@ -2046,6 +2206,7 @@ void Track::initializeTrack(char trackIdentifier) {
         trackNodes[78].reserved = false;
         trackNodes[79].name = "E16";
         trackNodes[79].type = NODE_SENSOR;
+        trackNodes[79].sensor = Sensor('E', (char)16);
         trackNodes[79].num = 79;
         trackNodes[79].reverseNode = &trackNodes[78];
         trackNodes[79].edges[DIR_AHEAD].reverseEdge = &trackNodes[65].edges[DIR_AHEAD];

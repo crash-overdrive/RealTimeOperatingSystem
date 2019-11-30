@@ -4,13 +4,15 @@
 #include "io/VT100.hpp"
 #include "user/courier/GUITermCourier.hpp"
 #include "user/message/IdleMessage.hpp"
+#include "user/message/LocationMessage.hpp"
 #include "user/message/MessageHeader.hpp"
 #include "user/message/SensorMessage.hpp"
 #include "user/message/SWMessage.hpp"
 #include "user/message/TextMessage.hpp"
-#include "user/message/TimeMessage.hpp"
 #include "user/message/ThinMessage.hpp"
+#include "user/message/TimeMessage.hpp"
 #include "user/message/TrainMessage.hpp"
+#include "user/model/Track.hpp"
 #include "user/model/Train.hpp"
 #include "user/server/GUIServer.hpp"
 #include "user/syscall/UserSyscall.hpp"
@@ -25,27 +27,43 @@ int GUI::insertSetDisplayAttrs(char *str, int attr) {
     return format(str, "%s", attrstr);
 }
 
-int GUI::insertSaveCursorAndAttrs(char *str, int index) {
-    str[index++] = '\033';
-    str[index++] = '7';
-    return index;
-}
+// int GUI::insertSaveCursorAndAttrs(char *str, int index) {
+//     str[index++] = '\033';
+//     str[index++] = '7';
+//     return index;
+// }
 
-int GUI::insertRestorCursorAndAttrs(char *str, int index) {
-    str[index++] = '\033';
-    str[index++] = '8';
-    return index;
-}
+// int GUI::insertRestorCursorAndAttrs(char *str, int index) {
+//     str[index++] = '\033';
+//     str[index++] = '8';
+//     return index;
+// }
 
-// Inserts a force cursor position escape sequence at the desired location in the string
-int GUI::insertForceCursorPos(char *str, int index, int row, int col) {
-    str[index++] = '\033';
-    str[index++] = '[';
-    // Logic for inserting row
-    str[index++] = ';';
-    // Logic for inserting col
-    str[index++] = 'f';
-    return index;
+// // Inserts a force cursor position escape sequence at the desired location in the string
+// int GUI::insertForceCursorPos(char *str, int index, int row, int col) {
+//     str[index++] = '\033';
+//     str[index++] = '[';
+//     // Logic for inserting row
+//     str[index++] = ';';
+//     // Logic for inserting col
+//     str[index++] = 'f';
+//     return index;
+// }
+
+int GUI::insertTrainColor(char *str, int index) {
+    if (index == TRINDEX::T1) {
+        return insertSetDisplayAttrs(str, FG_GREEN);
+    } else if (index == TRINDEX::T24) {
+        return insertSetDisplayAttrs(str, FG_MAGENTA);
+    } else if (index == TRINDEX::T58) {
+        return insertSetDisplayAttrs(str, FG_YELLOW);
+    } else if (index == TRINDEX::T74) {
+        return insertSetDisplayAttrs(str, FG_RED);
+    } else if (index == TRINDEX::T78) {
+        return insertSetDisplayAttrs(str, FG_BLUE);
+    } else {
+        return insertSetDisplayAttrs(str, FG_CYAN);
+    }
 }
 
 void GUI::drawTime(char *msg) {
@@ -224,6 +242,41 @@ void GUI::drawTrain(char *msg) {
     Reply(termCourier, (char *)&drawmsg, drawmsg.size());
 }
 
+void GUI::drawLocation(char *msg) {
+    char posstr[8] = {0};
+    LocationMessage *lm = (LocationMessage *)msg;
+
+    int xpos = 69;
+    int ypos = 14;
+
+    drawmsg.msglen = 0;
+    drawmsg.msglen += format(drawmsg.msg, "%s", Constants::VT100::SAVE_CURSOR_AND_ATTRS);
+
+    for (int i = 0; i < lm->count; ++i) {
+        int index = Train::getTrainIndex(lm->locationInfo[i].train);
+
+        // Move the cursor to the right position for the train
+        int count = format(posstr, Constants::VT100::MOVE_CURSOR_POS, ypos + index, xpos);
+        posstr[count] = 0;
+        drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%s", posstr);
+
+        // Color the text
+        drawmsg.msglen += insertTrainColor(&drawmsg.msg[drawmsg.msglen], index);
+
+        // For now, just draw it as is
+        count = format(&drawmsg.msg[drawmsg.msglen], "%s+%dmm", track.trackNodes[(int)lm->locationInfo[i].location.landmark].name, lm->locationInfo[i].location.offset/1000);
+        drawmsg.msglen += count;
+        for (int i = 0; i < 12 - count; ++i) {
+            drawmsg.msg[drawmsg.msglen++] = ' ';
+        }
+    }
+
+    drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%s", Constants::VT100::RESTORE_CURSOR_AND_ATTRS);
+    drawmsg.msg[drawmsg.msglen] = 0;
+
+    Reply(termCourier, (char *)&drawmsg, drawmsg.size());
+}
+
 void GUI::init() {
     termCourier = Create(7, guiTermCourier);
 }
@@ -289,6 +342,14 @@ void guiServer() {
                     bwprintf(COM2, "GUI Server - Terminal courier unexpectedly blocked on TRAIN!");
                 }
                 gui.drawTrain(msg);
+                Reply(tid, (char*)&rdymsg, rdymsg.size());
+                tsBlocked = false;
+                break;
+            case Constants::MSG::LOCATION:
+                if (tsBlocked != true) {
+                    bwprintf(COM2, "GUI Server - Terminal courier unexpectedly blocked on LOCATION!");
+                }
+                gui.drawLocation(msg);
                 Reply(tid, (char*)&rdymsg, rdymsg.size());
                 tsBlocked = false;
                 break;
