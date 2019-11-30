@@ -207,7 +207,7 @@ void GUI::drawTrain(char *msg) {
     }
 
     // Draw estimate dist
-    diff = format(&drawmsg.msg[drawmsg.msglen], "%d", tm->trainInfo[0].predictedDist);
+    diff = format(&drawmsg.msg[drawmsg.msglen], "%d", tm->trainInfo[0].predictedDistance);
     drawmsg.msglen += diff;
     for (int i = 0; i < 10 - diff; ++i) {
         drawmsg.msg[drawmsg.msglen++] = ' ';
@@ -223,14 +223,14 @@ void GUI::drawTrain(char *msg) {
     }
 
     // Draw actual time
-    diff = format(&drawmsg.msg[drawmsg.msglen], "%d", tm->trainInfo[0].realTime);
+    diff = format(&drawmsg.msg[drawmsg.msglen], "%d", tm->trainInfo[0].timeDelta);
     drawmsg.msglen += diff;
     for (int i = 0; i < 10 - diff; ++i) {
         drawmsg.msg[drawmsg.msglen++] = ' ';
     }
 
     // Draw actual dist
-    diff = format(&drawmsg.msg[drawmsg.msglen], "%d", tm->trainInfo[0].realDist);
+    diff = format(&drawmsg.msg[drawmsg.msglen], "%d", tm->trainInfo[0].distanceDelta);
     drawmsg.msglen += diff;
     for (int i = 0; i < 10 - diff; ++i) {
         drawmsg.msg[drawmsg.msglen++] = ' ';
