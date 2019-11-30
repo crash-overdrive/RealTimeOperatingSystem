@@ -30,7 +30,6 @@ public:
     Track track;
 
     void init();
-    TRINDEX getTrainIndex(char number);
     void queueTrainSpeed(char tr, char s);
     void queueReverse(char tr);
     int queueIndex();
@@ -44,6 +43,7 @@ public:
     void updateLocation();
     int getDirection(int i);
     void sendLocation();
+    int getNextSensorDistance(int i);
 };
 
 #endif

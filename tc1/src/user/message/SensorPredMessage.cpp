@@ -8,5 +8,5 @@ int SensorPredMessage::size() {
 }
 
 int SensorPredMessage::maxSize() {
-    return sizeof(MessageHeader) + 4 - sizeof(MessageHeader) % 4 + sizeof(int) + 10 * sizeof(SensorPred);
+    return sizeof(MessageHeader) + 4 - sizeof(MessageHeader) % 4 + sizeof(int) + 6 * sizeof(SensorPred);
 }

@@ -1,6 +1,14 @@
 #include "user/model/Track.hpp"
 #include "user/model/Sensor.hpp"
 
+int Track::getIndex(Sensor sensor) {
+    return sensor.bank - 'A' * 16 + sensor.bank - 1;
+}
+
+Sensor Track::getSensor(int index) {
+    return Sensor(index / 16 + 'A', index % 16 + 1);
+}
+
 void Track::initializeTrack(char trackIdentifier) {
     switch (trackIdentifier) {
     case 'A':

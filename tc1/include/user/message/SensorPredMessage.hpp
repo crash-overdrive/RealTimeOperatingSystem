@@ -9,7 +9,7 @@ class SensorPredMessage {
 public:
     MessageHeader mh;
     int count;
-    SensorPred predictions[10];
+    SensorPred predictions[6];
 
     SensorPredMessage();
 

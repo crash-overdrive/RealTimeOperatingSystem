@@ -53,6 +53,9 @@ class Track {
         Track() {
             initializeTrack('A');
         }
+
+        static int getIndex(Sensor sensor);
+        static Sensor getSensor(int index);
 };
 
 #endif

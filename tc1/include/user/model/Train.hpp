@@ -1,8 +1,9 @@
 #ifndef TRAIN_HPP
 #define TRAIN_HPP
 
-#include "user/model/Sensor.hpp"
 #include "user/model/Location.hpp"
+#include "user/model/Sensor.hpp"
+#include "user/model/TrainInfo.hpp"
 
 enum TRINDEX {
     T1 = 0,
@@ -23,6 +24,8 @@ public:
     unsigned int acc[15];
     Location location;
     Sensor nextSensor[2];
+    TrainInfo trainInfo;
+    int lastSensorAttrTime;
 
     bool updated;
     bool locationUpdated; // Do we need this?

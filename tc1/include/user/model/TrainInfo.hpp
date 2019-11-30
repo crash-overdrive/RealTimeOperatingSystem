@@ -10,9 +10,10 @@ public:
 
     Sensor next;
     Sensor prev;
-    int predictedTime, predictedDist, realTime, realDist;
+    int predictedTime, predictedDistance, timeDelta, distanceDelta;
 
     TrainInfo();
+    TrainInfo(char n);
 };
 
 #endif

@@ -16,4 +16,4 @@ SensorAttr::SensorAttr() : sensor{0, 0}, train{0} {}
 
 SensorAttr::SensorAttr(char b, char n, char t) : sensor{b, n}, train{t} {}
 
-SensorPred::SensorPred() { train = 0; }
+SensorPred::SensorPred(): train{0} {}
