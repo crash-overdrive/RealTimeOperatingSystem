@@ -312,7 +312,7 @@ bool NavigationServer::findPath() {
         // push to sensorDistance List
         if (nextTrackIndex == -1) {
             sensorDistanceLists[trainIndex].push(distance);
-            bwprintf(COM2, "Pushed %d for %s\n\r", distance, track.trackNodes[currentTrackIndex].name);
+            // bwprintf(COM2, "Pushed %d for %s\n\r", distance, track.trackNodes[currentTrackIndex].name);
         } else {
             switch (track.trackNodes[currentTrackIndex].type) {
                 case NODE_TYPE::NODE_SENSOR:
@@ -327,7 +327,7 @@ bool NavigationServer::findPath() {
                         bwprintf(COM2, "Navigation Server - Error initializing Sensor distance list, node sensor\n\r");
                     }
                     sensorDistanceLists[trainIndex].push(distance);
-                    bwprintf(COM2, "Pushed %d for %s\n\r", distance, track.trackNodes[currentTrackIndex].name);
+                    // bwprintf(COM2, "Pushed %d for %s\n\r", distance, track.trackNodes[currentTrackIndex].name);
                     distance = 0;
                     break;
                 }
