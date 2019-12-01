@@ -290,72 +290,55 @@ bool NavigationServer::findPath() {
 
     djikstra(&track, srcIndex, destIndex, lastHop);
 
+    int nextTrackIndex = -1;
     int currentTrackIndex = -1;
+    int distance = 0;
     int trainIndex = Train::getTrainIndex(rtmsg->train);
 
     do {
+        nextTrackIndex = currentTrackIndex;
         currentTrackIndex = currentTrackIndex == -1 ? destIndex : lastHop[currentTrackIndex];
 
+        // error checking
         if (currentTrackIndex == -1) {
             bwprintf(COM2, "Navigation Server - No Path Exists from %s to %s\n\r", rtmsg->src, rtmsg->dest); // TODO(sgaweda): This actually shouldn't never happen and if it can we have to find a way around it!
             paths[trainIndex].reset();
             reservationsList.reset();
             sensorLists[trainIndex].reset();
+            sensorDistanceLists[trainIndex].reset();
             return false;
         }
 
-        paths[trainIndex].push(currentTrackIndex);
-        reservationsList.push(currentTrackIndex);
-        if (track.trackNodes[currentTrackIndex].type == NODE_SENSOR) {
-            sensorLists[trainIndex].push(convertToSensor(currentTrackIndex));
-        }
-    } while(currentTrackIndex != srcIndex);
-
-    reserveTrack();
-    // -1 implies start of path
-    paths[trainIndex].push(-1);
-    initializeSensorDistanceList(trainIndex);
-    return true;
-}
-
-void NavigationServer::initializeSensorDistanceList(int trainIndex) {
-    DataStructures::Stack<int, TRACK_MAX> tempPath;
-    DataStructures::Stack<int, TRACK_MAX> tempDist;
-    int distance = 0;
-    int currentTrackIndex = -1;
-    int prevTrackIndex = -1;
-    while (!paths[trainIndex].empty()) {
-        prevTrackIndex = currentTrackIndex;
-        currentTrackIndex = paths[trainIndex].pop();
-        tempPath.push(currentTrackIndex);
-
-        if (prevTrackIndex == -1) {
-            distance = 0;
+        // push to sensorDistance List
+        if (nextTrackIndex == -1) {
+            sensorDistanceLists[trainIndex].push(distance);
+            bwprintf(COM2, "Pushed %d for %s\n\r", distance, track.trackNodes[currentTrackIndex].name);
         } else {
-            switch (track.trackNodes[prevTrackIndex].type) {
+            switch (track.trackNodes[currentTrackIndex].type) {
                 case NODE_TYPE::NODE_SENSOR:
                 {
-                    tempDist.push(distance);
-                    distance = 0;
-                    int trackIndexAhead = track.trackNodes[prevTrackIndex].edges[DIR_AHEAD].destNode - &track.trackNodes[0];
-                    int trackIndexReverse = track.trackNodes[prevTrackIndex].reverseNode - &track.trackNodes[0];
-                    if (trackIndexAhead == currentTrackIndex) {
-                        distance += track.trackNodes[prevTrackIndex].edges[DIR_AHEAD].dist;
-                    } else if (trackIndexReverse == currentTrackIndex) {
+                    int trackIndexAhead = track.trackNodes[currentTrackIndex].edges[DIR_AHEAD].destNode - &track.trackNodes[0];
+                    int trackIndexReverse = track.trackNodes[currentTrackIndex].reverseNode - &track.trackNodes[0];
+                    if (trackIndexAhead == nextTrackIndex) {
+                        distance += track.trackNodes[currentTrackIndex].edges[DIR_AHEAD].dist;
+                    } else if (trackIndexReverse == nextTrackIndex) {
                         distance += reverseClearance;
                     } else {
-                        bwprintf(COM2, "Navigation Server - Error initializing Sensor distance list, node merge\n\r");
+                        bwprintf(COM2, "Navigation Server - Error initializing Sensor distance list, node sensor\n\r");
                     }
+                    sensorDistanceLists[trainIndex].push(distance);
+                    bwprintf(COM2, "Pushed %d for %s\n\r", distance, track.trackNodes[currentTrackIndex].name);
+                    distance = 0;
                     break;
                 }
                 case NODE_TYPE::NODE_BRANCH:
                 {
-                    int trackIndexStraight = track.trackNodes[prevTrackIndex].edges[DIR_STRAIGHT].destNode - &track.trackNodes[0];
-                    int trackIndexCurved = track.trackNodes[prevTrackIndex].edges[DIR_CURVED].destNode - &track.trackNodes[0];
-                    if (trackIndexStraight == currentTrackIndex) {
-                        distance += track.trackNodes[prevTrackIndex].edges[DIR_STRAIGHT].dist;
-                    } else if (trackIndexCurved == currentTrackIndex) {
-                        distance += track.trackNodes[prevTrackIndex].edges[DIR_CURVED].dist;
+                    int trackIndexStraight = track.trackNodes[currentTrackIndex].edges[DIR_STRAIGHT].destNode - &track.trackNodes[0];
+                    int trackIndexCurved = track.trackNodes[currentTrackIndex].edges[DIR_CURVED].destNode - &track.trackNodes[0];
+                    if (trackIndexStraight == nextTrackIndex) {
+                        distance += track.trackNodes[currentTrackIndex].edges[DIR_STRAIGHT].dist;
+                    } else if (trackIndexCurved == nextTrackIndex) {
+                        distance += track.trackNodes[currentTrackIndex].edges[DIR_CURVED].dist;
                     } else {
                         bwprintf(COM2, "Navigation Server - Error initializing Sensor distance list, branch selection\n\r");
                     }
@@ -363,11 +346,11 @@ void NavigationServer::initializeSensorDistanceList(int trainIndex) {
                 }
                 case NODE_TYPE::NODE_MERGE:
                 {
-                    int trackIndexAhead = track.trackNodes[prevTrackIndex].edges[DIR_AHEAD].destNode - &track.trackNodes[0];
-                    int trackIndexReverse = track.trackNodes[prevTrackIndex].reverseNode - &track.trackNodes[0];
-                    if (trackIndexAhead == currentTrackIndex) {
-                        distance += track.trackNodes[prevTrackIndex].edges[DIR_AHEAD].dist;
-                    } else if (trackIndexReverse == currentTrackIndex) {
+                    int trackIndexAhead = track.trackNodes[currentTrackIndex].edges[DIR_AHEAD].destNode - &track.trackNodes[0];
+                    int trackIndexReverse = track.trackNodes[currentTrackIndex].reverseNode - &track.trackNodes[0];
+                    if (trackIndexAhead == nextTrackIndex) {
+                        distance += track.trackNodes[currentTrackIndex].edges[DIR_AHEAD].dist;
+                    } else if (trackIndexReverse == nextTrackIndex) {
                         distance += reverseClearance;
                     } else {
                         bwprintf(COM2, "Navigation Server - Error initializing Sensor distance list, node merge\n\r");
@@ -376,9 +359,9 @@ void NavigationServer::initializeSensorDistanceList(int trainIndex) {
                 }
                 case NODE_TYPE::NODE_ENTER:
                 {
-                    int trackIndexAhead = track.trackNodes[prevTrackIndex].edges[DIR_AHEAD].destNode - &track.trackNodes[0];
-                    if (trackIndexAhead == currentTrackIndex) {
-                        distance += track.trackNodes[prevTrackIndex].edges[DIR_AHEAD].dist;
+                    int trackIndexAhead = track.trackNodes[currentTrackIndex].edges[DIR_AHEAD].destNode - &track.trackNodes[0];
+                    if (trackIndexAhead == nextTrackIndex) {
+                        distance += track.trackNodes[currentTrackIndex].edges[DIR_AHEAD].dist;
                     } else {
                         bwprintf(COM2, "Navigation Server - Error initializing Sensor distance list, node enter\n\r");
                     }
@@ -386,8 +369,8 @@ void NavigationServer::initializeSensorDistanceList(int trainIndex) {
                 }
                 case NODE_TYPE::NODE_EXIT:
                 {
-                    int trackIndexReverse = track.trackNodes[prevTrackIndex].reverseNode - &track.trackNodes[0];
-                    if (trackIndexReverse == currentTrackIndex) {
+                    int trackIndexReverse = track.trackNodes[currentTrackIndex].reverseNode - &track.trackNodes[0];
+                    if (trackIndexReverse == nextTrackIndex) {
                         distance += reverseClearance;
                     } else {
                         bwprintf(COM2, "Navigation Server - Error initializing Sensor distance list, node exit\n\r");
@@ -401,18 +384,28 @@ void NavigationServer::initializeSensorDistanceList(int trainIndex) {
                 }
             }
         }
-    }
-    tempDist.push(distance);
 
-    sensorDistanceLists[trainIndex].push(0);
-    while (tempDist.size() > 1) {
-        sensorDistanceLists[trainIndex].push(tempDist.pop());
-    }
-    while (!tempPath.empty()) {
-        paths[trainIndex].push(tempPath.pop());
-    }
+        // push to Sensor List
+        if (track.trackNodes[currentTrackIndex].type == NODE_SENSOR) {
+            sensorLists[trainIndex].push(convertToSensor(currentTrackIndex));
+        }
+
+        // push to paths List
+        paths[trainIndex].push(currentTrackIndex);
+
+        //push to reservationList
+        reservationsList.push(currentTrackIndex);
+
+    } while(currentTrackIndex != srcIndex);
     ASSERT(sensorLists[trainIndex].size() == sensorDistanceLists[trainIndex].size());
+
+    // reserve Track
+    reserveTrack();
+    // push start marker to path
+    paths[trainIndex].push(-1);
+    return true;
 }
+
 void NavigationServer::initSensorPredictions() {
     int trainIndex = Train::getTrainIndex(rtmsg->train);
     spmsg.predictions[spmsg.count].nextSensor[0] = sensorLists[trainIndex].peek();

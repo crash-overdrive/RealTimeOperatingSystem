@@ -47,7 +47,6 @@ class NavigationServer {
         void navigate();
         void freeReservationsForTrain(int trainIndex);
         void reserveTrack();
-        void initializeSensorDistanceList(int trainIndex);
 };
 
 #endif
