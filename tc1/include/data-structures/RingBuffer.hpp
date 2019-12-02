@@ -64,6 +64,18 @@ class RingBuffer {
 
         }
 
+        T *peek() {
+
+            if (empty()) {
+
+                return nullptr;
+
+            }
+
+            return &buffer[tail % maxSize];
+
+        }
+
         T *peekLast() {
 
             if (empty()) {

@@ -11,7 +11,7 @@
 #define FOREVER for(;;)
 
 void trackInit() {
-    int CLOCK = WhoIs("CLOCK SERVER");
+    int CLOCK = WhoIs("CLOCK");
     int SWITCH = WhoIs("SWITCH");
     TextMessage tm;
     SWMessage swmsg;

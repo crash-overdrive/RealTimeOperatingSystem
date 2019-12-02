@@ -16,7 +16,8 @@
 #include "user/message/ThinMessage.hpp"
 #include "user/message/TRMessage.hpp"
 #include "user/message/TrainMessage.hpp"
-#include "user/notifier/TrainNotifier.hpp"
+#include "user/notifier/TrainDelayNotifier.hpp"
+#include "user/notifier/TrainTickNotifier.hpp"
 #include "user/model/Train.hpp"
 #include "user/server/TrainServer.hpp"
 #include "user/syscall/UserSyscall.hpp"
@@ -39,7 +40,7 @@ void TrainServer::queueReverse(char tr) {
 // Returns the index of the first non-empty train command queue or -1 if all are empty
 int TrainServer::queueIndex() {
     for (int i = 0; i < 5; ++i) {
-        if (!trbuf[i].empty()) {
+        if (!trbuf[i].empty() && !trains[i].reversing) {
             return i;
         }
     }
@@ -58,6 +59,13 @@ void TrainServer::setTrainSpeed(int train, char s) {
     trains[train].speed = s;
 }
 
+int TrainServer::getDelayNotifierIndex(int tid) {
+    for (int i = 0; i < 5; ++i) {
+        if (delayNotifiers[i] == tid) { return i; }
+    }
+    return -1;
+}
+
 void TrainServer::attributeSensors() {
     int attributionTime = Time(CLOCK);
     for (int i = 0; i < sdmsg->count; ++i) {
@@ -68,7 +76,7 @@ void TrainServer::attributeSensors() {
                 // Update train info
                 trains[j].trainInfo.prev = trains[j].nextSensor[0];
                 if (trains[j].aheadOfPrediction[0]) {
-                    trains[j].trainInfo.distanceDelta = trains[j].location.offset/1000; // TODO: fix this, since we check if we're ahead of this sensor we know by how much
+                    trains[j].trainInfo.distanceDelta = trains[j].location.offset/1000; // TODO: fix this to use distance since we became "ahead of sensor"
                     trains[j].aheadOfPrediction[0] = false;
                 } else {
                     trains[j].trainInfo.distanceDelta = currnode->edges[getDirection(j)].dist - trains[j].location.offset/1000; // TODO: fix this too
@@ -78,7 +86,7 @@ void TrainServer::attributeSensors() {
 
                 // Update train location
                 trains[j].location.landmark = Track::getIndex(trains[j].nextSensor[0]);
-                trains[j].location.offset = 0;
+                trains[j].location.offset = trains[j].reverse ? 15500 : 4500;
 
                 // Add to sensor attribution message
                 samsg.sensorAttrs[samsg.count].sensor = sdmsg->sensors[i];
@@ -150,21 +158,21 @@ int TrainServer::getDirection(int i) {
 
     const TrackNode *currnode = &track.trackNodes[(int)trains[i].location.landmark];
 
-    switch (track.trackNodes[(int)trains[i].location.landmark].type) {
+    switch (currnode->type) {
         case NODE_SENSOR:
         case NODE_MERGE:
         case NODE_ENTER:
             break;
         case NODE_BRANCH:
             {
-                const TrackNode *straight = track.trackNodes[(int)trains[i].location.landmark].edges[DIR_STRAIGHT].destNode;
-                const TrackNode *curved = track.trackNodes[(int)trains[i].location.landmark].edges[DIR_CURVED].destNode;
+                const TrackNode *straight = currnode->edges[DIR_STRAIGHT].destNode;
+                const TrackNode *curved = currnode->edges[DIR_CURVED].destNode;
                 if (straight->type == NODE_TYPE::NODE_SENSOR && (straight->sensor == trains[i].nextSensor[0] || straight->sensor == trains[i].nextSensor[1])) {
                     return DIR_STRAIGHT;
                 } else if (curved->type == NODE_TYPE::NODE_SENSOR && (curved->sensor == trains[i].nextSensor[0] || curved->sensor == trains[i].nextSensor[1])) {
                     return DIR_CURVED;
-                } else if (track.trackNodes[(int)trains[i].location.landmark].num == 11) {
-                    if (Sensor('A', 4) == trains[i].nextSensor[0]) {
+                } else if (currnode->num == 11) {
+                    if (Sensor('A', 4) == trains[i].nextSensor[0] || Sensor('A', 4) == trains[i].nextSensor[1]) {
                         return DIR_CURVED;
                     } else {
                         return DIR_STRAIGHT;
@@ -173,25 +181,25 @@ int TrainServer::getDirection(int i) {
                     return DIR_CURVED;
                 } else if (curved->type == NODE_TYPE::NODE_SENSOR) {
                     return DIR_STRAIGHT;
-                } else if (track.trackNodes[(int)trains[i].location.landmark].num == 153 || track.trackNodes[(int)trains[i].location.landmark].num == 155) {
+                } else if (currnode->num == 153 || currnode->num == 155) {
                     return DIR_CURVED;
                 } else {
-                    bwprintf(COM2, "Train Server - Unexpected direction scenario from %s", track.trackNodes[(int)trains[i].location.landmark].name);
+                    bwprintf(COM2, "Train Server - Unexpected direction scenario from %s", currnode->name);
                 }
             }
             break;
         case NODE_EXIT:
-            bwprintf(COM2, "Train Server - Unexpected EXIT direction from %s", track.trackNodes[(int)trains[i].location.landmark].name);
-            // bwprintf(COM2, "Train Server - Do we even support EXIT location updates? %d %d %s", trains[i].number, trains[i].location.landmark, track.trackNodes[(int)trains[i].location.landmark].name);
+            bwprintf(COM2, "Train Server - Unexpected EXIT direction from %s", currnode->name);
+            // bwprintf(COM2, "Train Server - Do we even support EXIT location updates? %d %d %s", trains[i].number, trains[i].location.landmark, currnode->name);
             SwitchOff();
             break;
         case NODE_NONE:
-            bwprintf(COM2, "Train Server - Unexpected NONE direction from %s", track.trackNodes[(int)trains[i].location.landmark].name);
-            // bwprintf(COM2, "Train Server - Do we even support NONE location updates? %d %d %s", trains[i].number, trains[i].location.landmark, track.trackNodes[(int)trains[i].location.landmark].name);
+            bwprintf(COM2, "Train Server - Unexpected NONE direction from %s", currnode->name);
+            // bwprintf(COM2, "Train Server - Do we even support NONE location updates? %d %d %s", trains[i].number, trains[i].location.landmark, currnode->name);
             SwitchOff();
             break;
         default:
-            bwprintf(COM2, "Train Server - Unexpected NODE_TYPE %d received in getDirection() from %s with index %d", track.trackNodes[(int)trains[i].location.landmark].type, track.trackNodes[(int)trains[i].location.landmark].name, &track.trackNodes[(int)trains[i].location.landmark] - track.trackNodes);
+            bwprintf(COM2, "Train Server - Unexpected NODE_TYPE %d received in getDirection() from %s with index %d", currnode->type, currnode->name, currnode - track.trackNodes);
             break;
     }
     return DIR_STRAIGHT;
@@ -229,16 +237,17 @@ void TrainServer::updateLocation() {
             int dist = trainVelocity[i] * delta / 100;
             // bwprintf(COM2, "Dist: %d\n\r", dist);
             // Update train location
+            TrackNode *currnode = &track.trackNodes[(int)trains[i].location.landmark];
             trains[i].location.offset += dist;
             int direction = DIR_AHEAD;
             direction = getDirection(i);
-            dist = trains[i].location.offset - track.trackNodes[(int)trains[i].location.landmark].edges[direction].dist * 1000;
+            dist = trains[i].location.offset - currnode->edges[direction].dist * 1000;
             while (dist >= 0) {
-                int index = (track.trackNodes[(int)trains[i].location.landmark].edges[direction].destNode - track.trackNodes);
+                int index = (currnode->edges[direction].destNode - track.trackNodes);
                 trains[i].location.landmark = (char)index;
                 trains[i].location.offset = dist;
                 direction = getDirection(i);
-                dist = trains[i].location.offset - track.trackNodes[(int)trains[i].location.landmark].edges[direction].dist * 1000;
+                dist = trains[i].location.offset - currnode->edges[direction].dist * 1000;
             }
 
             // Check to see if we're ahead of our next predicted sensor
@@ -254,10 +263,39 @@ void TrainServer::updateLocation() {
     }
 }
 
+void TrainServer::sendMarklin() {
+    int index = queueIndex();
+    if (!marklinCourierReady || index < 0) { return; }
+    *trmsg = popTRMessage(index);
+    TRMessage *next = trbuf[index].peek();
+    Train *train = &trains[index];
+    // If the next command is reverse, we need to delay this train's next command
+    if (next && next->speed == 15) {
+        delaymsg.delay = 27*trains[index].speed; // TODO: make this based off of stopping distance
+        Reply(delayNotifiers[index], (char*)&delaymsg, delaymsg.size());
+        train->reversing = true;
+    }
+    // If this command is reverse, we need to delay this train's next command
+    if (trmsg->speed == 15) {
+        // TODO: use to delay if needed
+        TrackNode *currnode = &track.trackNodes[(int)trains[index].location.landmark];
+        int direction = getDirection(index);
+        train->location.offset = currnode->edges[direction].dist * 1000 + 20000 - train->location.offset;
+        train->location.landmark = currnode->edges[direction].destNode->reverseNode - track.trackNodes;
+        train->reverse = !train->reverse;
+    }
+    setTrainSpeed(index, trmsg->speed);
+    Reply(marklinCourier, msg, trmsg->size());
+}
+
 void TrainServer::sendLocation() {
-    if (locNavCourierReady && locmsg.count != 0) Reply(locNavCourier, (char *)&locmsg, locmsg.size());
-    if (currtime % 10 == 0) {
+    if (locGUICourierReady && locmsg.count > 0 && currtime % 10 == 0) {
         Reply(locGUICourier, (char *)&locmsg, locmsg.size());
+        locGUICourierReady = false;
+    }
+    if (locNavCourierReady && locmsg.count > 0) {
+        Reply(locNavCourier, (char *)&locmsg, locmsg.size());
+        locNavCourierReady = false;
     }
     locmsg.count = 0;
 }
@@ -291,25 +329,26 @@ void TrainServer::init() {
     navCourierReady = false;
     guiCourier = Create(8, trainGUICourier);
     guiCourierReady = false;
-    notifier = Create(5, trainNotifier);
+    tickNotifier = Create(5, trainTickNotifier);
     locNavCourier = Create(5, trainLocNavCourier);
     locNavCourierReady = false;
     locGUICourier = Create(8, trainLocGUICourier);
     locGUICourierReady = false;
 
 
-    // Set the speed measurements for the trains
+    // Set the speed measurements for the trains and intialize delay notifiers
     for (int i = 0; i < 5; ++i) {
         memcpy(trains[i].acc, Train::accelerations[i], 15*sizeof(int));
         memcpy(trains[i].vel, Train::velocities[i], 15*sizeof(int));
         memcpy(trains[i].dec, Train::decelerations[i], 15*sizeof(int));
+        delayNotifiers[i] = Create(5, trainDelayNotifier);
     }
 
     prevtime = 0;
     currtime = 0;
     tickCount = 0;
 
-    CLOCK = WhoIs("CLOCK SERVER");
+    CLOCK = WhoIs("CLOCK");
 }
 
 void trainServer() {
@@ -321,7 +360,6 @@ void trainServer() {
     int result, tid;
     MessageHeader *mh = (MessageHeader*)&ts.msg;
     RVMessage *rvmsg = (RVMessage *)&ts.msg;
-    TRMessage *trmsg = (TRMessage *)&ts.msg;
 
     ThinMessage rdymsg(Constants::MSG::RDY);
     ThinMessage errmsg(Constants::MSG::ERR);
@@ -337,43 +375,28 @@ void trainServer() {
             ts.sendLocation();
             Reply(tid, (char*)&rdymsg, rdymsg.size());
         } else if (mh->type == Constants::MSG::RDY) {
-            int index = ts.queueIndex();
             if (tid == ts.marklinCourier) {
-                if (index < 0) {
-                    ts.marklinCourierReady = true;
-                } else {
-                    *trmsg = ts.popTRMessage(index);
-                    ts.setTrainSpeed(index, trmsg->speed);
-                    Reply(ts.marklinCourier, ts.msg, trmsg->size());
-                }
+                ts.marklinCourierReady = true;
+                ts.sendMarklin();
             } else if (tid == ts.guiCourier) {
                 ts.guiCourierReady = true;
                 ts.sendGUI();
             } else if (tid == ts.locGUICourier) {
                 ts.locGUICourierReady = true;
+                ts.sendLocation();
             } else if (tid == ts.locNavCourier) {
                 ts.locNavCourierReady = true;
+                ts.sendLocation();
             } else {
                 bwprintf(COM2, "Train Server - Unexpected ready message!");
             }
         } else if (mh->type == Constants::MSG::TR) {
-            if (ts.marklinCourierReady) {
-                ts.setTrainSpeed(trmsg->train, trmsg->speed);
-                Reply(ts.marklinCourier, ts.msg, trmsg->size());
-                ts.marklinCourierReady = false;
-            } else {
-                ts.queueTrainSpeed(trmsg->train, trmsg->speed);
-            }
+            ts.queueTrainSpeed(ts.trmsg->train, ts.trmsg->speed);
+            ts.sendMarklin();
             Reply(tid, (char *)&rdymsg, rdymsg.size());
         } else if (mh->type == Constants::MSG::RV) {
             ts.queueReverse(rvmsg->train);
-            if (ts.marklinCourierReady) {
-                *trmsg = ts.popTRMessage(Train::getTrainIndex(rvmsg->train));
-                Reply(ts.marklinCourier, ts.msg, trmsg->size());
-                ts.marklinCourierReady = false;
-            } else {
-                ts.queueReverse(rvmsg->train);
-            }
+            ts.sendMarklin();
             Reply(tid, (char *)&rdymsg, rdymsg.size());
         } else if (mh->type == Constants::MSG::SENSOR_DIFF) {
             ts.attributeSensors();
@@ -397,6 +420,9 @@ void trainServer() {
                 Reply(tid, (char*)&rdymsg, rdymsg.size());
             }
             ts.sendGUI(); // Send updated information to GUI Server
+        } else if (mh->type == Constants::MSG::DELAY) {
+            ts.trains[ts.getDelayNotifierIndex(tid)].reversing = false;
+            ts.sendMarklin();
         } else {
             bwprintf(COM2, "Train Server - Unrecognized message type received %d", mh->type);
         }

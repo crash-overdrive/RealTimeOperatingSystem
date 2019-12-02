@@ -331,14 +331,14 @@ void NavigationServer::reserveTrack() {
         int trackIndex = reservationsList.pop();
         track.trackNodes[trackIndex].reserved = true;
         track.trackNodes[trackIndex].reverseNode->reserved = true;
-        bwprintf(COM2, "Reserved %s %s\n\r", track.trackNodes[trackIndex].name, track.trackNodes[trackIndex].reverseNode->name);
+        // bwprintf(COM2, "Reserved %s %s\n\r", track.trackNodes[trackIndex].name, track.trackNodes[trackIndex].reverseNode->name);
     }
 }
 
 void NavigationServer::unreserveTrack(int trackIndex) {
     track.trackNodes[trackIndex].reserved = false;
     track.trackNodes[trackIndex].reverseNode->reserved = false;
-    bwprintf(COM2, "Unreserved %s %s\n\r", track.trackNodes[trackIndex].name, track.trackNodes[trackIndex].reverseNode->name);
+    // bwprintf(COM2, "Unreserved %s %s\n\r", track.trackNodes[trackIndex].name, track.trackNodes[trackIndex].reverseNode->name);
 }
 
 bool NavigationServer::findPath() {
@@ -570,7 +570,7 @@ void NavigationServer::evaluate(int trainIndex) {
 
     // TODO: uncomment the assert and remove the debug statement
     if (paths[trainIndex].empty()) {
-        bwprintf(COM2, "Got invalid location from Train Server: %s %d\n\r", track.trackNodes[(int)location.landmark].name, location.offset);
+        bwprintf(COM2, "Got invalid location: %s%d from Train Server: %s %d\n\r", track.trackNodes[location.landmark].name, location.offset, track.trackNodes[(int)location.landmark].name, location.offset);
     }
     ASSERT(!(paths[trainIndex].empty()));
 

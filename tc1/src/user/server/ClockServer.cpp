@@ -17,7 +17,7 @@ class ClockServerEntry {
             tid = -1;
             ticksToReleaseAt = -1;
         }
-        
+
         ClockServerEntry(int td, int ticks) {
             tid = td;
             ticksToReleaseAt = ticks;
@@ -27,13 +27,13 @@ class ClockServerEntry {
 void clockServer() {
     // bwprintf(COM2, "Clock Server - Created Clock server\n\r");
 
-    RegisterAs("CLOCK SERVER");
+    RegisterAs("CLOCK");
 
     // TODO: use a priority queue for this
     DataStructures::RingBuffer<ClockServerEntry,Constants::NUM_TASKS> clockServerEntries;
-    
+
     int numberOfTicksElapsed = 0;
-    
+
     Create(0, clockNotifier);
 
     FOREVER {
@@ -70,7 +70,7 @@ void clockServer() {
                     }
                     break;
                 }
-                
+
 
             case Constants::ClockServer::TIME:
                 {
@@ -81,7 +81,7 @@ void clockServer() {
 
                     break;
                 }
-                
+
 
             case Constants::ClockServer::DELAY:
                 {
@@ -94,28 +94,28 @@ void clockServer() {
 
                     break;
                 }
-                
+
 
             case Constants::ClockServer::DELAY_UNTIL:
                 {
                     int ticks;
                     memcpy(&ticks, sendMessage+1, sizeof(ticks));
-                    
+
                     // bwprintf(COM2, "Clock Server - Received delay until request from %d for ticks: %d at ticks: %d, pushed to cses\n\r", sendTid, ticks, numberOfTicksElapsed);
-                    
+
                     clockServerEntries.push(ClockServerEntry(sendTid, ticks));
 
                     break;
                 }
-                
+
 
             default:
                 {
                     bwprintf(COM2, "Clock Server - Received invalid SEND: %d from : %d, SendMessageSize: %d\n\r", sendMessage[0], sendTid, sendMessageSize);
-                    
+
                     break;
                 }
-                    
+
             }
         } else {
             bwprintf(COM2, "Clock Server - Received invalid send from: %d, size: %d\n\r", sendTid, sendMessageSize);
