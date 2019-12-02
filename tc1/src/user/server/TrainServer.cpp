@@ -52,6 +52,7 @@ TRMessage TrainServer::popTRMessage(int i) {
 
 void TrainServer::setTrainSpeed(char tr, char s) {
     trains[Train::getTrainIndex(tr)].speed = s;
+    Train::currentSpeedLevels[Train::getTrainIndex(tr)] = s;
 }
 
 void TrainServer::setTrainSpeed(int train, char s) {
@@ -235,7 +236,7 @@ void TrainServer::updateLocation() {
 }
 
 void TrainServer::sendLocation() {
-    // Reply(locNavCourier, (char *)&locmsg, locmsg.size());
+    if (locNavCourierReady && locmsg.count != 0) Reply(locNavCourier, (char *)&locmsg, locmsg.size());
     if (currtime % 10 == 0) {
         Reply(locGUICourier, (char *)&locmsg, locmsg.size());
     }
@@ -272,7 +273,7 @@ void TrainServer::init() {
     guiCourier = Create(8, trainGUICourier);
     guiCourierReady = false;
     notifier = Create(5, trainNotifier);
-    // locNavCourier = Create(5, trainLocNavCourier);
+    locNavCourier = Create(5, trainLocNavCourier);
     locNavCourierReady = false;
     locGUICourier = Create(8, trainLocGUICourier);
     locGUICourierReady = false;
@@ -331,6 +332,8 @@ void trainServer() {
                 ts.sendGUI();
             } else if (tid == ts.locGUICourier) {
                 ts.locGUICourierReady = true;
+            } else if (tid == ts.locNavCourier) {
+                ts.locNavCourierReady = true;
             } else {
                 bwprintf(COM2, "Train Server - Unexpected ready message!");
             }

@@ -291,9 +291,11 @@ void NavigationServer::predictSensors() {
             sensorDistanceLists[trainIndex].pop();
 
             while(sensorHitIndex != paths[trainIndex].peek()) {
-                int pathIndex = paths[trainIndex].pop();
+                unreserveTrack(paths[trainIndex].pop());
                 landmarkDistanceLists[trainIndex].pop();
-                unreserveTrack(pathIndex);
+            }
+            if (sensorLists[trainIndex].empty()) {
+                unreserveTrack(sensorHitIndex);
             }
         } else if (sensorLists[trainIndex].peekSecond() == Track::getIndex(samsg->sensorAttrs->sensor)) {
             // TODO: handle recovery logic if needed
@@ -303,9 +305,11 @@ void NavigationServer::predictSensors() {
             sensorDistanceLists[trainIndex].pop();
 
             while(sensorHitIndex != paths[trainIndex].peek()) {
-                int pathIndex = paths[trainIndex].pop();
+                unreserveTrack(paths[trainIndex].pop());
                 landmarkDistanceLists[trainIndex].pop();
-                unreserveTrack(pathIndex);
+            }
+            if (sensorLists[trainIndex].empty()) {
+                unreserveTrack(sensorHitIndex);
             }
         } else {
             bwprintf(COM2, "Nav Server - Bad Sensor Attribution.."); // NOTE(sgaweda): This should NEVER happen, if a train attributes a sensor incorrectly, it's because the Navigation Server told it to!
@@ -565,12 +569,13 @@ void NavigationServer::evaluate(int trainIndex) {
     }
 
     // TODO: uncomment the assert and remove the debug statement
-    // ASSERT(!(paths[trainIndex].empty()));
     if (paths[trainIndex].empty()) {
         bwprintf(COM2, "Got invalid location from Train Server: %s %d\n\r", track.trackNodes[(int)location.landmark].name, location.offset);
     }
+    ASSERT(!(paths[trainIndex].empty()));
 
     int distanceLeft = journeyLeft(trainIndex);
+    // bwprintf(COM2, "%d left %d thresh\n\r", distanceLeft, Train::stoppingDistances[trainIndex][Train::currentSpeedLevels[trainIndex]]);
 
     // the offset should be less than the landmarkDistance to the next landmark
     ASSERT(location.offset < landmarkDistanceLists[trainIndex].peek());
@@ -600,8 +605,9 @@ void NavigationServer::evaluate(int trainIndex) {
             queueCommand(trackCommand);
         }
     }
-    if (distanceLeft < 300 && !stopCommandSent[trainIndex] && reverseList[trainIndex].empty()) {
+    if (distanceLeft < Train::stoppingDistances[trainIndex][Train::currentSpeedLevels[trainIndex]] / 1000 && !stopCommandSent[trainIndex] && reverseList[trainIndex].empty()) {
         stopCommandSent[trainIndex] = true;
+        bwprintf(COM2, "Stop sent\n\r");
         // TODO: fix this....
         // STOP TRAIN
         TrackCommand trackCommand;
@@ -626,11 +632,6 @@ void NavigationServer::navigate() {
         lastKnownLocations[trainIndex] = Location(newLocation->landmark, newLocation->offset / 1000);
 
         evaluate(trainIndex);
-        // int trackIndex = lastKnownLocations[trainIndex].landmark;
-        // int offset = lastKnownLocations[trainIndex].offset;
-        // bwprintf(COM2, "T: %d, Loc: %s, O: %d\n\r", locmsg->locationInfo->train, track.trackNodes[trackIndex].name, offset);
-
-        // int distanceLeft = journeyLeft(trainIndex, trackIndex, offset);
     }
 }
 

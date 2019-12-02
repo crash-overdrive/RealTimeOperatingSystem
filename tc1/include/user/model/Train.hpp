@@ -40,6 +40,8 @@ public:
     static const int accelerations[5][15];
     static const int velocities[5][15];
     static const int decelerations[5][15];
+    static const int stoppingDistances[5][15];
+    static int currentSpeedLevels[5];
 };
 
 #endif
