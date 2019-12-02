@@ -206,18 +206,19 @@ void TrainServer::updateLocation() {
         // to stop updating locations, we need both speed and velocity to be zero
         if (trains[i].speed != 0 || trainVelocity[i] != 0) {
             // acceleration
-            if (trainVelocity[i] < Train::velocities[i][trains[i].speed]) {
-                trainVelocity[i] = trainVelocity[i] + Train::accelerations[i][trains[i].speed] * delta / 100;
-                if (trainVelocity[i] > Train::velocities[i][trains[i].speed]) {
-                    trainVelocity[i] = Train::velocities[i][trains[i].speed];
+            if (trainVelocity[i] < Train::velocities[i][(int)trains[i].speed]) {
+                // TODO: fix this
+                trainVelocity[i] = trainVelocity[i] + Train::accelerations[i][(int)trains[i].speed] * 2 * delta / 100;
+                if (trainVelocity[i] > Train::velocities[i][(int)trains[i].speed]) {
+                    trainVelocity[i] = Train::velocities[i][(int)trains[i].speed];
                 }
                 // bwprintf(COM2, "Accelerating %d ", trainVelocity[i]);
             }
             // deceleration
-            else if (trainVelocity[i] > Train::velocities[i][trains[i].speed]) {
-                trainVelocity[i] = trainVelocity[i] - Train::accelerations[i][trains[i].speed] * delta / 100;
-                if (trainVelocity[i] < Train::velocities[i][trains[i].speed]) {
-                    trainVelocity[i] = Train::velocities[i][trains[i].speed];
+            else if (trainVelocity[i] > Train::velocities[i][(int)trains[i].speed]) {
+                trainVelocity[i] = trainVelocity[i] - Train::decelerations[i][(int)trains[i].speed] * delta / 100;
+                if (trainVelocity[i] < Train::velocities[i][(int)trains[i].speed]) {
+                    trainVelocity[i] = Train::velocities[i][(int)trains[i].speed];
                 }
                 // bwprintf(COM2, "Decelerating %d ", trainVelocity[i]);
             } else {

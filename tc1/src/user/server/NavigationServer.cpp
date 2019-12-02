@@ -406,7 +406,7 @@ bool NavigationServer::findPath() {
                 int trackIndexAhead = track.trackNodes[currentTrackIndex].edges[DIR_AHEAD].destNode - &track.trackNodes[0];
                 int trackIndexReverse = track.trackNodes[currentTrackIndex].reverseNode - &track.trackNodes[0];
                 if (nextTrackIndex == -1) {
-                    sensorDistance = 0;
+                    sensorDistance = 100;
                     landmarkDistanceLists[trainIndex].push(sensorDistance);
                 } else if (trackIndexAhead == nextTrackIndex) {
                     sensorDistance += track.trackNodes[currentTrackIndex].edges[DIR_AHEAD].dist;
