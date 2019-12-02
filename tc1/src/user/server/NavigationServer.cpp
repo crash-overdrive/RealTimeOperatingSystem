@@ -580,7 +580,7 @@ void NavigationServer::evaluate(int trainIndex) {
 
     // the offset should be less than the landmarkDistance to the next landmark
     if (location.offset > landmarkDistanceLists[trainIndex].peek()) {
-        bwprintf(COM2, "Location offset invalid, got: %d, max: %d\n\r", landmarkDistanceLists[trainIndex].peek(), location.offset);
+        bwprintf(COM2, "Location offset invalid, got: %d, max: %d\n\r", location.offset, landmarkDistanceLists[trainIndex].peek());
     }
     ASSERT(location.offset < landmarkDistanceLists[trainIndex].peek());
     int distance = 300 + location.offset;

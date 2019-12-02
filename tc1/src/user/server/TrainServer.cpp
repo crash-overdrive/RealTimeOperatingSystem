@@ -172,7 +172,7 @@ int TrainServer::getDirection(int i) {
                 } else if (curved->type == NODE_TYPE::NODE_SENSOR && (curved->sensor == trains[i].nextSensor[0] || curved->sensor == trains[i].nextSensor[1])) {
                     return DIR_CURVED;
                 } else if (currnode->num == 11) {
-                    if (Sensor('A', 4) == trains[i].nextSensor[0]) {
+                    if (Sensor('A', 4) == trains[i].nextSensor[0] || Sensor('A', 4) == trains[i].nextSensor[1]) {
                         return DIR_CURVED;
                     } else {
                         return DIR_STRAIGHT;
