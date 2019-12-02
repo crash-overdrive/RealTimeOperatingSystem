@@ -27,14 +27,6 @@
 
 constexpr int reverseClearance = 250;
 
-int convertToIndex(Sensor sensor) {
-    return sensor.bank - 'A' * 16 + sensor.bank - 1;
-}
-
-Sensor convertToSensor(int trackIndex) {
-    return Sensor(trackIndex / 16 + 'A',trackIndex % 16 + 1);
-}
-
 int nextNodeToBeConsidered(const Track* track, bool visitedNodes[], int dist[]) {
     int noOfNodes = track->noOfNodes;
     int i = 0;
@@ -100,7 +92,7 @@ void djikstra(const Track* track, int srcIndex, int destIndex, int lastHop[]) {
 
             int trackIndexReverse = track->trackNodes[srcIndex].reverseNode - &track->trackNodes[0];
             if (!track->trackNodes[trackIndexReverse].reserved) {
-                dist[trackIndexReverse] = 0;
+                dist[trackIndexReverse] = reverseClearance;
                 lastHop[trackIndexReverse] = srcIndex;
             } else {
                 bwprintf(COM2, "Navigation Server - Djikstra initiliaztion in reverse direction failed %s reserved\n\r", track->trackNodes[trackIndexReverse].name);
@@ -133,7 +125,7 @@ void djikstra(const Track* track, int srcIndex, int destIndex, int lastHop[]) {
                 }
                 int trackIndexReverse = track->trackNodes[minVertexNotVisited].reverseNode - &track->trackNodes[0];
                 if (visitedNodes[trackIndexReverse] == false && !track->trackNodes[trackIndexReverse].reserved) {
-                    int distToNeighbour = 0;
+                    int distToNeighbour = reverseClearance;
                     if (dist[minVertexNotVisited] + distToNeighbour < dist[trackIndexReverse]) {
                         dist[trackIndexReverse] = dist[minVertexNotVisited] + distToNeighbour;
                         lastHop[trackIndexReverse] = minVertexNotVisited;
@@ -160,14 +152,6 @@ void djikstra(const Track* track, int srcIndex, int destIndex, int lastHop[]) {
                         lastHop[trackIndexCurved] = minVertexNotVisited;
                     }
                 }
-                int trackIndexReverse = track->trackNodes[minVertexNotVisited].reverseNode - &track->trackNodes[0];
-                if (visitedNodes[trackIndexReverse] == false && !track->trackNodes[trackIndexReverse].reserved) {
-                    int distToNeighbour = 0;
-                    if (dist[minVertexNotVisited] + distToNeighbour < dist[trackIndexReverse]) {
-                        dist[trackIndexReverse] = dist[minVertexNotVisited] + distToNeighbour;
-                        lastHop[trackIndexReverse] = minVertexNotVisited;
-                    }
-                }
                 break;
             }
 
@@ -183,7 +167,7 @@ void djikstra(const Track* track, int srcIndex, int destIndex, int lastHop[]) {
                 }
                 int trackIndexReverse = track->trackNodes[minVertexNotVisited].reverseNode - &track->trackNodes[0];
                 if (visitedNodes[trackIndexReverse] == false && !track->trackNodes[trackIndexReverse].reserved) {
-                    int distToNeighbour = 0;
+                    int distToNeighbour = reverseClearance;
                     if (dist[minVertexNotVisited] + distToNeighbour < dist[trackIndexReverse]) {
                         dist[trackIndexReverse] = dist[minVertexNotVisited] + distToNeighbour;
                         lastHop[trackIndexReverse] = minVertexNotVisited;
@@ -209,7 +193,7 @@ void djikstra(const Track* track, int srcIndex, int destIndex, int lastHop[]) {
             {
                 int trackIndexReverse = track->trackNodes[minVertexNotVisited].reverseNode - &track->trackNodes[0];
                 if (visitedNodes[trackIndexReverse] == false && !track->trackNodes[trackIndexReverse].reserved) {
-                    int distToNeighbour = 0;
+                    int distToNeighbour = reverseClearance;
                     if (dist[minVertexNotVisited] + distToNeighbour < dist[trackIndexReverse]) {
                         dist[trackIndexReverse] = dist[minVertexNotVisited] + distToNeighbour;
                         lastHop[trackIndexReverse] = minVertexNotVisited;
@@ -224,40 +208,10 @@ void djikstra(const Track* track, int srcIndex, int destIndex, int lastHop[]) {
     } while(!djikstraFinished(track, visitedNodes));
 }
 
-void NavigationServer::freeReservationsForTrain(int trainIndex) {
-    while(!freeReservationsList[trainIndex].empty()) {
-        int trackIndex = freeReservationsList[trainIndex].pop();
-        track.trackNodes[trackIndex].reserved = false;
-        track.trackNodes[trackIndex].reverseNode->reserved = false;
-    }
-}
-
-void NavigationServer::reserveTrack() {
-    while(!reservationsList.empty()) {
-        int trackIndex = reservationsList.pop();
-        track.trackNodes[trackIndex].reserved = true;
-        track.trackNodes[trackIndex].reverseNode->reserved = true;
-    }
-}
-
-void NavigationServer::transmitToCommandServer(int msgType) {
-    ASSERT(commandCourierReady = true);
-    commandCourierReady = false;
-    switch (msgType) {
-        case Constants::MSG::TR:
-            Reply(commandCourier, (char*)&trmsg, trmsg.size());
-            break;
-        case Constants::MSG::RV:
-            Reply(commandCourier, (char*)&rvmsg, rvmsg.size());
-            break;
-        case Constants::MSG::SW:
-            Reply(commandCourier, (char*)&swmsg, swmsg.size());
-            break;
-        default:
-            commandCourierReady = true;
-            bwprintf(COM2, "Navigation Server - Tried to send invalid msg to Command Server: %d", msgType);
-            break;
-    }
+void NavigationServer::init() {
+    // TODO: (spratap) add support for both tracks
+    commandCourier = Create(7, navCSCourier);
+    trainCourier = Create(5, navTrainCourier);
 }
 
 void NavigationServer::transmitToTrainServer(int msgType) {
@@ -270,7 +224,128 @@ void NavigationServer::transmitToTrainServer(int msgType) {
     }
 }
 
+void NavigationServer::queueCommand(TrackCommand trackCommand) {
+    cmdqueue.push(trackCommand);
+    if (commandCourierReady) {
+        issueCommand();
+    }
+}
+
+void NavigationServer::issueCommand() {
+    ASSERT(commandCourierReady);
+    if (!cmdqueue.empty()) {
+        commandCourierReady = false;
+        TrackCommand trackCommand = cmdqueue.pop();
+        switch(trackCommand.type) {
+            case COMMANDS::SWITCH:
+            {
+                SWMessage msg;
+                msg.sw = trackCommand.tr_sw_rv.sw.number;
+                msg.state = trackCommand.tr_sw_rv.sw.orientation;
+                Reply(commandCourier, (char*)&msg, msg.size());
+                break;
+            }
+            case COMMANDS::TRAIN:
+            {
+                TRMessage msg;
+                msg.train = trackCommand.tr_sw_rv.tr.train;
+                msg.speed = trackCommand.tr_sw_rv.tr.speed;
+                Reply(commandCourier, (char*)&msg, msg.size());
+                break;
+            }
+            case COMMANDS::REVERSE:
+            {
+                RVMessage msg;
+                msg.train = trackCommand.tr_sw_rv.rv.train;
+                Reply(commandCourier, (char*)&msg, msg.size());
+                break;
+            }
+            default:
+            {
+                bwprintf(COM2, "Navigation Server - illegal command tried to be issued: %d", trackCommand.type);
+                break;
+            }
+        }
+    }
+}
+
+void NavigationServer::initSensorPredictions() {
+    int trainIndex = Train::getTrainIndex(rtmsg->train);
+    spmsg.predictions[spmsg.count].nextSensor[0] = Track::getSensor(sensorLists[trainIndex].peek());
+    spmsg.predictions[spmsg.count].nextSensor[1] = Track::getSensor(sensorLists[trainIndex].peekSecond());
+    spmsg.predictions[spmsg.count].nextSensorDistance[0] = sensorDistanceLists[trainIndex].peek();
+    spmsg.predictions[spmsg.count].nextSensorDistance[1] = sensorDistanceLists[trainIndex].peekSecond();
+    spmsg.predictions[spmsg.count].train = rtmsg->train;
+    spmsg.count++;
+    transmitToTrainServer(Constants::MSG::SENSOR_PRED);
+    spmsg.count = 0;
+}
+
+void NavigationServer::predictSensors() {
+    for (int i = 0; i < samsg->count; ++i) {
+        // bwprintf(COM2, "Sensor %c%d tripped\n\r", samsg->sensorAttrs[i].sensor.bank, samsg->sensorAttrs[i].sensor.number);
+        char train = samsg->sensorAttrs[i].train;
+        int trainIndex = Train::getTrainIndex(train);
+        if (sensorLists[trainIndex].peek() == Track::getIndex(samsg->sensorAttrs[i].sensor)) {
+            int sensorHitIndex = sensorLists[trainIndex].pop();
+            sensorDistanceLists[trainIndex].pop();
+
+            while(sensorHitIndex != paths[trainIndex].peek()) {
+                int pathIndex = paths[trainIndex].pop();
+                landmarkDistanceLists[trainIndex].pop();
+                unreserveTrack(pathIndex);
+            }
+        } else if (sensorLists[trainIndex].peekSecond() == Track::getIndex(samsg->sensorAttrs->sensor)) {
+            // TODO: handle recovery logic if needed
+            sensorLists[trainIndex].pop();
+            int sensorHitIndex = sensorLists[trainIndex].pop();
+            sensorDistanceLists[trainIndex].pop();
+            sensorDistanceLists[trainIndex].pop();
+
+            while(sensorHitIndex != paths[trainIndex].peek()) {
+                int pathIndex = paths[trainIndex].pop();
+                landmarkDistanceLists[trainIndex].pop();
+                unreserveTrack(pathIndex);
+            }
+        } else {
+            bwprintf(COM2, "Nav Server - Bad Sensor Attribution.."); // NOTE(sgaweda): This should NEVER happen, if a train attributes a sensor incorrectly, it's because the Navigation Server told it to!
+            return;
+        }
+
+        spmsg.predictions[spmsg.count].nextSensor[0] = Track::getSensor(sensorLists[trainIndex].peek());
+        spmsg.predictions[spmsg.count].nextSensor[1] = Track::getSensor(sensorLists[trainIndex].peekSecond());
+        spmsg.predictions[spmsg.count].nextSensorDistance[0] = sensorDistanceLists[trainIndex].peek();
+        spmsg.predictions[spmsg.count].nextSensorDistance[1] = sensorDistanceLists[trainIndex].peekSecond();
+        spmsg.predictions[spmsg.count].train = train;
+        spmsg.count++;
+    }
+}
+
+void NavigationServer::reserveTrack() {
+    while(!reservationsList.empty()) {
+        int trackIndex = reservationsList.pop();
+        track.trackNodes[trackIndex].reserved = true;
+        track.trackNodes[trackIndex].reverseNode->reserved = true;
+        bwprintf(COM2, "Reserved %s %s\n\r", track.trackNodes[trackIndex].name, track.trackNodes[trackIndex].reverseNode->name);
+    }
+}
+
+void NavigationServer::unreserveTrack(int trackIndex) {
+    track.trackNodes[trackIndex].reserved = false;
+    track.trackNodes[trackIndex].reverseNode->reserved = false;
+    bwprintf(COM2, "Unreserved %s %s\n\r", track.trackNodes[trackIndex].name, track.trackNodes[trackIndex].reverseNode->name);
+}
+
 bool NavigationServer::findPath() {
+    int trainIndex = Train::getTrainIndex(rtmsg->train);
+    ASSERT(paths[trainIndex].size() == 0);
+    ASSERT(reverseList[trainIndex].size() == 0);
+    ASSERT(branchList[trainIndex].size() == 0);
+    ASSERT(sensorLists[trainIndex].size() == 0);
+    ASSERT(sensorDistanceLists[trainIndex].size() == 0);
+    ASSERT(landmarkDistanceLists[trainIndex].size() == 0);
+    ASSERT(reservationsList.size() == 0);
+
     int srcIndex = -1;
     int destIndex = -1;
     int lastHop[track.noOfNodes];
@@ -292,8 +367,7 @@ bool NavigationServer::findPath() {
 
     int nextTrackIndex = -1;
     int currentTrackIndex = -1;
-    int distance = 0;
-    int trainIndex = Train::getTrainIndex(rtmsg->train);
+    int sensorDistance = 0;
 
     do {
         nextTrackIndex = currentTrackIndex;
@@ -303,91 +377,13 @@ bool NavigationServer::findPath() {
         if (currentTrackIndex == -1) {
             bwprintf(COM2, "Navigation Server - No Path Exists from %s to %s\n\r", rtmsg->src, rtmsg->dest); // TODO(sgaweda): This actually shouldn't never happen and if it can we have to find a way around it!
             paths[trainIndex].reset();
-            reservationsList.reset();
+            reverseList[trainIndex].reset();
+            branchList[trainIndex].reset();
             sensorLists[trainIndex].reset();
             sensorDistanceLists[trainIndex].reset();
+            landmarkDistanceLists[trainIndex].reset();
+            reservationsList.reset();
             return false;
-        }
-
-        // push to sensorDistance List
-        if (nextTrackIndex == -1) {
-            sensorDistanceLists[trainIndex].push(distance);
-            // bwprintf(COM2, "Pushed %d for %s\n\r", distance, track.trackNodes[currentTrackIndex].name);
-        } else {
-            switch (track.trackNodes[currentTrackIndex].type) {
-                case NODE_TYPE::NODE_SENSOR:
-                {
-                    int trackIndexAhead = track.trackNodes[currentTrackIndex].edges[DIR_AHEAD].destNode - &track.trackNodes[0];
-                    int trackIndexReverse = track.trackNodes[currentTrackIndex].reverseNode - &track.trackNodes[0];
-                    if (trackIndexAhead == nextTrackIndex) {
-                        distance += track.trackNodes[currentTrackIndex].edges[DIR_AHEAD].dist;
-                    } else if (trackIndexReverse == nextTrackIndex) {
-                        distance += reverseClearance;
-                    } else {
-                        bwprintf(COM2, "Navigation Server - Error initializing Sensor distance list, node sensor\n\r");
-                    }
-                    sensorDistanceLists[trainIndex].push(distance);
-                    // bwprintf(COM2, "Pushed %d for %s\n\r", distance, track.trackNodes[currentTrackIndex].name);
-                    distance = 0;
-                    break;
-                }
-                case NODE_TYPE::NODE_BRANCH:
-                {
-                    int trackIndexStraight = track.trackNodes[currentTrackIndex].edges[DIR_STRAIGHT].destNode - &track.trackNodes[0];
-                    int trackIndexCurved = track.trackNodes[currentTrackIndex].edges[DIR_CURVED].destNode - &track.trackNodes[0];
-                    if (trackIndexStraight == nextTrackIndex) {
-                        distance += track.trackNodes[currentTrackIndex].edges[DIR_STRAIGHT].dist;
-                    } else if (trackIndexCurved == nextTrackIndex) {
-                        distance += track.trackNodes[currentTrackIndex].edges[DIR_CURVED].dist;
-                    } else {
-                        bwprintf(COM2, "Navigation Server - Error initializing Sensor distance list, branch selection\n\r");
-                    }
-                    break;
-                }
-                case NODE_TYPE::NODE_MERGE:
-                {
-                    int trackIndexAhead = track.trackNodes[currentTrackIndex].edges[DIR_AHEAD].destNode - &track.trackNodes[0];
-                    int trackIndexReverse = track.trackNodes[currentTrackIndex].reverseNode - &track.trackNodes[0];
-                    if (trackIndexAhead == nextTrackIndex) {
-                        distance += track.trackNodes[currentTrackIndex].edges[DIR_AHEAD].dist;
-                    } else if (trackIndexReverse == nextTrackIndex) {
-                        distance += reverseClearance;
-                    } else {
-                        bwprintf(COM2, "Navigation Server - Error initializing Sensor distance list, node merge\n\r");
-                    }
-                    break;
-                }
-                case NODE_TYPE::NODE_ENTER:
-                {
-                    int trackIndexAhead = track.trackNodes[currentTrackIndex].edges[DIR_AHEAD].destNode - &track.trackNodes[0];
-                    if (trackIndexAhead == nextTrackIndex) {
-                        distance += track.trackNodes[currentTrackIndex].edges[DIR_AHEAD].dist;
-                    } else {
-                        bwprintf(COM2, "Navigation Server - Error initializing Sensor distance list, node enter\n\r");
-                    }
-                    break;
-                }
-                case NODE_TYPE::NODE_EXIT:
-                {
-                    int trackIndexReverse = track.trackNodes[currentTrackIndex].reverseNode - &track.trackNodes[0];
-                    if (trackIndexReverse == nextTrackIndex) {
-                        distance += reverseClearance;
-                    } else {
-                        bwprintf(COM2, "Navigation Server - Error initializing Sensor distance list, node exit\n\r");
-                    }
-                    break;
-                }
-                default:
-                {
-                    bwprintf(COM2, "Navigation Server - Error initializing sensorDistanceList\n\r");
-                    break;
-                }
-            }
-        }
-
-        // push to Sensor List
-        if (track.trackNodes[currentTrackIndex].type == NODE_SENSOR) {
-            sensorLists[trainIndex].push(convertToSensor(currentTrackIndex));
         }
 
         // push to paths List
@@ -396,193 +392,246 @@ bool NavigationServer::findPath() {
         //push to reservationList
         reservationsList.push(currentTrackIndex);
 
+        switch (track.trackNodes[currentTrackIndex].type) {
+            case NODE_TYPE::NODE_SENSOR:
+            {
+                // push to sensor List
+                sensorLists[trainIndex].push(currentTrackIndex);
+
+                int trackIndexAhead = track.trackNodes[currentTrackIndex].edges[DIR_AHEAD].destNode - &track.trackNodes[0];
+                int trackIndexReverse = track.trackNodes[currentTrackIndex].reverseNode - &track.trackNodes[0];
+                if (nextTrackIndex == -1) {
+                    sensorDistance = 0;
+                    landmarkDistanceLists[trainIndex].push(sensorDistance);
+                } else if (trackIndexAhead == nextTrackIndex) {
+                    sensorDistance += track.trackNodes[currentTrackIndex].edges[DIR_AHEAD].dist;
+                    // push to landmarkDistance list
+                    landmarkDistanceLists[trainIndex].push(track.trackNodes[currentTrackIndex].edges[DIR_AHEAD].dist);
+                } else if (trackIndexReverse == nextTrackIndex) {
+                    // push to reverse List
+                    reverseList[trainIndex].push(currentTrackIndex);
+
+                    sensorDistance += reverseClearance;
+                    // push to landmarkDistance list
+                    landmarkDistanceLists[trainIndex].push(reverseClearance);
+                } else {
+                    bwprintf(COM2, "Navigation Server - Error initializing Sensor distance list, node sensor\n\r");
+                }
+
+                // push to sensorDistances List
+                sensorDistanceLists[trainIndex].push(sensorDistance);
+                sensorDistance = 0;
+                break;
+            }
+            case NODE_TYPE::NODE_BRANCH:
+            {
+                SW msg;
+                msg.number = currentTrackIndex;
+
+                int trackIndexStraight = track.trackNodes[currentTrackIndex].edges[DIR_STRAIGHT].destNode - &track.trackNodes[0];
+                int trackIndexCurved = track.trackNodes[currentTrackIndex].edges[DIR_CURVED].destNode - &track.trackNodes[0];
+                if (trackIndexStraight == nextTrackIndex) {
+                    sensorDistance += track.trackNodes[currentTrackIndex].edges[DIR_STRAIGHT].dist;
+                    // push to branch List
+                    msg.orientation = 'S';
+                    branchList[trainIndex].push(msg);
+                    // push to landmarkDistance list
+                    landmarkDistanceLists[trainIndex].push(track.trackNodes[currentTrackIndex].edges[DIR_STRAIGHT].dist);
+                } else if (trackIndexCurved == nextTrackIndex) {
+                    sensorDistance += track.trackNodes[currentTrackIndex].edges[DIR_CURVED].dist;
+                     // push to branch List
+                    msg.orientation = 'C';
+                    branchList[trainIndex].push(msg);
+                    // push to landmarkDistance list
+                    landmarkDistanceLists[trainIndex].push(track.trackNodes[currentTrackIndex].edges[DIR_CURVED].dist);
+                } else {
+                    bwprintf(COM2, "Navigation Server - Error initializing Sensor distance list, branch selection\n\r");
+                }
+                break;
+            }
+            case NODE_TYPE::NODE_MERGE:
+            {
+                int trackIndexAhead = track.trackNodes[currentTrackIndex].edges[DIR_AHEAD].destNode - &track.trackNodes[0];
+                int trackIndexReverse = track.trackNodes[currentTrackIndex].reverseNode - &track.trackNodes[0];
+                if (trackIndexAhead == nextTrackIndex) {
+                    sensorDistance += track.trackNodes[currentTrackIndex].edges[DIR_AHEAD].dist;
+                    // push to landmarkDistance list
+                    landmarkDistanceLists[trainIndex].push(track.trackNodes[currentTrackIndex].edges[DIR_AHEAD].dist);
+                } else if (trackIndexReverse == nextTrackIndex) {
+                    // push to reverse List
+                    reverseList[trainIndex].push(currentTrackIndex);
+
+                    sensorDistance += reverseClearance;
+                    // push to landmarkDistance list
+                    landmarkDistanceLists[trainIndex].push(reverseClearance);
+                } else {
+                    bwprintf(COM2, "Navigation Server - Error initializing Sensor distance list, node merge\n\r");
+                }
+                break;
+            }
+            case NODE_TYPE::NODE_ENTER:
+            {
+                int trackIndexAhead = track.trackNodes[currentTrackIndex].edges[DIR_AHEAD].destNode - &track.trackNodes[0];
+                if (trackIndexAhead == nextTrackIndex) {
+                    sensorDistance += track.trackNodes[currentTrackIndex].edges[DIR_AHEAD].dist;
+                    // push to landmarkDistance list
+                    landmarkDistanceLists[trainIndex].push(track.trackNodes[currentTrackIndex].edges[DIR_AHEAD].dist);
+                } else {
+                    bwprintf(COM2, "Navigation Server - Error initializing Sensor distance list, node enter\n\r");
+                }
+                break;
+            }
+            case NODE_TYPE::NODE_EXIT:
+            {
+                int trackIndexReverse = track.trackNodes[currentTrackIndex].reverseNode - &track.trackNodes[0];
+                if (trackIndexReverse == nextTrackIndex) {
+                    // push to reverse List
+                    reverseList[trainIndex].push(currentTrackIndex);
+
+                    sensorDistance += reverseClearance;
+                    // push to landmarkDistance list
+                    landmarkDistanceLists[trainIndex].push(reverseClearance);
+                } else {
+                    bwprintf(COM2, "Navigation Server - Error initializing Sensor distance list, node exit\n\r");
+                }
+                break;
+            }
+            default:
+            {
+                bwprintf(COM2, "Navigation Server - Error initializing sensorDistanceList\n\r");
+                break;
+            }
+        }
     } while(currentTrackIndex != srcIndex);
     ASSERT(sensorLists[trainIndex].size() == sensorDistanceLists[trainIndex].size());
+    ASSERT(landmarkDistanceLists[trainIndex].size() == paths[trainIndex].size());
 
     // reserve Track
     reserveTrack();
-    // push start marker to path
-    paths[trainIndex].push(-1);
+    stopCommandSent[trainIndex] = false;
+
+    // bwprintf(COM2, "Landmark - Distance\n\r");
+    // while(!paths[trainIndex].empty()) {
+    //     bwprintf(COM2, "%s %d\n\r", track.trackNodes[paths[trainIndex].pop()].name, landmarkDistanceLists[trainIndex].pop());
+    // }
+    // bwprintf(COM2, "Sensor - Sensor Distance List\n\r");
+    // while(!sensorLists[trainIndex].empty()) {
+    //     bwprintf(COM2, "%s %d\n\r", track.trackNodes[sensorLists[trainIndex].pop()].name, sensorDistanceLists[trainIndex].pop());
+    // }
+    // bwprintf(COM2, "Reverse List\n\r");
+    // while(!reverseList[trainIndex].empty()) {
+    //     bwprintf(COM2, "%s\n\r", track.trackNodes[reverseList[trainIndex].pop()].name);
+    // }
+    // bwprintf(COM2, "Branches\n\r");
+    // while(!branchList[trainIndex].empty()) {
+    //     bwprintf(COM2, "%s\n\r", track.trackNodes[branchList[trainIndex].pop()].name);
+    // }
     return true;
 }
 
-void NavigationServer::initSensorPredictions() {
-    int trainIndex = Train::getTrainIndex(rtmsg->train);
-    spmsg.predictions[spmsg.count].nextSensor[0] = sensorLists[trainIndex].peek();
-    spmsg.predictions[spmsg.count].nextSensor[1] = sensorLists[trainIndex].peekSecond();
-    spmsg.predictions[spmsg.count].nextSensorDistance[0] = sensorDistanceLists[trainIndex].peek();
-    spmsg.predictions[spmsg.count].nextSensorDistance[1] = sensorDistanceLists[trainIndex].peekSecond();
-    spmsg.predictions[spmsg.count].train = rtmsg->train;
-    spmsg.count++;
-    transmitToTrainServer(Constants::MSG::SENSOR_PRED);
-    spmsg.count = 0;
+int NavigationServer::journeyLeft(int trainIndex) {
+    ASSERT(paths[trainIndex].peek() == lastKnownLocations[trainIndex].landmark);
+
+    DataStructures::Stack<int, TRACK_MAX> tempPath;
+    DataStructures::Stack<int, 40> tempDistanceList;
+
+    int distance = 0;
+
+    while (!paths[trainIndex].empty()) {
+        int trackIndex = paths[trainIndex].pop();
+        int landMarkDistance = landmarkDistanceLists[trainIndex].pop();
+        tempPath.push(trackIndex);
+        tempDistanceList.push(landMarkDistance);
+        distance = distance + landMarkDistance;
+
+    }
+    while(!tempPath.empty()) {
+        paths[trainIndex].push(tempPath.pop());
+        landmarkDistanceLists[trainIndex].push(tempDistanceList.pop());
+    }
+    return distance - lastKnownLocations[trainIndex].offset;
 }
 
-void NavigationServer::predictSensors() {
-    for (int i = 0; i < samsg->count; ++i) {
-        char train = samsg->sensorAttrs[i].train;
-        int trainIndex = Train::getTrainIndex(train);
-        if (sensorLists[trainIndex].peek() == samsg->sensorAttrs[i].sensor) {
-            ASSERT(samsg->sensorAttrs[i].sensor == convertToSensor(paths[trainIndex].peek()));
+void NavigationServer::evaluate(int trainIndex) {
+    DataStructures::Stack<int, 40> tempPath;
+    DataStructures::Stack<int, 40> tempDistanceList;
 
-            int sensorIndex = paths[trainIndex].pop();
-            freeReservationsList[trainIndex].push(sensorIndex);
-            freeReservationsForTrain(trainIndex);
+    // Get lastKnownLocation for the train and pop path and landmarkDistance list to match the lastKnownLocation
+    Location location = lastKnownLocations[trainIndex];
+    while(paths[trainIndex].peek() != lastKnownLocations[trainIndex].landmark && !paths[trainIndex].empty()) {
+        tempPath.push(paths[trainIndex].pop());
+        tempDistanceList.push(landmarkDistanceLists[trainIndex].pop());
+        // bwprintf(COM2, "Popped %s != %s\n\r", track.trackNodes[tempPath.peek()].name, track.trackNodes[lastKnownLocations[trainIndex].landmark].name);
+    }
 
-            sensorLists[trainIndex].pop();
-            sensorDistanceLists[trainIndex].pop();
-            spmsg.predictions[spmsg.count].nextSensor[0] = sensorLists[trainIndex].peek();
-            spmsg.predictions[spmsg.count].nextSensor[1] = sensorLists[trainIndex].peekSecond();
-            spmsg.predictions[spmsg.count].nextSensorDistance[0] = sensorDistanceLists[trainIndex].peek();
-            spmsg.predictions[spmsg.count].nextSensorDistance[1] = sensorDistanceLists[trainIndex].peekSecond();
-            spmsg.predictions[spmsg.count].train = train;
-            spmsg.count++;
-        } else if (sensorLists[trainIndex].peekSecond() == samsg->sensorAttrs->sensor) {
-            // TODO: handle recovery logic if needed
-            Sensor sensor1 = sensorLists[trainIndex].pop();
-            int sensor1Index = paths[trainIndex].pop();
-            ASSERT((sensor1 == convertToSensor(sensor1Index)));
-            freeReservationsList[trainIndex].push(sensor1Index);
+    // TODO: uncomment the assert and remove the debug statement
+    // ASSERT(!(paths[trainIndex].empty()));
+    if (paths[trainIndex].empty()) {
+        bwprintf(COM2, "Got invalid location from Train Server: %s %d\n\r", track.trackNodes[(int)location.landmark].name, location.offset);
+    }
 
-            Sensor sensor2 = sensorLists[trainIndex].pop();
-            int trackIndex = -1;
-            do {
-                trackIndex = paths[trainIndex].pop();
-                freeReservationsList[trainIndex].push(trackIndex);
-            } while (track.trackNodes[trackIndex].type != NODE_TYPE::NODE_SENSOR);
-            ASSERT((sensor2 == convertToSensor(trackIndex)));
-            freeReservationsForTrain(trainIndex);
+    int distanceLeft = journeyLeft(trainIndex);
 
-            sensorDistanceLists[trainIndex].pop();
-            sensorDistanceLists[trainIndex].pop();
+    // the offset should be less than the landmarkDistance to the next landmark
+    ASSERT(location.offset < landmarkDistanceLists[trainIndex].peek());
+    int distance = 300 + location.offset;
 
-            spmsg.predictions[spmsg.count].nextSensor[0] = sensorLists[trainIndex].peek();
-            spmsg.predictions[spmsg.count].nextSensor[1] = sensorLists[trainIndex].peekSecond();
-            spmsg.predictions[spmsg.count].nextSensorDistance[0] = sensorDistanceLists[trainIndex].peek();
-            spmsg.predictions[spmsg.count].nextSensorDistance[1] = sensorDistanceLists[trainIndex].peekSecond();
-            spmsg.predictions[spmsg.count].train = train;
-            spmsg.count++;
-        } else {
-            bwprintf(COM2, "Nav Server - Bad Sensor Attribution.."); // NOTE(sgaweda): This should NEVER happen, if a train attributes a sensor incorrectly, it's because the Navigation Server told it to!
+    while (distance > 0 && !paths[trainIndex].empty()) {
+        int trackIndex = paths[trainIndex].pop();
+        int landMarkDistance = landmarkDistanceLists[trainIndex].pop();
+        tempPath.push(trackIndex);
+        tempDistanceList.push(landMarkDistance);
+        distance = distance - landMarkDistance;
+
+        if(branchList[trainIndex].peek().number == trackIndex) {
+            bwprintf(COM2, "Found branch %s at %s %d\n\r", track.trackNodes[trackIndex].name, track.trackNodes[(int)location.landmark].name, location.offset);
+            SW sw = branchList[trainIndex].pop();
+            TrackCommand trackCommand;
+            trackCommand.type = COMMANDS::SWITCH;
+            trackCommand.tr_sw_rv.sw.number = track.trackNodes[(int)sw.number].num;
+            trackCommand.tr_sw_rv.sw.orientation = sw.orientation;
+            queueCommand(trackCommand);
+        } else if (reverseList[trainIndex].peek() == trackIndex) {
+            bwprintf(COM2, "Found reverse %s at %s %d\n\r", track.trackNodes[trackIndex].name, track.trackNodes[(int)location.landmark].name, location.offset);
+            reverseList[trainIndex].pop();
+            TrackCommand trackCommand;
+            trackCommand.type = COMMANDS::REVERSE;
+            trackCommand.tr_sw_rv.rv.train = Train::getTrainNumber(trainIndex);
+            queueCommand(trackCommand);
         }
+    }
+    if (distanceLeft < 300 && !stopCommandSent[trainIndex] && reverseList[trainIndex].empty()) {
+        stopCommandSent[trainIndex] = true;
+        // TODO: fix this....
+        // STOP TRAIN
+        TrackCommand trackCommand;
+        trackCommand.type = COMMANDS::TRAIN;
+        trackCommand.tr_sw_rv.tr.train = Train::getTrainNumber(trainIndex);
+        trackCommand.tr_sw_rv.tr.speed = 0;
+        queueCommand(trackCommand);
+    }
 
-
-
-        // TODO: refactor this logic out of here
-        if (sensorLists[trainIndex].peek().bank == 0) {
-            // STOP TRAIN
-            trmsg.speed = 0;
-            trmsg.train = train;
-            transmitToCommandServer(Constants::MSG::TR);
-        } else if (sensorLists[trainIndex].peekSecond().bank == 0) {
-            // SLOW TRAIN
-            trmsg.speed = 8;
-            trmsg.train = train;
-            transmitToCommandServer(Constants::MSG::TR);
-        }
-
-
-
+    while (!tempPath.empty()) {
+        paths[trainIndex].push(tempPath.pop());
+        landmarkDistanceLists[trainIndex].push(tempDistanceList.pop());
     }
 }
 
 void NavigationServer::navigate() {
-    ASSERT(commandCourierReady == true);
-    for (int trainIndex = 0; trainIndex < 5; ++trainIndex) {
-        // Do nothing if there's no path
-        if (paths[trainIndex].empty()) {
-            continue;
-        }
+    for (int locationInfoIndex = 0; locationInfoIndex < locmsg->count; ++ locationInfoIndex) {
+        int trainIndex = Train::getTrainIndex(locmsg->locationInfo[locationInfoIndex].train);
 
-        int trackIndex = paths[trainIndex].peek();
+        //first update the lastKnownLocation and then evaluate the train
+        Location* newLocation = &(locmsg->locationInfo[locationInfoIndex].location);
+        lastKnownLocations[trainIndex] = Location(newLocation->landmark, newLocation->offset / 1000);
 
-        if (trackIndex == -1) { //start the train
-            paths[trainIndex].pop();
-            int trainNumber = Train::getTrainNumber(trainIndex);
-            trmsg.train = trainNumber;
-            trmsg.speed = 1;
-            transmitToCommandServer(Constants::MSG::TR);
-            return;
-        }
+        evaluate(trainIndex);
+        // int trackIndex = lastKnownLocations[trainIndex].landmark;
+        // int offset = lastKnownLocations[trainIndex].offset;
+        // bwprintf(COM2, "T: %d, Loc: %s, O: %d\n\r", locmsg->locationInfo->train, track.trackNodes[trackIndex].name, offset);
 
-        const TrackNode* currentLandmark = &track.trackNodes[trackIndex];
-        const char* currentLandmarkName = currentLandmark->name; // TODO: Are you sure this works the way you think it does? How the does while loop know how to allocate space for each string? This looks wrong, and you're STILL ignoring warnings!!!
-
-        if (currentLandmark->type == NODE_TYPE::NODE_SENSOR) {
-            //TODO: implement me for reversing
-            continue;
-        }
-
-        while(currentLandmark->type != NODE_TYPE::NODE_SENSOR) {
-            int landmarkIndex = paths[trainIndex].pop();
-            freeReservationsList[trainIndex].push(landmarkIndex);
-            ASSERT(paths[trainIndex].empty() == false);
-            const TrackNode* nextLandmark =  &track.trackNodes[paths[trainIndex].peek()];
-            const char* nextLandmarkName = nextLandmark->name;
-
-            switch (currentLandmark->type) {
-                case NODE_TYPE::NODE_BRANCH:
-                {
-                    const char* straightDirectionLandmarkName = currentLandmark->edges[DIR_STRAIGHT].destNode->name;
-                    const char* curvedDirectionLandmarkName = currentLandmark->edges[DIR_CURVED].destNode->name;
-
-                    if (!strcmp(nextLandmarkName, straightDirectionLandmarkName)) {
-                        swmsg.sw = currentLandmark->num;
-                        swmsg.state = 'S';
-                        transmitToCommandServer(Constants::MSG::SW);
-                        return;
-                    } else if (!strcmp(nextLandmarkName, curvedDirectionLandmarkName)) {
-                        swmsg.sw = currentLandmark->num;
-                        swmsg.state = 'C';
-                        transmitToCommandServer(Constants::MSG::SW);
-                        return;
-                    } else {
-                        bwprintf(COM2, "Navigation Server - Branch direction selection failed!\n\r");
-                    }
-                    break;
-                }
-                case NODE_TYPE::NODE_MERGE:
-                {
-                    const char* aheadDirectionLandmarkName = currentLandmark->edges[DIR_AHEAD].destNode->name;
-                    const char* reverseDirectionLandmarkName = currentLandmark->reverseNode->name;
-                    if (!strcmp(nextLandmarkName, aheadDirectionLandmarkName)) {
-                    } else if(!strcmp(nextLandmarkName, reverseDirectionLandmarkName)) {
-                        rvmsg.train = Train::getTrainNumber(trainIndex);
-                        transmitToCommandServer(Constants::MSG::RV);
-                        return;
-                    } else {
-                        bwprintf(COM2, "Navigation Server - Merge direction selection failed!\n\r");
-                    }
-                    break;
-                }
-                case NODE_TYPE::NODE_ENTER:
-                {
-                    break;
-                }
-                case NODE_TYPE::NODE_EXIT:
-                {
-                    break;
-                }
-                case NODE_TYPE::NODE_NONE:
-                {
-                    break;
-                }
-                default:
-                {
-                    bwprintf(COM2, "Navigation Server - Invalid Node type %d encountered\n\r", currentLandmark->type);
-                    break;
-                }
-            }
-            currentLandmark = nextLandmark;
-            currentLandmarkName = nextLandmarkName;
-        }
+        // int distanceLeft = journeyLeft(trainIndex, trackIndex, offset);
     }
-}
-
-void NavigationServer::init() {
-    // TODO: (spratap) add support for both tracks
-    commandCourier = Create(7, navCSCourier);
-    trainCourier = Create(5, navTrainCourier);
 }
 
 void navigationServer() {
@@ -599,33 +648,45 @@ void navigationServer() {
         Receive(&tid, (char*)&ns.msg, 128);
 
         if (ns.mh->type == Constants::MSG::RDY) {
+
             if (tid == ns.commandCourier) {
+                // bwprintf(COM2, "CC Ready\n\r");
                 ns.commandCourierReady = true;
-                ns.navigate();
+                ns.issueCommand();
             } else if (tid == ns.trainCourier) {
                 ns.trainCourierReady = true;
             }
+
         } else if (ns.mh->type == Constants::MSG::RT) {
+
             Reply(tid, (char*)&rdymsg, rdymsg.size());
             bool pathExist = ns.findPath();
             if (pathExist) {
-
-                ns.navigate(); // start nagivation (will start train)
                 ns.initSensorPredictions(); // initialize train predictions
+                // TODO: take this out of here
+                TrackCommand trackCommand;
+                trackCommand.type = COMMANDS::TRAIN;
+                trackCommand.tr_sw_rv.tr.train = ns.rtmsg->train;
+                trackCommand.tr_sw_rv.tr.speed = 9;
+                ns.queueCommand(trackCommand); //start the train
             }
+
+        } else if (ns.mh->type == Constants::MSG::SENSOR_ATTR) {
+
+            ns.predictSensors();
+            Reply(tid, (char*)&ns.spmsg, ns.spmsg.size());
+            ns.spmsg.count = 0;
+
+        } else if (ns.mh->type == Constants::MSG::LOCATION) {
+
+            Reply(tid, (char*)&rdymsg, rdymsg.size());
+            ns.navigate();
+
         } else if (ns.mh->type == Constants::MSG::DT) {
             // TODO: Implement me
             // Once we have information it should be possible to change destination
         } else if (ns.mh->type == Constants::MSG::TP) {
             // Placeholder, super low priority to implement this
-        } else if (ns.mh->type == Constants::MSG::SENSOR_ATTR) {
-            ns.predictSensors();
-            Reply(tid, (char*)&ns.spmsg, ns.spmsg.size());
-            ns.spmsg.count = 0;
-
-            if (ns.commandCourierReady) {
-                ns.navigate();
-            }
         } else {
             bwprintf(COM2, "Navigation Server - Received an unexpected message: %d", ns.mh->type);
         }
