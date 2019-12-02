@@ -20,8 +20,9 @@ public:
     bool headlights;
     bool reverse;
 
-    unsigned int vel[15];
-    unsigned int acc[15];
+    int acc[15];
+    int vel[15];
+    int dec[15];
     Location location;
     Sensor nextSensor[2];
     TrainInfo trainInfo;
@@ -34,6 +35,11 @@ public:
     Train(char n);
     static TRINDEX getTrainIndex(char number);
     static char getTrainNumber(char trainIndex);
+
+    // TODO: update acceleration with correct values
+    static const int accelerations[5][15];
+    static const int velocities[5][15];
+    static const int decelerations[5][15];
 };
 
 #endif

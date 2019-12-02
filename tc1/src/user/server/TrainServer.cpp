@@ -59,23 +59,29 @@ void TrainServer::setTrainSpeed(int train, char s) {
 }
 
 void TrainServer::attributeSensors() {
-    int currTime = Time(CLOCK);
+    int attributionTime = Time(CLOCK);
     for (int i = 0; i < sdmsg->count; ++i) {
         for (int j = 0; j < 5; ++j) {
             if (sdmsg->sensors[i] == trains[j].nextSensor[0]) {
                 const TrackNode *currnode = &track.trackNodes[(int)trains[j].location.landmark];
+
+                // Update train info
+                trains[j].trainInfo.prev = trains[j].nextSensor[0];
                 if (track.trackNodes[(int)trains[j].location.landmark].type == NODE_TYPE::NODE_SENSOR && currnode->sensor == trains[j].nextSensor[0]) {
                     // Hit sensor late, update prediction data
-                    trains[j].trainInfo.prev = trains[j].nextSensor[0];
                     trains[j].trainInfo.distanceDelta = trains[j].location.offset;
-                    trains[j].trainInfo.timeDelta = currTime - trains[j].lastSensorAttrTime;
-                    trains[j].lastSensorAttrTime = currTime;
 
-                    // Update real position
+                    // Update real location
                     trains[j].location.offset = 0; // TODO: account for direction when setting this!
                 } else if (track.trackNodes[(int)trains[j].location.landmark].type != NODE_TYPE::NODE_SENSOR && track.trackNodes[(int)trains[j].location.landmark].edges[getDirection(j)].destNode->sensor == trains[j].nextSensor[0]) {
+                    // Hit sensor early, update prediction data
+                    trains[j].trainInfo.distanceDelta = track.trackNodes[(int)trains[j].location.landmark].edges[getDirection(j)].dist - trains[j].location.offset;
 
+                    // Update real location
+                    trains[j].location.landmark = Track::getIndex(trains[j].nextSensor[0]);
+                    trains[j].location.offset = 0;
                 }
+                trains[j].trainInfo.timeDelta = attributionTime - trains[j].trainInfo.predictedTime;
 
                 // Add to sensor attribution message
                 samsg.sensorAttrs[samsg.count].sensor = sdmsg->sensors[i];
@@ -144,6 +150,9 @@ int TrainServer::getDirection(int i) {
     if (trains[i].location.landmark == 255) {
         return DIR_STRAIGHT;
     }
+
+    const TrackNode *currnode = &track.trackNodes[(int)trains[i].location.landmark];
+
     switch (track.trackNodes[(int)trains[i].location.landmark].type) {
         case NODE_SENSOR:
         case NODE_MERGE:
@@ -163,6 +172,12 @@ int TrainServer::getDirection(int i) {
                     } else {
                         return DIR_STRAIGHT;
                     }
+                } else if (straight->type == NODE_TYPE::NODE_SENSOR) {
+                    return DIR_CURVED;
+                } else if (curved->type == NODE_TYPE::NODE_SENSOR) {
+                    return DIR_STRAIGHT;
+                } else if (track.trackNodes[(int)trains[i].location.landmark].num == 153 || track.trackNodes[(int)trains[i].location.landmark].num == 155) {
+                    return DIR_CURVED;
                 } else {
                     bwprintf(COM2, "Train Server - Unexpected direction scenario from %s", track.trackNodes[(int)trains[i].location.landmark].name);
                 }
@@ -262,24 +277,10 @@ void TrainServer::init() {
 
 
     // Set the speed measurements for the trains
-    int velocities[5][15] = {
-        { 0, 0, 0, 0, 0, 0, 99000, 171000, 221000, 279000, 337000, 411000, 478000, 545000, 594000 },
-        { 0, 0, 0, 0, 0, 0, 99000, 171000, 221000, 279000, 337000, 411000, 478000, 545000, 594000 },
-        { 0, 0, 0, 0, 0, 0, 99000, 171000, 221000, 279000, 337000, 411000, 478000, 545000, 594000 },
-        { 0, 0, 0, 0, 0, 0, 99000, 171000, 221000, 279000, 337000, 411000, 478000, 545000, 594000 },
-        { 0, 0, 0, 0, 0, 0, 99000, 171000, 221000, 279000, 337000, 411000, 478000, 545000, 594000 },
-    };
-
-    int dec[5][15] = {
-        { 0, 0, 0, 0, 0, 0, 544500, 1044321, 1221025, 1297350, 1305390, 1468878, 1475994, 1515433, 1400142},
-        { 0, 0, 0, 0, 0, 0, 544500, 1044321, 1221025, 1297350, 1305390, 1468878, 1475994, 1515433, 1400142},
-        { 0, 0, 0, 0, 0, 0, 544500, 1044321, 1221025, 1297350, 1305390, 1468878, 1475994, 1515433, 1400142},
-        { 0, 0, 0, 0, 0, 0, 544500, 1044321, 1221025, 1297350, 1305390, 1468878, 1475994, 1515433, 1400142},
-        { 0, 0, 0, 0, 0, 0, 544500, 1044321, 1221025, 1297350, 1305390, 1468878, 1475994, 1515433, 1400142},
-    };
-
     for (int i = 0; i < 5; ++i) {
-        memcpy(trains[i].vel, velocities[i], 15*sizeof(int));
+        memcpy(trains[i].acc, Train::accelerations[i], 15*sizeof(int));
+        memcpy(trains[i].vel, Train::velocities[i], 15*sizeof(int));
+        memcpy(trains[i].dec, Train::decelerations[i], 15*sizeof(int));
     }
 
     prevtime = 0;

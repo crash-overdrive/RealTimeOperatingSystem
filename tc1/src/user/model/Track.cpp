@@ -2,7 +2,7 @@
 #include "user/model/Sensor.hpp"
 
 int Track::getIndex(Sensor sensor) {
-    return sensor.bank - 'A' * 16 + sensor.bank - 1;
+    return (sensor.bank - 'A') * 16 + sensor.number - 1;
 }
 
 Sensor Track::getSensor(int index) {

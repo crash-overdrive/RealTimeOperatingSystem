@@ -500,7 +500,7 @@ void NavigationServer::navigate() {
             paths[trainIndex].pop();
             int trainNumber = Train::getTrainNumber(trainIndex);
             trmsg.train = trainNumber;
-            trmsg.speed = 14;
+            trmsg.speed = 1;
             transmitToCommandServer(Constants::MSG::TR);
             return;
         }
