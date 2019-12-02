@@ -26,10 +26,10 @@ public:
     Location location;
     Sensor nextSensor[2];
     TrainInfo trainInfo;
-    int lastSensorAttrTime;
+    int lastAttributionTime;
 
     bool updated;
-    bool locationUpdated; // Do we need this?
+    bool aheadOfPrediction[2];
 
     Train();
     Train(char n);

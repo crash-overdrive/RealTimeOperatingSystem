@@ -27,7 +27,7 @@ void Kernel::drawGUI() {
                    "╠════════════════════════════════════════════════════════════════════════════════════════════╣\r\n"
                    "║ %sSensor Predictions%s                                                                         ║\r\n"
                    "║                                                                                            ║\r\n"
-                   "║       N Sensor  Est Time  Est Dist  P Sensor  Real Time Real Dist Current Loc              ║\r\n"
+                   "║       N Sensor  Est Time  Est Dist  P Sensor  Delt Time Delt Dist Current Loc              ║\r\n"
                    "║   %sT1%s                                                                                       ║\r\n"
                    "║   %sT24%s                                                                                      ║\r\n"
                    "║   %sT58%s                                                                                      ║\r\n"

@@ -67,21 +67,18 @@ void TrainServer::attributeSensors() {
 
                 // Update train info
                 trains[j].trainInfo.prev = trains[j].nextSensor[0];
-                if (track.trackNodes[(int)trains[j].location.landmark].type == NODE_TYPE::NODE_SENSOR && currnode->sensor == trains[j].nextSensor[0]) {
-                    // Hit sensor late, update prediction data
-                    trains[j].trainInfo.distanceDelta = trains[j].location.offset;
-
-                    // Update real location
-                    trains[j].location.offset = 0; // TODO: account for direction when setting this!
-                } else if (track.trackNodes[(int)trains[j].location.landmark].type != NODE_TYPE::NODE_SENSOR && track.trackNodes[(int)trains[j].location.landmark].edges[getDirection(j)].destNode->sensor == trains[j].nextSensor[0]) {
-                    // Hit sensor early, update prediction data
-                    trains[j].trainInfo.distanceDelta = track.trackNodes[(int)trains[j].location.landmark].edges[getDirection(j)].dist - trains[j].location.offset;
-
-                    // Update real location
-                    trains[j].location.landmark = Track::getIndex(trains[j].nextSensor[0]);
-                    trains[j].location.offset = 0;
+                if (trains[j].aheadOfPrediction[0]) {
+                    trains[j].trainInfo.distanceDelta = trains[j].location.offset/1000; // TODO: fix this, since we check if we're ahead of this sensor we know by how much
+                    trains[j].aheadOfPrediction[0] = false;
+                } else {
+                    trains[j].trainInfo.distanceDelta = currnode->edges[getDirection(j)].dist - trains[j].location.offset/1000; // TODO: fix this too
                 }
-                trains[j].trainInfo.timeDelta = attributionTime - trains[j].trainInfo.predictedTime;
+                trains[j].trainInfo.timeDelta = attributionTime - trains[j].lastAttributionTime - trains[j].trainInfo.predictedTime;
+                trains[j].lastAttributionTime = attributionTime;
+
+                // Update train location
+                trains[j].location.landmark = Track::getIndex(trains[j].nextSensor[0]);
+                trains[j].location.offset = 0;
 
                 // Add to sensor attribution message
                 samsg.sensorAttrs[samsg.count].sensor = sdmsg->sensors[i];
@@ -222,6 +219,11 @@ void TrainServer::updateLocation() {
                 trains[i].location.offset = dist;
                 direction = getDirection(i);
                 dist = trains[i].location.offset - track.trackNodes[(int)trains[i].location.landmark].edges[direction].dist * 1000;
+            }
+
+            // Check to see if we're ahead of our next predicted sensor
+            if (!trains[i].aheadOfPrediction[0] && trains[i].location.landmark == Track::getIndex(trains[i].nextSensor[0])) {
+                trains[i].aheadOfPrediction[0] = true;
             }
 
             // Add train to location message
