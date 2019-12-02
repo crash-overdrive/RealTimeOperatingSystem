@@ -203,11 +203,30 @@ void TrainServer::updateLocation() {
     int delta = currtime - prevtime; // Number of ticks, should always be 1
     ASSERT(delta > 0);
     for (int i = 0; i < 5; ++i) {
-        if (trains[i].speed != 0) {
-            // Calculate distance travelled since last tick
-            // TODO: improve logic to account for acceleration
-            int dist = trains[i].vel[(int)trains[i].speed] * delta / 100;
+        // to stop updating locations, we need both speed and velocity to be zero
+        if (trains[i].speed != 0 || trainVelocity[i] != 0) {
+            // acceleration
+            if (trainVelocity[i] < Train::velocities[i][trains[i].speed]) {
+                trainVelocity[i] = trainVelocity[i] + Train::accelerations[i][trains[i].speed] * delta / 100;
+                if (trainVelocity[i] > Train::velocities[i][trains[i].speed]) {
+                    trainVelocity[i] = Train::velocities[i][trains[i].speed];
+                }
+                // bwprintf(COM2, "Accelerating %d ", trainVelocity[i]);
+            }
+            // deceleration
+            else if (trainVelocity[i] > Train::velocities[i][trains[i].speed]) {
+                trainVelocity[i] = trainVelocity[i] - Train::accelerations[i][trains[i].speed] * delta / 100;
+                if (trainVelocity[i] < Train::velocities[i][trains[i].speed]) {
+                    trainVelocity[i] = Train::velocities[i][trains[i].speed];
+                }
+                // bwprintf(COM2, "Decelerating %d ", trainVelocity[i]);
+            } else {
+                // bwprintf(COM2, "Constant Speed %d ", trainVelocity[i]);
+            }
 
+            // Calculate distance travelled since last tick
+            int dist = trainVelocity[i] * delta / 100;
+            // bwprintf(COM2, "Dist: %d\n\r", dist);
             // Update train location
             trains[i].location.offset += dist;
             int direction = DIR_AHEAD;

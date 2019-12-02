@@ -26,6 +26,7 @@ public:
     int marklinCourier, navCourier, guiCourier, locNavCourier, locGUICourier, notifier;
     bool marklinCourierReady, navCourierReady, guiCourierReady, locNavCourierReady, locGUICourierReady;
     int CLOCK, currtime, prevtime, tickCount;
+    int trainVelocity[5] = {0};
 
     Track track;
 
