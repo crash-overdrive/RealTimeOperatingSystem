@@ -12,7 +12,7 @@
 #define FOREVER for(;;)
 
 void clockClient() {
-    int clockServerTid = WhoIs("CLOCK SERVER");
+    int clockServerTid = WhoIs("CLOCK");
     int GUI = WhoIs("GUI");
 
     SystemTime sysTime;

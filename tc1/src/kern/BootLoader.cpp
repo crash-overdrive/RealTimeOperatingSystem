@@ -81,8 +81,10 @@ void bootLoader() {
     tid = Create(7, commandServer);
     tid = Create(5, switchServer);
     tid = Create(5, trainServer);
+    // bwprintf(COM2, "BootLoader - Created Trian Server with tid: %d\n\r", tid);
     tid = Create(5, sensorServer);
     tid = Create(5, navigationServer);
+    // bwprintf(COM2, "BootLoader - Created Navigation Server with tid: %d\n\r", tid);
 
     tid = Create(7, terminalServer);
     // int tstid = tid;

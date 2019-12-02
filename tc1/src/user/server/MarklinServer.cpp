@@ -3,7 +3,6 @@
 #include "io/bwio.hpp"
 #include "io/ts7200.h"
 #include "io/UART.hpp"
-#include "user/client/SensorData.hpp"
 #include "user/courier/MarklinSensorCourier.hpp"
 #include "user/courier/UART1RXCourier.hpp"
 #include "user/courier/UART1TXCourier.hpp"
@@ -47,7 +46,7 @@ void marklinServer() {
     // TODO(sgaweda): make this a proper constant
     DataStructures::RingBuffer<char, 64> outbuf;
 
-    int CLOCK = WhoIs("CLOCK SERVER");
+    int CLOCK = WhoIs("CLOCK");
 
     FOREVER {
         result = Receive(&tid, msg, Constants::TerminalServer::MSG_SIZE);

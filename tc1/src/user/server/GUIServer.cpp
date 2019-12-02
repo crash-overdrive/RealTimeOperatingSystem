@@ -167,73 +167,66 @@ void GUI::drawTrain(char *msg) {
     int xpos = 9;
     int ypos = 14;
 
-    int index = Train::getTrainIndex(tm->trainInfo[0].number);
-    int diff;
-
-    ypos += index;
-    // Move the cursor to the right position for the train
-    format(posstr, Constants::VT100::MOVE_CURSOR_POS, ypos, xpos);
     drawmsg.msglen = 0;
-    drawmsg.msglen += format(drawmsg.msg, "%s%s", Constants::VT100::SAVE_CURSOR_AND_ATTRS, posstr);
+    drawmsg.msglen += format(drawmsg.msg, "%s", Constants::VT100::SAVE_CURSOR_AND_ATTRS);
 
-    if (index == TRINDEX::T1) {
-        drawmsg.msglen += insertSetDisplayAttrs(&drawmsg.msg[drawmsg.msglen], FG_GREEN);
-    } else if (index == TRINDEX::T24) {
-        drawmsg.msglen += insertSetDisplayAttrs(&drawmsg.msg[drawmsg.msglen], FG_MAGENTA);
-    } else if (index == TRINDEX::T58) {
-        drawmsg.msglen += insertSetDisplayAttrs(&drawmsg.msg[drawmsg.msglen], FG_YELLOW);
-    } else if (index == TRINDEX::T74) {
-        drawmsg.msglen += insertSetDisplayAttrs(&drawmsg.msg[drawmsg.msglen], FG_RED);
-    } else if (index == TRINDEX::T78) {
-        drawmsg.msglen += insertSetDisplayAttrs(&drawmsg.msg[drawmsg.msglen], FG_BLUE);
-    } else {
-        drawmsg.msglen += insertSetDisplayAttrs(&drawmsg.msg[drawmsg.msglen], FG_CYAN);
-    }
+    for (int i = 0; i < tm->count; ++i) {
+        int index = Train::getTrainIndex(tm->trainInfo[i].number);
+        int diff;
 
-    // Draw next sensor
-    if (tm->trainInfo[0].next.number == 0) {
-        drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "N/A       ", tm->trainInfo[0].next.bank ,tm->trainInfo[0].next.number);
-    } else if (tm->trainInfo[0].next.number / 10 == 0) {
-        drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%c0%d       ", tm->trainInfo[0].next.bank ,tm->trainInfo[0].next.number);
-    } else {
-        drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%c%d       ", tm->trainInfo[0].next.bank ,tm->trainInfo[0].next.number);
-    }
+        // Move the cursor to the right position for the train
+        format(posstr, Constants::VT100::MOVE_CURSOR_POS, ypos + index, xpos);
+        drawmsg.msglen = 0;
+        drawmsg.msglen += format(drawmsg.msg, "%s", posstr);
 
-    // Draw estimate time
-    diff = format(&drawmsg.msg[drawmsg.msglen], "%d", tm->trainInfo[0].predictedTime);
-    drawmsg.msglen += diff;
-    for (int i = 0; i < 10 - diff; ++i) {
-        drawmsg.msg[drawmsg.msglen++] = ' ';
-    }
+        // Color the text
+        drawmsg.msglen += insertTrainColor(&drawmsg.msg[drawmsg.msglen], index);
 
-    // Draw estimate dist
-    diff = format(&drawmsg.msg[drawmsg.msglen], "%d", tm->trainInfo[0].predictedDistance);
-    drawmsg.msglen += diff;
-    for (int i = 0; i < 10 - diff; ++i) {
-        drawmsg.msg[drawmsg.msglen++] = ' ';
-    }
+        // Draw next sensor
+        if (tm->trainInfo[i].next.number == 0) {
+            drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "N/A       ", tm->trainInfo[i].next.bank ,tm->trainInfo[i].next.number);
+        } else if (tm->trainInfo[i].next.number / 10 == 0) {
+            drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%c0%d       ", tm->trainInfo[i].next.bank ,tm->trainInfo[i].next.number);
+        } else {
+            drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%c%d       ", tm->trainInfo[i].next.bank ,tm->trainInfo[i].next.number);
+        }
 
-    // Draw prev sensor
-    if (tm->trainInfo[0].prev.number == 0) {
-        drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "N/A       ", tm->trainInfo[0].prev.bank ,tm->trainInfo[0].prev.number);
-    } else if (tm->trainInfo[0].prev.number / 10 == 0) {
-        drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%c0%d       ", tm->trainInfo[0].prev.bank ,tm->trainInfo[0].prev.number);
-    } else {
-        drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%c%d       ", tm->trainInfo[0].prev.bank ,tm->trainInfo[0].prev.number);
-    }
+        // Draw estimate time
+        diff = format(&drawmsg.msg[drawmsg.msglen], "%d", tm->trainInfo[i].predictedTime);
+        drawmsg.msglen += diff;
+        for (int i = 0; i < 10 - diff; ++i) {
+            drawmsg.msg[drawmsg.msglen++] = ' ';
+        }
 
-    // Draw actual time
-    diff = format(&drawmsg.msg[drawmsg.msglen], "%d", tm->trainInfo[0].timeDelta);
-    drawmsg.msglen += diff;
-    for (int i = 0; i < 10 - diff; ++i) {
-        drawmsg.msg[drawmsg.msglen++] = ' ';
-    }
+        // Draw estimate dist
+        diff = format(&drawmsg.msg[drawmsg.msglen], "%d", tm->trainInfo[i].predictedDistance);
+        drawmsg.msglen += diff;
+        for (int i = 0; i < 10 - diff; ++i) {
+            drawmsg.msg[drawmsg.msglen++] = ' ';
+        }
 
-    // Draw actual dist
-    diff = format(&drawmsg.msg[drawmsg.msglen], "%d", tm->trainInfo[0].distanceDelta);
-    drawmsg.msglen += diff;
-    for (int i = 0; i < 10 - diff; ++i) {
-        drawmsg.msg[drawmsg.msglen++] = ' ';
+        // Draw prev sensor
+        if (tm->trainInfo[i].prev.number == 0) {
+            drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "N/A       ", tm->trainInfo[i].prev.bank ,tm->trainInfo[i].prev.number);
+        } else if (tm->trainInfo[i].prev.number / 10 == 0) {
+            drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%c0%d       ", tm->trainInfo[i].prev.bank ,tm->trainInfo[i].prev.number);
+        } else {
+            drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%c%d       ", tm->trainInfo[i].prev.bank ,tm->trainInfo[i].prev.number);
+        }
+
+        // Draw time delta
+        diff = format(&drawmsg.msg[drawmsg.msglen], "%d", tm->trainInfo[i].timeDelta);
+        drawmsg.msglen += diff;
+        for (int i = 0; i < 10 - diff; ++i) {
+            drawmsg.msg[drawmsg.msglen++] = ' ';
+        }
+
+        // Draw dist delta
+        diff = format(&drawmsg.msg[drawmsg.msglen], "%d", tm->trainInfo[i].distanceDelta);
+        drawmsg.msglen += diff;
+        for (int i = 0; i < 10 - diff; ++i) {
+            drawmsg.msg[drawmsg.msglen++] = ' ';
+        }
     }
 
     drawmsg.msglen += format(&drawmsg.msg[drawmsg.msglen], "%s", Constants::VT100::RESTORE_CURSOR_AND_ATTRS);

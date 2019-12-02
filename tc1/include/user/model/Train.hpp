@@ -20,6 +20,8 @@ public:
     bool headlights;
     bool reverse;
 
+    bool reversing;
+
     int acc[15];
     int vel[15];
     int dec[15];

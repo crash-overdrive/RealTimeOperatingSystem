@@ -331,14 +331,14 @@ void NavigationServer::reserveTrack() {
         int trackIndex = reservationsList.pop();
         track.trackNodes[trackIndex].reserved = true;
         track.trackNodes[trackIndex].reverseNode->reserved = true;
-        bwprintf(COM2, "Reserved %s %s\n\r", track.trackNodes[trackIndex].name, track.trackNodes[trackIndex].reverseNode->name);
+        // bwprintf(COM2, "Reserved %s %s\n\r", track.trackNodes[trackIndex].name, track.trackNodes[trackIndex].reverseNode->name);
     }
 }
 
 void NavigationServer::unreserveTrack(int trackIndex) {
     track.trackNodes[trackIndex].reserved = false;
     track.trackNodes[trackIndex].reverseNode->reserved = false;
-    bwprintf(COM2, "Unreserved %s %s\n\r", track.trackNodes[trackIndex].name, track.trackNodes[trackIndex].reverseNode->name);
+    // bwprintf(COM2, "Unreserved %s %s\n\r", track.trackNodes[trackIndex].name, track.trackNodes[trackIndex].reverseNode->name);
 }
 
 bool NavigationServer::findPath() {
@@ -571,7 +571,7 @@ void NavigationServer::evaluate(int trainIndex) {
 
     // TODO: uncomment the assert and remove the debug statement
     if (paths[trainIndex].empty()) {
-        bwprintf(COM2, "Got invalid location from Train Server: %s %d\n\r", track.trackNodes[(int)location.landmark].name, location.offset);
+        bwprintf(COM2, "Got invalid location: %s%d from Train Server: %s %d\n\r", track.trackNodes[location.landmark].name, location.offset, track.trackNodes[(int)location.landmark].name, location.offset);
     }
     ASSERT(!(paths[trainIndex].empty()));
 
@@ -579,6 +579,9 @@ void NavigationServer::evaluate(int trainIndex) {
     // bwprintf(COM2, "%d left %d thresh\n\r", distanceLeft, Train::stoppingDistances[trainIndex][Train::currentSpeedLevels[trainIndex]]);
 
     // the offset should be less than the landmarkDistance to the next landmark
+    if (location.offset > landmarkDistanceLists[trainIndex].peek()) {
+        bwprintf(COM2, "Location offset invalid, got: %d, max: %d\n\r", landmarkDistanceLists[trainIndex].peek(), location.offset);
+    }
     ASSERT(location.offset < landmarkDistanceLists[trainIndex].peek());
     int distance = 300 + location.offset;
 
