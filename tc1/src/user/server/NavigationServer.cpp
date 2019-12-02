@@ -250,7 +250,7 @@ void NavigationServer::issueCommand() {
                 TRMessage msg;
                 msg.train = trackCommand.tr_sw_rv.tr.train;
                 msg.speed = trackCommand.tr_sw_rv.tr.speed;
-                trainSpeed[trackCommand.tr_sw_rv.tr.train] = trackCommand.tr_sw_rv.tr.speed;
+                trainSpeed[Train::getTrainIndex(trackCommand.tr_sw_rv.tr.train)] = trackCommand.tr_sw_rv.tr.speed;
                 Reply(commandCourier, (char*)&msg, msg.size());
                 break;
             }
@@ -566,7 +566,6 @@ void NavigationServer::evaluate(int trainIndex) {
     while(paths[trainIndex].peek() != lastKnownLocations[trainIndex].landmark && !paths[trainIndex].empty()) {
         tempPath.push(paths[trainIndex].pop());
         tempDistanceList.push(landmarkDistanceLists[trainIndex].pop());
-        // bwprintf(COM2, "Popped %s != %s\n\r", track.trackNodes[tempPath.peek()].name, track.trackNodes[lastKnownLocations[trainIndex].landmark].name);
     }
 
     // TODO: uncomment the assert and remove the debug statement
@@ -576,11 +575,11 @@ void NavigationServer::evaluate(int trainIndex) {
     ASSERT(!(paths[trainIndex].empty()));
 
     int distanceLeft = journeyLeft(trainIndex);
-    // bwprintf(COM2, "%d left %d thresh\n\r", distanceLeft, Train::stoppingDistances[trainIndex][Train::currentSpeedLevels[trainIndex]]);
+    // bwprintf(COM2, "left %d thresh %d speed %d\n\r", distanceLeft, Train::stoppingDistances[trainIndex][trainSpeed[trainIndex]], trainSpeed[trainIndex]);
 
     // the offset should be less than the landmarkDistance to the next landmark
     if (location.offset > landmarkDistanceLists[trainIndex].peek()) {
-        bwprintf(COM2, "Location offset invalid, got: %d, max: %d\n\r", location.offset, landmarkDistanceLists[trainIndex].peek());
+        bwprintf(COM2, "Offset too large %s given: %d, max: %d\n\r", track.trackNodes[location.landmark].name, location.offset, landmarkDistanceLists[trainIndex].peek());
     }
     ASSERT(location.offset < landmarkDistanceLists[trainIndex].peek());
     int distance = 300 + location.offset;
@@ -609,7 +608,7 @@ void NavigationServer::evaluate(int trainIndex) {
             queueCommand(trackCommand);
         }
     }
-    if (distanceLeft < Train::stoppingDistances[trainIndex][trainSpeed[trainIndex]] / 1000 && !stopCommandSent[trainIndex] && reverseList[trainIndex].empty()) {
+    if (distanceLeft < Train::stoppingDistances[trainIndex][trainSpeed[trainIndex]] / 1000 && !stopCommandSent[trainIndex]) { // && reverseList[trainIndex].empty()) {
         stopCommandSent[trainIndex] = true;
         bwprintf(COM2, "Stop sent\n\r");
         // TODO: fix this....
