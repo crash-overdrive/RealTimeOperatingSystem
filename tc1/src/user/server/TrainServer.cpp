@@ -52,7 +52,6 @@ TRMessage TrainServer::popTRMessage(int i) {
 
 void TrainServer::setTrainSpeed(char tr, char s) {
     trains[Train::getTrainIndex(tr)].speed = s;
-    Train::currentSpeedLevels[Train::getTrainIndex(tr)] = s;
 }
 
 void TrainServer::setTrainSpeed(int train, char s) {

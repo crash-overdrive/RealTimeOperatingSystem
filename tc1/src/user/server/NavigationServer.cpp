@@ -250,6 +250,7 @@ void NavigationServer::issueCommand() {
                 TRMessage msg;
                 msg.train = trackCommand.tr_sw_rv.tr.train;
                 msg.speed = trackCommand.tr_sw_rv.tr.speed;
+                trainSpeed[trackCommand.tr_sw_rv.tr.train] = trackCommand.tr_sw_rv.tr.speed;
                 Reply(commandCourier, (char*)&msg, msg.size());
                 break;
             }
@@ -605,7 +606,7 @@ void NavigationServer::evaluate(int trainIndex) {
             queueCommand(trackCommand);
         }
     }
-    if (distanceLeft < Train::stoppingDistances[trainIndex][Train::currentSpeedLevels[trainIndex]] / 1000 && !stopCommandSent[trainIndex] && reverseList[trainIndex].empty()) {
+    if (distanceLeft < Train::stoppingDistances[trainIndex][trainSpeed[trainIndex]] / 1000 && !stopCommandSent[trainIndex] && reverseList[trainIndex].empty()) {
         stopCommandSent[trainIndex] = true;
         bwprintf(COM2, "Stop sent\n\r");
         // TODO: fix this....

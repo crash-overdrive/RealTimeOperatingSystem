@@ -80,6 +80,8 @@ class NavigationServer {
 
         DataStructures::RingBuffer<TrackCommand, 40> cmdqueue;
 
+        int trainSpeed[5] = {0};
+
         void init();
         void transmitToTrainServer(int msgType);
         void queueCommand(TrackCommand trackCommand); // queues messages to be sent to Command Server
