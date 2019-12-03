@@ -245,6 +245,7 @@ void TrainServer::updateLocation() {
             while (dist >= 0) {
                 int index = (currnode->edges[direction].destNode - track.trackNodes);
                 trains[i].location.landmark = (char)index;
+                currnode = &track.trackNodes[(int)trains[i].location.landmark];
                 trains[i].location.offset = dist;
                 direction = getDirection(i);
                 dist = trains[i].location.offset - currnode->edges[direction].dist * 1000;
@@ -275,7 +276,7 @@ void TrainServer::sendMarklin() {
         Reply(delayNotifiers[index], (char*)&delaymsg, delaymsg.size());
         train->reversing = true;
     }
-    // If this command is reverse, we need to delay this train's next command
+    // If this command is reverse, update our state
     if (trmsg->speed == 15) {
         // TODO: use to delay if needed
         if (train->location.landmark != 255) {

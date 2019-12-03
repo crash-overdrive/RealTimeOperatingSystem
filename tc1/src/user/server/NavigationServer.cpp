@@ -576,7 +576,7 @@ void NavigationServer::evaluate(int trainIndex) {
 
     // TODO: uncomment the assert and remove the debug statement
     if (paths[trainIndex].empty()) {
-        bwprintf(COM2, "Got invalid location: %s%d from Train Server: %s %d\n\r", track.trackNodes[location.landmark].name, location.offset, track.trackNodes[(int)location.landmark].name, location.offset);
+        // bwprintf(COM2, "Got invalid location: %s%d from Train Server: %s %d\n\r", track.trackNodes[location.landmark].name, location.offset, track.trackNodes[(int)location.landmark].name, location.offset);
         while (!tempPath.empty()) {
             paths[trainIndex].push(tempPath.pop());
             landmarkDistanceLists[trainIndex].push(tempDistanceList.pop());
