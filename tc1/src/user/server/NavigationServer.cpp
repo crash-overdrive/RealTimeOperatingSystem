@@ -416,7 +416,7 @@ bool NavigationServer::findPath() {
                     // push to reverse List
                     reverseList[trainIndex].push(currentTrackIndex);
 
-                    sensorDistance += 2* reverseClearance;
+                    sensorDistance += 2 * reverseClearance;
                     // push to landmarkDistance list
                     int nextLandmarkDistance = landmarkDistanceLists[trainIndex].pop() + reverseClearance;
                     landmarkDistanceLists[trainIndex].push(nextLandmarkDistance); // for next landmark
@@ -535,7 +535,7 @@ bool NavigationServer::findPath() {
     // }
     // bwprintf(COM2, "Branches\n\r");
     // while(!branchList[trainIndex].empty()) {
-    //     bwprintf(COM2, "%s\n\r", track.trackNodes[branchList[trainIndex].pop()].name);
+    //     bwprintf(COM2, "%s\n\r", track.trackNodes[branchList[trainIndex].pop().number].name);
     // }
     return true;
 }
@@ -593,7 +593,7 @@ void NavigationServer::evaluate(int trainIndex) {
         DataStructures::Stack<int, 40> tempDistanceListSwitch;
         int distanceSwitch = Train::velocities[trainIndex][trainSpeed[trainIndex]] * 5 / 10000 - distanceToTravelToNextLandmark;
 
-        while (distanceSwitch > 0 && !paths[trainIndex].empty()) {
+        while (distanceSwitch > 0 && !paths[trainIndex].empty() && !branchList[trainIndex].empty()) {
             int trackIndex = paths[trainIndex].pop();
             int landMarkDistance = landmarkDistanceLists[trainIndex].pop();
             tempPathSwitch.push(trackIndex);
@@ -601,7 +601,7 @@ void NavigationServer::evaluate(int trainIndex) {
             distanceSwitch = distanceSwitch - landMarkDistance;
 
             if(branchList[trainIndex].peek().number == trackIndex) {
-                bwprintf(COM2, "Found branch %s at %s %d\n\r", track.trackNodes[trackIndex].name, track.trackNodes[location.landmark].name, location.offset);
+                bwprintf(COM2, "Found branch %s at %s %d dist: %d\n\r", track.trackNodes[trackIndex].name, track.trackNodes[location.landmark].name, location.offset, distanceSwitch);
                 SW sw = branchList[trainIndex].pop();
                 TrackCommand trackCommand;
                 trackCommand.type = COMMANDS::SWITCH;
@@ -617,9 +617,9 @@ void NavigationServer::evaluate(int trainIndex) {
 
         DataStructures::Stack<int, 40> tempPathReverse;
         DataStructures::Stack<int, 40> tempDistanceListReverse;
-        int distanceReverse = Train::stoppingDistances[trainIndex][trainSpeed[trainIndex]]/1000 - distanceToTravelToNextLandmark - 100;
+        int distanceReverse = Train::stoppingDistances[trainIndex][trainSpeed[trainIndex]]/1000 - distanceToTravelToNextLandmark;
 
-        while(distanceReverse > 0 && !paths[trainIndex].empty()) {
+        while(distanceReverse > 0 && !paths[trainIndex].empty() && !reverseList[trainIndex].empty()) {
             int trackIndex = paths[trainIndex].pop();
             int landMarkDistance = landmarkDistanceLists[trainIndex].pop();
             tempPathReverse.push(trackIndex);
@@ -627,12 +627,15 @@ void NavigationServer::evaluate(int trainIndex) {
             distanceReverse = distanceReverse - landMarkDistance;
 
             if (reverseList[trainIndex].peek() == trackIndex) {
-                bwprintf(COM2, "Found reverse %s at %s %d\n\r", track.trackNodes[trackIndex].name, track.trackNodes[location.landmark].name, location.offset);
-                reverseList[trainIndex].pop();
-                TrackCommand trackCommand;
-                trackCommand.type = COMMANDS::REVERSE;
-                trackCommand.tr_sw_rv.rv.train = Train::getTrainNumber(trainIndex);
-                queueCommand(trackCommand);
+                if (distanceReverse + Train::stoppingDistances[trainIndex][trainSpeed[trainIndex]]/1000 > reverseClearance) {
+                    bwprintf(COM2, "Found reverse %s at %s %d, dist: %d\n\r", track.trackNodes[trackIndex].name, track.trackNodes[location.landmark].name, location.offset, distanceReverse);
+                    // bwprintf(COM2, "Reversing now\n\r");
+                    reverseList[trainIndex].pop();
+                    TrackCommand trackCommand;
+                    trackCommand.type = COMMANDS::REVERSE;
+                    trackCommand.tr_sw_rv.rv.train = Train::getTrainNumber(trainIndex);
+                    queueCommand(trackCommand);
+                }
             }
         }
 
