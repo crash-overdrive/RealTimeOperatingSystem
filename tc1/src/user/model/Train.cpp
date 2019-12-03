@@ -2,9 +2,9 @@
 #include "user/model/Train.hpp"
 #include "user/syscall/UserSyscall.hpp"
 
-Train::Train() : number{0}, speed{0} {}
+Train::Train() : number{0}, speed{0}, headlights{true} {}
 
-Train::Train(char n) : number{n}, speed{0}, headlights{false}, reverse{false}, reversing{false}, trainInfo{n}, updated{false}, aheadOfPrediction{false, false} {}
+Train::Train(char n) : number{n}, speed{0}, headlights{true}, reverse{false}, reversing{false}, trainInfo{n}, updated{false}, aheadOfPrediction{false, false} {}
 
 TRINDEX Train::getTrainIndex(char number) {
     switch (number) {
