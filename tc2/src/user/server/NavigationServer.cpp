@@ -343,6 +343,16 @@ void NavigationServer::unreserveTrack(int trackIndex) {
 
 bool NavigationServer::findPath() {
     int trainIndex = Train::getTrainIndex(rtmsg->train);
+    while (!paths[trainIndex].empty()) {
+        unreserveTrack(paths[trainIndex].pop());
+        landmarkDistanceLists[trainIndex].pop();
+    }
+    paths[trainIndex].reset();
+    landmarkDistanceLists[trainIndex].reset();
+    branchList[trainIndex].reset();
+    sensorLists[trainIndex].reset();
+    sensorDistanceLists[trainIndex].reset();
+    reservationsList.reset();
     ASSERT(paths[trainIndex].size() == 0);
     ASSERT(reverseList[trainIndex].size() == 0);
     ASSERT(branchList[trainIndex].size() == 0);
