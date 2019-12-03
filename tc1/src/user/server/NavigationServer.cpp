@@ -605,7 +605,7 @@ void NavigationServer::evaluate(int trainIndex) {
         tempDistanceListSwitch.push(landMarkDistance);
         distanceSwitch = distanceSwitch - landMarkDistance;
 
-        if(branchList[trainIndex].peek().number == trackIndex) {
+        if(branchList[trainIndex].peek().number == trackIndex && distanceSwitch > -50) {
             bwprintf(COM2, "[Found branch %s at %s %d]", track.trackNodes[trackIndex].name, track.trackNodes[(int)location.landmark].name, location.offset);
             SW sw = branchList[trainIndex].pop();
             TrackCommand trackCommand;
@@ -621,7 +621,7 @@ void NavigationServer::evaluate(int trainIndex) {
         landmarkDistanceLists[trainIndex].push(tempDistanceListSwitch.pop());
     }
 
-    int distanceReverse = Train::stoppingDistances[trainIndex][trainSpeed[trainIndex]]/1000 + location.offset - 126;
+    int distanceReverse = Train::stoppingDistances[trainIndex][trainSpeed[trainIndex]]/1000 + location.offset;
     DataStructures::Stack<int, 40> tempPathReverse;
     DataStructures::Stack<int, 40> tempDistanceListReverse;
 
@@ -632,7 +632,7 @@ void NavigationServer::evaluate(int trainIndex) {
         tempDistanceListReverse.push(landMarkDistance);
         distanceReverse = distanceReverse - landMarkDistance;
 
-        if (reverseList[trainIndex].peek() == trackIndex) {
+        if (reverseList[trainIndex].peek() == trackIndex && distanceReverse > -50) {
             bwprintf(COM2, "Found reverse %s at %s %d\n\r", track.trackNodes[trackIndex].name, track.trackNodes[(int)location.landmark].name, location.offset);
             reverseList[trainIndex].pop();
             TrackCommand trackCommand;
