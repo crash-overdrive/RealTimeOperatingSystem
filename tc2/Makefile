@@ -41,7 +41,7 @@ ASMFILES	:= $(patsubst src%,obj%,$(patsubst %.cpp,%.a,$(CPPFILES)))
 
 OBJDIR		= obj
 BUILDDIR	= build
-ELF			:= tc1.elf
+ELF			:= tc2.elf
 ELFPATH		:= $(BUILDDIR)/$(ELF)
 
 .PHONY: all dirs clean
