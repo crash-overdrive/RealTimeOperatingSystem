@@ -25,7 +25,7 @@
 
 #define FOREVER for(;;)
 
-constexpr int reverseClearance = 250;
+constexpr int reverseClearance = 300;
 
 int nextNodeToBeConsidered(const Track* track, bool visitedNodes[], int dist[]) {
     int noOfNodes = track->noOfNodes;

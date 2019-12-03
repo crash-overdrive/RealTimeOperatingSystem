@@ -136,6 +136,22 @@ void TrainServer::updatePredictions() {
         // Update prediction data
         trains[index].trainInfo.next = spmsg->predictions[i].nextSensor[0];
         trains[index].trainInfo.predictedDistance = spmsg->predictions[i].nextSensorDistance[0];
+        // TODO: create a better model for estimating time
+        // if (trainVelocity[i] <trains[i].vel[(int)trains[i].speed]) {
+        //     int t = (trains[i].vel[(int)trains[i].speed] - trainVelocity[i])/trains[index].acc[(int)trains[i].speed];
+        //     int d = trainVelocity[i] * t + trains[index].acc[(int)trains[i].speed] * t * t;
+        //     int diff = trains[index].trainInfo.predictedDistance - d;
+        //     if (diff >= 0) {
+        //         // Distance accelerated was shorter than predicted distance, add rest of time at velocity
+        //         t += diff/trains[i].vel[(int)trains[i].speed];
+        //     } else {
+        //         // Distance accelerated was longer than predicted distance, interpolate
+        //         t += t*diff/d;
+        //     }
+        //     trains[index].trainInfo.predictedTime = t;
+        // } else {
+        //     trains[index].trainInfo.predictedTime = trains[index].trainInfo.predictedDistance/trains[index].vel[(int)trains[index].speed]; // TODO: determine what measurement of time is appropriate
+        // }
         trains[index].trainInfo.predictedTime = trains[index].trainInfo.predictedDistance/trains[index].vel[(int)trains[index].speed]; // TODO: determine what measurement of time is appropriate
         trains[index].updated = true;
     }
@@ -216,7 +232,7 @@ void TrainServer::updateLocation() {
             // acceleration
             if (trainVelocity[i] < Train::velocities[i][(int)trains[i].speed]) {
                 // TODO: fix this
-                trainVelocity[i] = trainVelocity[i] + Train::accelerations[i][(int)trains[i].speed] * delta / 250;
+                trainVelocity[i] = trainVelocity[i] + Train::accelerations[i][(int)trains[i].speed] * delta / 175;
                 if (trainVelocity[i] > Train::velocities[i][(int)trains[i].speed]) {
                     trainVelocity[i] = Train::velocities[i][(int)trains[i].speed];
                 }
