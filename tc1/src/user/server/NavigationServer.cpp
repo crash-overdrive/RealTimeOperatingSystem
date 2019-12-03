@@ -594,11 +594,13 @@ void NavigationServer::evaluate(int trainIndex) {
     }
     ASSERT(location.offset < landmarkDistanceLists[trainIndex].peek());
 
-    int distanceSwitch = Train::velocities[trainIndex][trainSpeed[trainIndex]] * 5 / 10000 - (landmarkDistanceLists[trainIndex].peek() - location.offset);
+    // int distanceSwitch = Train::velocities[trainIndex][trainSpeed[trainIndex]] * 5 / 10000 - (landmarkDistanceLists[trainIndex].peek() - location.offset);
+    int distanceSwitch = Train::velocities[trainIndex][trainSpeed[trainIndex]] * 1000;
     DataStructures::Stack<int, 40> tempPathSwitch;
     DataStructures::Stack<int, 40> tempDistanceListSwitch;
 
     while (distanceSwitch > 0 && !paths[trainIndex].empty() && !branchList[trainIndex].empty()) {
+        // bwprintf(COM2, "Distance Switch: %d", distanceSwitch);
         int trackIndex = paths[trainIndex].pop();
         int landMarkDistance = landmarkDistanceLists[trainIndex].pop();
         tempPathSwitch.push(trackIndex);
@@ -622,7 +624,7 @@ void NavigationServer::evaluate(int trainIndex) {
     }
 
     // path stack and landmarkDistanceLists stack have been fixed already
-    int distanceReverse = Train::stoppingDistances[trainIndex][trainSpeed[trainIndex]]/1000 - (landmarkDistanceLists[trainIndex].peek() - location.offset);
+    int distanceReverse = Train::stoppingDistances[trainIndex][trainSpeed[trainIndex]]/1000 + location.offset;
     DataStructures::Stack<int, 40> tempPathReverse;
     DataStructures::Stack<int, 40> tempDistanceListReverse;
 
