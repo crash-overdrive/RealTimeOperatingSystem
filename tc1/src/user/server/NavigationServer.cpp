@@ -617,7 +617,7 @@ void NavigationServer::evaluate(int trainIndex) {
 
         DataStructures::Stack<int, 40> tempPathReverse;
         DataStructures::Stack<int, 40> tempDistanceListReverse;
-        int distanceReverse = Train::stoppingDistances[trainIndex][trainSpeed[trainIndex]]/1000 - distanceToTravelToNextLandmark;
+        int distanceReverse = Train::stoppingDistances[trainIndex][trainSpeed[trainIndex]]/1000 - distanceToTravelToNextLandmark - 100;
 
         while(distanceReverse > 0 && !paths[trainIndex].empty()) {
             int trackIndex = paths[trainIndex].pop();
