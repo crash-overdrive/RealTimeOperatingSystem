@@ -271,33 +271,36 @@ void TrainServer::sendMarklin() {
     Train *train = &trains[index];
     // If the next command is reverse, we need to delay this train's next command
     if (next && next->speed == 15) {
-        delaymsg.delay = 27*trains[index].speed; // TODO: make this based off of stopping distance
+        delaymsg.delay = 27*train->speed; // TODO: make this based off of stopping distance
         Reply(delayNotifiers[index], (char*)&delaymsg, delaymsg.size());
         train->reversing = true;
     }
     // If this command is reverse, we need to delay this train's next command
     if (trmsg->speed == 15) {
         // TODO: use to delay if needed
-        TrackNode *currnode = &track.trackNodes[(int)trains[index].location.landmark];
-        int direction = getDirection(index);
-        train->location.offset = currnode->edges[direction].dist * 1000 + 20000 - train->location.offset;
-        train->location.landmark = currnode->edges[direction].destNode->reverseNode - track.trackNodes;
-        train->reverse = !train->reverse;
+        if (train->location.landmark != 255) {
+            TrackNode *currnode = &track.trackNodes[(int)train->location.landmark];
+            int direction = getDirection(index);
+            train->location.landmark = currnode->edges[direction].destNode->reverseNode - track.trackNodes;
+            train->location.offset = currnode->edges[direction].dist * 1000 + 20000 - train->location.offset;
+            train->reverse = !train->reverse;
+        }
+    } else {
+        setTrainSpeed(index, trmsg->speed);
     }
-    setTrainSpeed(index, trmsg->speed);
     Reply(marklinCourier, msg, trmsg->size());
 }
 
 void TrainServer::sendLocation() {
-    if (locGUICourierReady && locmsg.count > 0 && currtime % 10 == 0) {
-        Reply(locGUICourier, (char *)&locmsg, locmsg.size());
-        locGUICourierReady = false;
-    }
     if (locNavCourierReady && locmsg.count > 0) {
+        if (locGUICourierReady && locmsg.count > 0 && currtime % 10 == 0) {
+            Reply(locGUICourier, (char *)&locmsg, locmsg.size());
+            locGUICourierReady = false;
+        }
         Reply(locNavCourier, (char *)&locmsg, locmsg.size());
         locNavCourierReady = false;
+        locmsg.count = 0;
     }
-    locmsg.count = 0;
 }
 
 void TrainServer::sendGUI() {

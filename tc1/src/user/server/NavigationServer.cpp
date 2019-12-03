@@ -577,7 +577,7 @@ void NavigationServer::evaluate(int trainIndex) {
     // TODO: uncomment the assert and remove the debug statement
     if (paths[trainIndex].empty()) {
         bwprintf(COM2, "Got invalid location: %s%d from Train Server: %s %d\n\r", track.trackNodes[location.landmark].name, location.offset, track.trackNodes[(int)location.landmark].name, location.offset);
-            while (!tempPath.empty()) {
+        while (!tempPath.empty()) {
             paths[trainIndex].push(tempPath.pop());
             landmarkDistanceLists[trainIndex].push(tempDistanceList.pop());
         }
@@ -606,7 +606,7 @@ void NavigationServer::evaluate(int trainIndex) {
         distanceSwitch = distanceSwitch - landMarkDistance;
 
         if(branchList[trainIndex].peek().number == trackIndex) {
-            bwprintf(COM2, "Found branch %s at %s %d\n\r", track.trackNodes[trackIndex].name, track.trackNodes[(int)location.landmark].name, location.offset);
+            bwprintf(COM2, "[Found branch %s at %s %d]", track.trackNodes[trackIndex].name, track.trackNodes[(int)location.landmark].name, location.offset);
             SW sw = branchList[trainIndex].pop();
             TrackCommand trackCommand;
             trackCommand.type = COMMANDS::SWITCH;
@@ -621,7 +621,7 @@ void NavigationServer::evaluate(int trainIndex) {
         landmarkDistanceLists[trainIndex].push(tempDistanceListSwitch.pop());
     }
 
-    int distanceReverse = Train::stoppingDistances[trainIndex][trainSpeed[trainIndex]]/1000 + location.offset;
+    int distanceReverse = Train::stoppingDistances[trainIndex][trainSpeed[trainIndex]]/1000 + location.offset - 126;
     DataStructures::Stack<int, 40> tempPathReverse;
     DataStructures::Stack<int, 40> tempDistanceListReverse;
 
