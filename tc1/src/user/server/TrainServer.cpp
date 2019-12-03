@@ -216,7 +216,7 @@ void TrainServer::updateLocation() {
             // acceleration
             if (trainVelocity[i] < Train::velocities[i][(int)trains[i].speed]) {
                 // TODO: fix this
-                trainVelocity[i] = trainVelocity[i] + Train::accelerations[i][(int)trains[i].speed] * 2 * delta / 100;
+                trainVelocity[i] = trainVelocity[i] + Train::accelerations[i][(int)trains[i].speed] * delta / 250;
                 if (trainVelocity[i] > Train::velocities[i][(int)trains[i].speed]) {
                     trainVelocity[i] = Train::velocities[i][(int)trains[i].speed];
                 }
