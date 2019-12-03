@@ -571,8 +571,13 @@ void NavigationServer::evaluate(int trainIndex) {
     // TODO: uncomment the assert and remove the debug statement
     if (paths[trainIndex].empty()) {
         bwprintf(COM2, "Got invalid location: %s%d from Train Server: %s %d\n\r", track.trackNodes[location.landmark].name, location.offset, track.trackNodes[(int)location.landmark].name, location.offset);
+        while (!tempPath.empty()) {
+            paths[trainIndex].push(tempPath.pop());
+            landmarkDistanceLists[trainIndex].push(tempDistanceList.pop());
+        }
+        return;
     }
-    ASSERT(!(paths[trainIndex].empty()));
+    // ASSERT(!(paths[trainIndex].empty()));
 
     int distanceLeft = journeyLeft(trainIndex);
     // bwprintf(COM2, "left %d thresh %d speed %d\n\r", distanceLeft, Train::stoppingDistances[trainIndex][trainSpeed[trainIndex]], trainSpeed[trainIndex]);
@@ -582,7 +587,7 @@ void NavigationServer::evaluate(int trainIndex) {
         bwprintf(COM2, "Offset too large %s given: %d, max: %d\n\r", track.trackNodes[location.landmark].name, location.offset, landmarkDistanceLists[trainIndex].peek());
     }
     ASSERT(location.offset < landmarkDistanceLists[trainIndex].peek());
-    int distance = 300 + location.offset;
+    int distance = 500 + location.offset;
 
     while (distance > 0 && !paths[trainIndex].empty()) {
         int trackIndex = paths[trainIndex].pop();
@@ -592,7 +597,7 @@ void NavigationServer::evaluate(int trainIndex) {
         distance = distance - landMarkDistance;
 
         if(branchList[trainIndex].peek().number == trackIndex) {
-            bwprintf(COM2, "Found branch %s at %s %d\n\r", track.trackNodes[trackIndex].name, track.trackNodes[(int)location.landmark].name, location.offset);
+            bwprintf(COM2, "[Found branch %s at %s %d]", track.trackNodes[trackIndex].name, track.trackNodes[(int)location.landmark].name, location.offset);
             SW sw = branchList[trainIndex].pop();
             TrackCommand trackCommand;
             trackCommand.type = COMMANDS::SWITCH;
@@ -600,7 +605,7 @@ void NavigationServer::evaluate(int trainIndex) {
             trackCommand.tr_sw_rv.sw.orientation = sw.orientation;
             queueCommand(trackCommand);
         } else if (reverseList[trainIndex].peek() == trackIndex) {
-            bwprintf(COM2, "Found reverse %s at %s %d\n\r", track.trackNodes[trackIndex].name, track.trackNodes[(int)location.landmark].name, location.offset);
+            bwprintf(COM2, "[Found reverse %s at %s %d]", track.trackNodes[trackIndex].name, track.trackNodes[(int)location.landmark].name, location.offset);
             reverseList[trainIndex].pop();
             TrackCommand trackCommand;
             trackCommand.type = COMMANDS::REVERSE;
