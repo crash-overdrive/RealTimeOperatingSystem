@@ -416,9 +416,11 @@ bool NavigationServer::findPath() {
                     // push to reverse List
                     reverseList[trainIndex].push(currentTrackIndex);
 
-                    sensorDistance += reverseClearance;
+                    sensorDistance += 2* reverseClearance;
                     // push to landmarkDistance list
-                    landmarkDistanceLists[trainIndex].push(reverseClearance);
+                    int nextLandmarkDistance = landmarkDistanceLists[trainIndex].pop() + reverseClearance;
+                    landmarkDistanceLists[trainIndex].push(nextLandmarkDistance); // for next landmark
+                    landmarkDistanceLists[trainIndex].push(reverseClearance); // for current landmark
                 } else {
                     bwprintf(COM2, "Navigation Server - Error initializing Sensor distance list, node sensor\n\r");
                 }
@@ -466,9 +468,11 @@ bool NavigationServer::findPath() {
                     // push to reverse List
                     reverseList[trainIndex].push(currentTrackIndex);
 
-                    sensorDistance += reverseClearance;
+                    sensorDistance += 2 * reverseClearance;
                     // push to landmarkDistance list
-                    landmarkDistanceLists[trainIndex].push(reverseClearance);
+                    int nextLandmarkDistance = landmarkDistanceLists[trainIndex].pop() + reverseClearance;
+                    landmarkDistanceLists[trainIndex].push(nextLandmarkDistance); // for next landmark
+                    landmarkDistanceLists[trainIndex].push(reverseClearance); // for current landmark
                 } else {
                     bwprintf(COM2, "Navigation Server - Error initializing Sensor distance list, node merge\n\r");
                 }
@@ -493,9 +497,11 @@ bool NavigationServer::findPath() {
                     // push to reverse List
                     reverseList[trainIndex].push(currentTrackIndex);
 
-                    sensorDistance += reverseClearance;
+                    sensorDistance += 2 * reverseClearance;
                     // push to landmarkDistance list
-                    landmarkDistanceLists[trainIndex].push(reverseClearance);
+                    int nextLandmarkDistance = landmarkDistanceLists[trainIndex].pop() + reverseClearance;
+                    landmarkDistanceLists[trainIndex].push(nextLandmarkDistance); // for next landmark
+                    landmarkDistanceLists[trainIndex].push(reverseClearance); // for current landmark
                 } else {
                     bwprintf(COM2, "Navigation Server - Error initializing Sensor distance list, node exit\n\r");
                 }
@@ -573,21 +579,26 @@ void NavigationServer::evaluate(int trainIndex) {
         int landMarkDistance = landmarkDistanceLists[trainIndex].pop();
         tempPath.push(trackIndex);
         tempDistanceList.push(landMarkDistance);
-        distance = distance + landMarkDistance;
+        distance = distance + landMarkDistance; // sum of distance between landmarks greater than location.offset
     }
     if (paths[trainIndex].empty()) {
         // bwprintf(COM2, "Finished evaluating\n\r");
         ASSERT(reverseList[trainIndex].empty());
         ASSERT(branchList[trainIndex].empty());
     } else {
-        distance = distance - location.offset;
-        int distanceLeft = journeyLeft(trainIndex, distance);
-        while (distance < 300 && !paths[trainIndex].empty()) {
+        const int distanceToTravelToNextLandmark = distance - location.offset; // how far we have travelled along between last 2 landmarks
+        const int distanceLeft = journeyLeft(trainIndex, distanceToTravelToNextLandmark);
+
+        DataStructures::Stack<int, 40> tempPathSwitch;
+        DataStructures::Stack<int, 40> tempDistanceListSwitch;
+        int distanceSwitch = Train::velocities[trainIndex][trainSpeed[trainIndex]] * 5 / 10000 - distanceToTravelToNextLandmark;
+
+        while (distanceSwitch > 0 && !paths[trainIndex].empty()) {
             int trackIndex = paths[trainIndex].pop();
             int landMarkDistance = landmarkDistanceLists[trainIndex].pop();
-            tempPath.push(trackIndex);
-            tempDistanceList.push(landMarkDistance);
-            distance = distance + landMarkDistance;
+            tempPathSwitch.push(trackIndex);
+            tempDistanceListSwitch.push(landMarkDistance);
+            distanceSwitch = distanceSwitch - landMarkDistance;
 
             if(branchList[trainIndex].peek().number == trackIndex) {
                 bwprintf(COM2, "Found branch %s at %s %d\n\r", track.trackNodes[trackIndex].name, track.trackNodes[location.landmark].name, location.offset);
@@ -597,7 +608,25 @@ void NavigationServer::evaluate(int trainIndex) {
                 trackCommand.tr_sw_rv.sw.number = track.trackNodes[sw.number].num;
                 trackCommand.tr_sw_rv.sw.orientation = sw.orientation;
                 queueCommand(trackCommand);
-            } else if (reverseList[trainIndex].peek() == trackIndex) {
+            }
+        }
+        while(!tempPathSwitch.empty()) {
+            paths[trainIndex].push(tempPathSwitch.pop());
+            landmarkDistanceLists[trainIndex].push(tempDistanceListSwitch.pop());
+        }
+
+        DataStructures::Stack<int, 40> tempPathReverse;
+        DataStructures::Stack<int, 40> tempDistanceListReverse;
+        int distanceReverse = Train::stoppingDistances[trainIndex][trainSpeed[trainIndex]]/1000 - distanceToTravelToNextLandmark;
+
+        while(distanceReverse > 0 && !paths[trainIndex].empty()) {
+            int trackIndex = paths[trainIndex].pop();
+            int landMarkDistance = landmarkDistanceLists[trainIndex].pop();
+            tempPathReverse.push(trackIndex);
+            tempDistanceListReverse.push(landMarkDistance);
+            distanceReverse = distanceReverse - landMarkDistance;
+
+            if (reverseList[trainIndex].peek() == trackIndex) {
                 bwprintf(COM2, "Found reverse %s at %s %d\n\r", track.trackNodes[trackIndex].name, track.trackNodes[location.landmark].name, location.offset);
                 reverseList[trainIndex].pop();
                 TrackCommand trackCommand;
@@ -605,6 +634,11 @@ void NavigationServer::evaluate(int trainIndex) {
                 trackCommand.tr_sw_rv.rv.train = Train::getTrainNumber(trainIndex);
                 queueCommand(trackCommand);
             }
+        }
+
+        while(!tempPathReverse.empty()) {
+            paths[trainIndex].push(tempPathReverse.pop());
+            landmarkDistanceLists[trainIndex].push(tempDistanceListReverse.pop());
         }
 
         if (distanceLeft < Train::stoppingDistances[trainIndex][trainSpeed[trainIndex]] / 1000 && !stopCommandSent[trainIndex]) { // && reverseList[trainIndex].empty()) {
