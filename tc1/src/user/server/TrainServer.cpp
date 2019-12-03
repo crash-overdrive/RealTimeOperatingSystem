@@ -290,6 +290,7 @@ void TrainServer::sendMarklin() {
         setTrainSpeed(index, trmsg->speed);
     }
     Reply(marklinCourier, msg, trmsg->size());
+    marklinCourierReady = false;
 }
 
 void TrainServer::sendLocation() {

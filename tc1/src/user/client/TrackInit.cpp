@@ -6,18 +6,22 @@
 #include "user/message/SWMessage.hpp"
 #include "user/message/TextMessage.hpp"
 #include "user/message/ThinMessage.hpp"
+#include "user/message/TRMessage.hpp"
 #include "user/syscall/UserSyscall.hpp"
 
 #define FOREVER for(;;)
 
 void trackInit() {
+    int MARKLIN = WhoIs("MARKLIN");
     int SWITCH = WhoIs("SWITCH");
+    int TRAIN = WhoIs("TRAIN");
+
     TextMessage tm;
     SWMessage swmsg;
+    TRMessage trmsg;
     ThinMessage rdymsg(Constants::MSG::RDY);
     ThinMessage gomsg(Constants::MSG::GO);
 
-    int MARKLIN = WhoIs("MARKLIN");
     Send(MARKLIN, (char*)&gomsg, gomsg.size(), (char*)&rdymsg, rdymsg.size());
 
     swmsg.state = 'C';
@@ -49,5 +53,17 @@ void trackInit() {
     if (rdymsg.mh.type != Constants::MSG::RDY) {
         bwprintf(COM2, "Setup Client - Expected MSG::RDY but received a different response type\r\n");
     }
+
+    trmsg.train = 1;
+    Send(TRAIN, (char*)&trmsg, trmsg.size(), (char*)&rdymsg, rdymsg.size());
+    trmsg.train = 24;
+    Send(TRAIN, (char*)&trmsg, trmsg.size(), (char*)&rdymsg, rdymsg.size());
+    trmsg.train = 58;
+    Send(TRAIN, (char*)&trmsg, trmsg.size(), (char*)&rdymsg, rdymsg.size());
+    trmsg.train = 74;
+    Send(TRAIN, (char*)&trmsg, trmsg.size(), (char*)&rdymsg, rdymsg.size());
+    trmsg.train = 78;
+    Send(TRAIN, (char*)&trmsg, trmsg.size(), (char*)&rdymsg, rdymsg.size());
+
     Exit();
 }

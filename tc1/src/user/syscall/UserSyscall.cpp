@@ -219,8 +219,8 @@ void Shutdown() {
     trmsg.train = 78;
     Send(MARKLIN, (char*)&trmsg, trmsg.size(), (char*)&rdymsg, rdymsg.size());
     rdymsg.mh.type = Constants::MSG::STOP;
-    Send(MARKLIN, (char*)&trmsg, trmsg.size(), (char*)&rdymsg, rdymsg.size());
-    Delay(CLOCK, 100);
+    Send(MARKLIN, (char*)&rdymsg, rdymsg.size(), (char*)&rdymsg, rdymsg.size());
+    Delay(CLOCK, 200);
     sysShutdown();
 }
 
