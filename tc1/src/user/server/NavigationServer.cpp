@@ -594,11 +594,11 @@ void NavigationServer::evaluate(int trainIndex) {
     }
     ASSERT(location.offset < landmarkDistanceLists[trainIndex].peek());
 
-    int distanceSwitch = Train::velocities[trainIndex][trainSpeed[trainIndex]] * 5 / 10000 + location.offset;
+    int distanceSwitch = Train::velocities[trainIndex][trainSpeed[trainIndex]] * 5 / 10000 - (landmarkDistanceLists[trainIndex].peek() - location.offset);
     DataStructures::Stack<int, 40> tempPathSwitch;
     DataStructures::Stack<int, 40> tempDistanceListSwitch;
 
-    while (distanceSwitch > 0 && !paths[trainIndex].empty()) {
+    while (distanceSwitch > 0 && !paths[trainIndex].empty() && !branchList[trainIndex].empty()) {
         int trackIndex = paths[trainIndex].pop();
         int landMarkDistance = landmarkDistanceLists[trainIndex].pop();
         tempPathSwitch.push(trackIndex);
@@ -621,18 +621,19 @@ void NavigationServer::evaluate(int trainIndex) {
         landmarkDistanceLists[trainIndex].push(tempDistanceListSwitch.pop());
     }
 
-    int distanceReverse = Train::stoppingDistances[trainIndex][trainSpeed[trainIndex]]/1000 + location.offset - 126;
+    // path stack and landmarkDistanceLists stack have been fixed already
+    int distanceReverse = Train::stoppingDistances[trainIndex][trainSpeed[trainIndex]]/1000 - (landmarkDistanceLists[trainIndex].peek() - location.offset);
     DataStructures::Stack<int, 40> tempPathReverse;
     DataStructures::Stack<int, 40> tempDistanceListReverse;
 
-    while(distanceReverse > 0 && !paths[trainIndex].empty()) {
+    while(distanceReverse > 0 && !paths[trainIndex].empty() && !reverseList[trainIndex].empty()) {
         int trackIndex = paths[trainIndex].pop();
         int landMarkDistance = landmarkDistanceLists[trainIndex].pop();
         tempPathReverse.push(trackIndex);
         tempDistanceListReverse.push(landMarkDistance);
         distanceReverse = distanceReverse - landMarkDistance;
 
-        if (reverseList[trainIndex].peek() == trackIndex) {
+        if (reverseList[trainIndex].peek() == trackIndex && distanceReverse + Train::stoppingDistances[trainIndex][trainSpeed[trainIndex]]/1000 > reverseClearance) {
             bwprintf(COM2, "Found reverse %s at %s %d\n\r", track.trackNodes[trackIndex].name, track.trackNodes[(int)location.landmark].name, location.offset);
             reverseList[trainIndex].pop();
             TrackCommand trackCommand;
