@@ -2,6 +2,8 @@
 #include "io/bwio.hpp"
 #include "io/ts7200.h"
 #include "kern/Message.hpp"
+#include "user/message/TRMessage.hpp"
+#include "user/message/ThinMessage.hpp"
 #include "user/syscall/UserSyscall.hpp"
 #include "user/syscall/Syscall.hpp"
 #include <string.h>
@@ -103,7 +105,6 @@ int Time(int tid) {
     if(replySize == 5 && replyMessage[0] == Constants::ClockServer::ACKNOWLEDGE) {
         int ticks;
         memcpy(&ticks, replyMessage+1, sizeof(ticks));
-        // bwprintf(COM2, "Syscall Time - Got number of ticks: %d\n\r", ticks);
         return ticks;
     } else {
         bwprintf(COM2, "Syscall Time - Got invalid value from clock server: %c\n\r", replyMessage[0]);
@@ -130,7 +131,6 @@ int Delay(int tid, int ticks) {
     if(replySize == 5 && replyMessage[0] == Constants::ClockServer::ACKNOWLEDGE) {
         int ticksElapsed;
         memcpy(&ticksElapsed, replyMessage+1, sizeof(ticksElapsed));
-        // bwprintf(COM2, "Syscall Delay - Got number of ticks: %d\n\r", ticksElapsed);
         return ticksElapsed;
     } else {
         bwprintf(COM2, "Syscall Delay - Got invalid value from clock server: %c\n\r", replyMessage[0]);
@@ -157,7 +157,6 @@ int DelayUntil(int tid, int ticks) {
     if(replySize == 5 && replyMessage[0] == Constants::ClockServer::ACKNOWLEDGE) {
         int ticksElapsed;
         memcpy(&ticksElapsed, replyMessage+1, sizeof(ticksElapsed));
-        // bwprintf(COM2, "Syscall Delay Until - Got number of ticks: %d\n\r", ticksElapsed);
         return ticksElapsed;
     } else {
         bwprintf(COM2, "Syscall Delay Until - Got invalid value from clock server: %c\n\r", replyMessage[0]);
@@ -204,8 +203,25 @@ int Putc(int tid, int uart, char ch) {
     return 0;
 }
 
-void SwitchOff() {
-    sysSwitchOff();
+void Shutdown() {
+    int MARKLIN = WhoIs("MARKLIN");
+    int CLOCK = WhoIs("CLOCK");
+    TRMessage trmsg;
+    ThinMessage rdymsg(Constants::MSG::RDY);
+    trmsg.train = 1;
+    Send(MARKLIN, (char*)&trmsg, trmsg.size(), (char*)&rdymsg, rdymsg.size());
+    trmsg.train = 24;
+    Send(MARKLIN, (char*)&trmsg, trmsg.size(), (char*)&rdymsg, rdymsg.size());
+    trmsg.train = 58;
+    Send(MARKLIN, (char*)&trmsg, trmsg.size(), (char*)&rdymsg, rdymsg.size());
+    trmsg.train = 74;
+    Send(MARKLIN, (char*)&trmsg, trmsg.size(), (char*)&rdymsg, rdymsg.size());
+    trmsg.train = 78;
+    Send(MARKLIN, (char*)&trmsg, trmsg.size(), (char*)&rdymsg, rdymsg.size());
+    rdymsg.mh.type = Constants::MSG::STOP;
+    Send(MARKLIN, (char*)&trmsg, trmsg.size(), (char*)&rdymsg, rdymsg.size());
+    Delay(CLOCK, 100);
+    sysShutdown();
 }
 
 int Halt() {

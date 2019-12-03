@@ -11,7 +11,7 @@
 #  define ASSERT(expression) \
     if (!(expression)) { \
         bwprintf(COM2, "Assertion Failed: %s in %s:%s:%d \n\r", #expression, __FILE__, __PRETTY_FUNCTION__,  __LINE__); \
-        SwitchOff(); \
+        Shutdown(); \
     }
 
 namespace Util {

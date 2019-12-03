@@ -53,8 +53,8 @@ int sysReply(int tid, const char *reply, int rplen) {
     return retval;
 }
 
-void sysSwitchOff() {
-    asm volatile("swi %c0" :: "i"(Constants::SWI::SWITCH_OFF));
+void sysShutdown() {
+    asm volatile("swi %c0" :: "i"(Constants::SWI::SHUTDOWN));
 }
 
 int sysHalt() {

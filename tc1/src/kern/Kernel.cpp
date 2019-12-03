@@ -250,8 +250,8 @@ void Kernel::handle(int* stackPointer)  {
                 activeTask->returnValue = handleAwaitEvent((int)arg1);
                 break;
 
-            case Constants::SWI::SWITCH_OFF:
-                handleSwitchOff();
+            case Constants::SWI::SHUTDOWN:
+                handleShutdown();
                 break;
 
             case Constants::SWI::HALT:

@@ -24,7 +24,7 @@ void marklinServer() {
     int RXC = Create(4, uart1rxCourier);
     int sensorCourier = Create(5, marklinSensorCourier);
     bool reading = false;
-    bool switching = false;
+    // bool switching = false; // TODO: use this
     bool txcReady = false;
     int tid, result;
     char msg[Constants::TerminalServer::MSG_SIZE];
@@ -178,7 +178,18 @@ void marklinServer() {
             }
 
             // Reply to sensor client will occur when all sensor banks have been read
-        } else {
+        } else if (mh->type == Constants::MSG::STOP) {
+            outbuf.push(Constants::MarklinConsole::STOP_CONSOLE);
+
+            // Send a character if possible
+            if (!outbuf.empty() && txcReady && !reading) {
+                txmsg.ch = outbuf.pop();
+                Reply(TXC, (char*)&txmsg, txmsg.size());
+                txcReady = false;
+            }
+
+            Reply(tid, (char*)&rdymsg, rdymsg.size());
+        }else {
             bwprintf(COM2, "Marklin Server - Recieved message with invalid type!\r\n");
         }
     }

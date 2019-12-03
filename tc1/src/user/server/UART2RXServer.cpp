@@ -10,12 +10,8 @@
 #define FOREVER for (;;)
 
 void uart2rxServer() {
-    // bwprintf(COM2, "UART2RX Server - entered server\n\r");
-
-    // Server variables
     int tid;
     char msg[Constants::UART2RXServer::MSG_SIZE];
-    int msglen;
     char reply[Constants::UART2RXServer::RP_SIZE];
     UART uart2 = UART(UART2_BASE);
     DataStructures::RingBuffer<char, Constants::UART2RXServer::BUFFER_SIZE> rbuf;
@@ -24,11 +20,9 @@ void uart2rxServer() {
     RegisterAs("UART2RX");
 
     int notifierTid = Create(0, uart2rxNotifier);
-    // bwprintf(COM2, "UART2RX Server - created notifier with tid %d\n\r", notifierTid);
-
 
     FOREVER {
-        msglen = Receive(&tid, msg, Constants::UART2RXServer::MSG_SIZE);
+        Receive(&tid, msg, Constants::UART2RXServer::MSG_SIZE);
 
         if (tid == notifierTid) {
             // We've been notified that uart2 is ready to be read, so read everything into buffer
@@ -44,7 +38,6 @@ void uart2rxServer() {
                 Reply(tid, reply, 1);
             }
             uart2.enableRXInterrupt();
-            // bwprintf(COM2, "UART2RX Server - re-enabling interrupts\n\r");
         } else {
             // Request is coming from the kernel, so return a character from the read buffer
             if (rbuf.empty()) {

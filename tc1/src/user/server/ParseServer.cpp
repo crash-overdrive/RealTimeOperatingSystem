@@ -441,7 +441,7 @@ void parseServer() {
 
                 Reply(tid, (char *)&rdymsg, rdymsg.size());
                 // TODO: make this send to commandCourier
-                SwitchOff();
+                Shutdown();
             } else {
                 Reply(tid, (char*)&errmsg, errmsg.size());
             }

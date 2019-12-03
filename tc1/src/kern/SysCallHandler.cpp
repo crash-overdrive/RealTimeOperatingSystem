@@ -226,7 +226,7 @@ void Kernel::handleInterrupt(DataStructures::RingBuffer<TaskDescriptor *, Consta
     }
 }
 
-void Kernel::handleSwitchOff() {
+void Kernel::handleShutdown() {
     activeTask->taskState = Constants::STATE::ZOMBIE;
     while (!ready_queue.empty()) {
         TaskDescriptor* taskDescriptor = ready_queue.pop();

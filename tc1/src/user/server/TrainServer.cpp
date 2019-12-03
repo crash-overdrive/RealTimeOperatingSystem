@@ -191,12 +191,12 @@ int TrainServer::getDirection(int i) {
         case NODE_EXIT:
             bwprintf(COM2, "Train Server - Unexpected EXIT direction from %s", currnode->name);
             // bwprintf(COM2, "Train Server - Do we even support EXIT location updates? %d %d %s", trains[i].number, trains[i].location.landmark, currnode->name);
-            SwitchOff();
+            Shutdown();
             break;
         case NODE_NONE:
             bwprintf(COM2, "Train Server - Unexpected NONE direction from %s", currnode->name);
             // bwprintf(COM2, "Train Server - Do we even support NONE location updates? %d %d %s", trains[i].number, trains[i].location.landmark, currnode->name);
-            SwitchOff();
+            Shutdown();
             break;
         default:
             bwprintf(COM2, "Train Server - Unexpected NODE_TYPE %d received in getDirection() from %s with index %d", currnode->type, currnode->name, currnode - track.trackNodes);

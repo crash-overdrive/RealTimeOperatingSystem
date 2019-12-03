@@ -10,12 +10,8 @@
 #define FOREVER for (;;)
 
 void uart2txServer() {
-    // bwprintf(COM2, "UART2TX Server - entered server\n\r");
-
-    // Server variables
     int tid;
     char msg[Constants::UART2TXServer::MSG_SIZE];
-    int msglen;
     char reply[Constants::UART2TXServer::RP_SIZE];
     int result;
     UART uart2 = UART(UART2_BASE);
@@ -27,15 +23,12 @@ void uart2txServer() {
     RegisterAs("UART2TX");
 
     int notifierTid = Create(0, uart2txNotifier);
-    // bwprintf(COM2, "UART2TX Server - created notifier with tid %d\n\r", notifierTid);
 
     FOREVER {
-        msglen = Receive(&tid, msg, Constants::UART2TXServer::MSG_SIZE);
+        Receive(&tid, msg, Constants::UART2TXServer::MSG_SIZE);
 
         if (tid == notifierTid) {
             // We've been notified that uart2 is ready for transmission so flush as much of buffer as possible
-
-            // bwprintf(COM2, "N");
             blocked = false;
             reply[0] = Constants::Server::ACK;
             result = Reply(tid, reply, 1);
@@ -43,20 +36,12 @@ void uart2txServer() {
                 bwprintf(COM2, "UART2TXServer - An error was returned from Reply");
             }
 
-            // while (!uart2.isClearToSend()) {
-            //     // This is a trap
-            // }
-
             // While uart2 can transmit, push characters
             if (uart2.isTXEmpty() &&  !txbuf.empty()) {
                 uart2.putc(txbuf.pop());
                 blocked = true;
                 uart2.enableTXInterrupt();
             }
-            // If we have characters to transmit and uart2 is full, enable transmission interrupts
-            // if (uart2.isTXFull() && !txbuf.empty()) {
-            //     uart2.enableTXInterrupt();
-            // }
 
             // Move data from the wait buffer to the transmit buffer
             while (!waitbuf.empty() && !txbuf.full()) {
@@ -82,12 +67,6 @@ void uart2txServer() {
                 uart2.enableTXInterrupt();
                 blocked = true;
             }
-            // If we have characters to transmit and uart2 is full, enable transmission interrupts
-            // if (uart2.isTXFull() && !txbuf.empty()) {
-            //     uart2.enableTXInterrupt();
-            // }
-
-            // bwprintf(COM2, "bs %d", txbuf.size());
         }
     }
 }

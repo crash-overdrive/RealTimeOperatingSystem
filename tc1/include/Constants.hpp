@@ -37,7 +37,7 @@ namespace Constants {
         const char STRAIGHT_SWITCH = (char)33;
         const char CURVED_SWITCH = (char)34;
         const char GO = (char)96;
-        const char STOP = (char)97;
+        const char STOP_CONSOLE = (char)97;
         const char REQUEST_5_SENSOR_DATA = (char)133;
         const char SET_RESET_ON_FOR_SENSORS = (char)192;
     }
@@ -172,7 +172,7 @@ namespace Constants {
         REPLY,
         AWAIT_EVENT,
         HALT,
-        SWITCH_OFF
+        SHUTDOWN
     };
 
     enum EVENTS {

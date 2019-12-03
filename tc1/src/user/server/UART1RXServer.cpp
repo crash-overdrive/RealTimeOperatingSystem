@@ -10,12 +10,8 @@
 #define FOREVER for (;;)
 
 void uart1rxServer() {
-    // bwprintf(COM2, "UART1RX Server - entered server\n\r");
-
-    // Server variables
     int tid;
     char msg[Constants::UART1RXServer::MSG_SIZE];
-    int msglen;
     char reply[Constants::UART1RXServer::RP_SIZE];
     UART uart1 = UART(UART1_BASE);
     DataStructures::RingBuffer<char, Constants::UART1RXServer::BUFFER_SIZE> rbuf;
@@ -24,11 +20,9 @@ void uart1rxServer() {
     RegisterAs("UART1RX");
 
     int notifierTid = Create(0, uart1rxNotifier);
-    // bwprintf(COM2, "UART1RX Server - created notifier with tid %d\n\r", notifierTid);
-
 
     FOREVER {
-        msglen = Receive(&tid, msg, Constants::UART1RXServer::MSG_SIZE);
+        Receive(&tid, msg, Constants::UART1RXServer::MSG_SIZE);
 
         if (tid == notifierTid) {
             // We've been notified that uart1 is ready to be read, so read everything into buffer

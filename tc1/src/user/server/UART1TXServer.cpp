@@ -10,12 +10,8 @@
 #define FOREVER for (;;)
 
 void uart1txServer() {
-    // bwprintf(COM2, "UART1TX Server - entered server\n\r");
-
-    // Server variables
     int tid;
     char msg[Constants::UART1TXServer::MSG_SIZE];
-    int msglen;
     char reply[Constants::UART1TXServer::RP_SIZE];
     int result;
     UART uart1 = UART(UART1_BASE);
@@ -27,10 +23,9 @@ void uart1txServer() {
     RegisterAs("UART1TX");
 
     int notifierTid = Create(0, uart1txNotifier);
-    // bwprintf(COM2, "UART1TX Server - created notifier with tid %d\n\r", notifierTid);
 
     FOREVER {
-        msglen = Receive(&tid, msg, Constants::UART1TXServer::MSG_SIZE);
+        Receive(&tid, msg, Constants::UART1TXServer::MSG_SIZE);
 
         if (tid == notifierTid) {
             // We've been notified that uart1 is ready for transmission so flush as much of buffer as possible
@@ -47,10 +42,6 @@ void uart1txServer() {
                 blocked = true;
                 uart1.enableTXInterrupt();
             }
-            // If we have characters to transmit and uart1 is full, enable transmission interrupts
-            // if (uart1.isTXFull() && !txbuf.empty()) {
-            //     uart1.enableTXInterrupt();
-            // }
 
             // Move data from the wait buffer to the transmit buffer
             while (!waitbuf.empty() && !txbuf.full()) {
@@ -76,10 +67,6 @@ void uart1txServer() {
                 uart1.enableTXInterrupt();
                 blocked = true;
             }
-            // If we have characters to transmit and uart1 is full, enable transmission interrupts
-            // if (uart1.isTXFull() && !txbuf.empty()) {
-            //     uart1.enableTXInterrupt();
-            // }
         }
     }
 }

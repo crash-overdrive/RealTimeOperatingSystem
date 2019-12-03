@@ -65,7 +65,7 @@ class Kernel {
         int handleAwaitEvent(int eventId);
         int handleHalt();
         void handleExit();
-        void handleSwitchOff();
+        void handleShutdown();
 
         // void handleInterrupt(int data, DataStructures::RingBuffer<TaskDescriptor, Constants::NUM_TASKS> &blockQueue);
         void handleInterrupt(DataStructures::RingBuffer<TaskDescriptor *, Constants::NUM_TASKS> &blockQueue);
