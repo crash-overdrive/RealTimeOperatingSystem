@@ -331,14 +331,14 @@ void NavigationServer::reserveTrack() {
         int trackIndex = reservationsList.pop();
         track.trackNodes[trackIndex].reserved = true;
         track.trackNodes[trackIndex].reverseNode->reserved = true;
-        // bwprintf(COM2, "Reserved %s %s\n\r", track.trackNodes[trackIndex].name, track.trackNodes[trackIndex].reverseNode->name);
+        bwprintf(COM2, "Reserved %s %s\n\r", track.trackNodes[trackIndex].name, track.trackNodes[trackIndex].reverseNode->name);
     }
 }
 
 void NavigationServer::unreserveTrack(int trackIndex) {
     track.trackNodes[trackIndex].reserved = false;
     track.trackNodes[trackIndex].reverseNode->reserved = false;
-    // bwprintf(COM2, "Unreserved %s %s\n\r", track.trackNodes[trackIndex].name, track.trackNodes[trackIndex].reverseNode->name);
+    bwprintf(COM2, "Unreserved %s %s\n\r", track.trackNodes[trackIndex].name, track.trackNodes[trackIndex].reverseNode->name);
 }
 
 bool NavigationServer::findPath() {
@@ -406,7 +406,7 @@ bool NavigationServer::findPath() {
                 int trackIndexAhead = track.trackNodes[currentTrackIndex].edges[DIR_AHEAD].destNode - &track.trackNodes[0];
                 int trackIndexReverse = track.trackNodes[currentTrackIndex].reverseNode - &track.trackNodes[0];
                 if (nextTrackIndex == -1) {
-                    sensorDistance = 100;
+                    sensorDistance = 0;
                     landmarkDistanceLists[trainIndex].push(sensorDistance);
                 } else if (trackIndexAhead == nextTrackIndex) {
                     sensorDistance += track.trackNodes[currentTrackIndex].edges[DIR_AHEAD].dist;
@@ -534,13 +534,12 @@ bool NavigationServer::findPath() {
     return true;
 }
 
-int NavigationServer::journeyLeft(int trainIndex) {
-    ASSERT(paths[trainIndex].peek() == lastKnownLocations[trainIndex].landmark);
+int NavigationServer::journeyLeft(int trainIndex, int offset) {
 
     DataStructures::Stack<int, TRACK_MAX> tempPath;
     DataStructures::Stack<int, 40> tempDistanceList;
 
-    int distance = 0;
+    int distance = offset;
 
     while (!paths[trainIndex].empty()) {
         int trackIndex = paths[trainIndex].pop();
@@ -554,70 +553,71 @@ int NavigationServer::journeyLeft(int trainIndex) {
         paths[trainIndex].push(tempPath.pop());
         landmarkDistanceLists[trainIndex].push(tempDistanceList.pop());
     }
-    return distance - lastKnownLocations[trainIndex].offset;
+    return distance ;
 }
 
 void NavigationServer::evaluate(int trainIndex) {
     DataStructures::Stack<int, 40> tempPath;
     DataStructures::Stack<int, 40> tempDistanceList;
 
-    // Get lastKnownLocation for the train and pop path and landmarkDistance list to match the lastKnownLocation
     Location location = lastKnownLocations[trainIndex];
-    while(paths[trainIndex].peek() != lastKnownLocations[trainIndex].landmark && !paths[trainIndex].empty()) {
-        tempPath.push(paths[trainIndex].pop());
-        tempDistanceList.push(landmarkDistanceLists[trainIndex].pop());
+    if (paths[trainIndex].peek() != location.landmark) {
+        bwprintf(COM2, "Mismatch, expect %s got %s\n\r", track.trackNodes[paths[trainIndex].peek()].name, track.trackNodes[location.landmark].name);
     }
+    ASSERT(paths[trainIndex].peek() == location.landmark);
+    int distance = 0;
 
-    // TODO: uncomment the assert and remove the debug statement
-    if (paths[trainIndex].empty()) {
-        bwprintf(COM2, "Got invalid location: %s%d from Train Server: %s %d\n\r", track.trackNodes[location.landmark].name, location.offset, track.trackNodes[(int)location.landmark].name, location.offset);
-    }
-    ASSERT(!(paths[trainIndex].empty()));
-
-    int distanceLeft = journeyLeft(trainIndex);
-    // bwprintf(COM2, "left %d thresh %d speed %d\n\r", distanceLeft, Train::stoppingDistances[trainIndex][trainSpeed[trainIndex]], trainSpeed[trainIndex]);
-
-    // the offset should be less than the landmarkDistance to the next landmark
-    if (location.offset > landmarkDistanceLists[trainIndex].peek()) {
-        bwprintf(COM2, "Offset too large %s given: %d, max: %d\n\r", track.trackNodes[location.landmark].name, location.offset, landmarkDistanceLists[trainIndex].peek());
-    }
-    ASSERT(location.offset < landmarkDistanceLists[trainIndex].peek());
-    int distance = 300 + location.offset;
-
-    while (distance > 0 && !paths[trainIndex].empty()) {
+    while (distance < location.offset && !paths[trainIndex].empty()) {
         int trackIndex = paths[trainIndex].pop();
+        // bwprintf(COM2, "Ignored %s as its already been evaluated\n\r", track.trackNodes[trackIndex].name);
         int landMarkDistance = landmarkDistanceLists[trainIndex].pop();
         tempPath.push(trackIndex);
         tempDistanceList.push(landMarkDistance);
-        distance = distance - landMarkDistance;
+        distance = distance + landMarkDistance;
+    }
+    if (paths[trainIndex].empty()) {
+        // bwprintf(COM2, "Finished evaluating\n\r");
+        ASSERT(reverseList[trainIndex].empty());
+        ASSERT(branchList[trainIndex].empty());
+    } else {
+        distance = distance - location.offset;
+        int distanceLeft = journeyLeft(trainIndex, distance);
+        while (distance < 300 && !paths[trainIndex].empty()) {
+            int trackIndex = paths[trainIndex].pop();
+            int landMarkDistance = landmarkDistanceLists[trainIndex].pop();
+            tempPath.push(trackIndex);
+            tempDistanceList.push(landMarkDistance);
+            distance = distance + landMarkDistance;
 
-        if(branchList[trainIndex].peek().number == trackIndex) {
-            bwprintf(COM2, "Found branch %s at %s %d\n\r", track.trackNodes[trackIndex].name, track.trackNodes[(int)location.landmark].name, location.offset);
-            SW sw = branchList[trainIndex].pop();
+            if(branchList[trainIndex].peek().number == trackIndex) {
+                bwprintf(COM2, "Found branch %s at %s %d\n\r", track.trackNodes[trackIndex].name, track.trackNodes[location.landmark].name, location.offset);
+                SW sw = branchList[trainIndex].pop();
+                TrackCommand trackCommand;
+                trackCommand.type = COMMANDS::SWITCH;
+                trackCommand.tr_sw_rv.sw.number = track.trackNodes[sw.number].num;
+                trackCommand.tr_sw_rv.sw.orientation = sw.orientation;
+                queueCommand(trackCommand);
+            } else if (reverseList[trainIndex].peek() == trackIndex) {
+                bwprintf(COM2, "Found reverse %s at %s %d\n\r", track.trackNodes[trackIndex].name, track.trackNodes[location.landmark].name, location.offset);
+                reverseList[trainIndex].pop();
+                TrackCommand trackCommand;
+                trackCommand.type = COMMANDS::REVERSE;
+                trackCommand.tr_sw_rv.rv.train = Train::getTrainNumber(trainIndex);
+                queueCommand(trackCommand);
+            }
+        }
+
+        if (distanceLeft < Train::stoppingDistances[trainIndex][trainSpeed[trainIndex]] / 1000 && !stopCommandSent[trainIndex]) { // && reverseList[trainIndex].empty()) {
+            bwprintf(COM2, "Stop Loc: %s %d, dist left: %d, Stop dist: %d", track.trackNodes[location.landmark].name, location.offset, distanceLeft, Train::stoppingDistances[trainIndex][trainSpeed[trainIndex]]);
+            stopCommandSent[trainIndex] = true;
+            bwprintf(COM2, "Stop sent\n\r");
+            // STOP TRAIN
             TrackCommand trackCommand;
-            trackCommand.type = COMMANDS::SWITCH;
-            trackCommand.tr_sw_rv.sw.number = track.trackNodes[(int)sw.number].num;
-            trackCommand.tr_sw_rv.sw.orientation = sw.orientation;
-            queueCommand(trackCommand);
-        } else if (reverseList[trainIndex].peek() == trackIndex) {
-            bwprintf(COM2, "Found reverse %s at %s %d\n\r", track.trackNodes[trackIndex].name, track.trackNodes[(int)location.landmark].name, location.offset);
-            reverseList[trainIndex].pop();
-            TrackCommand trackCommand;
-            trackCommand.type = COMMANDS::REVERSE;
-            trackCommand.tr_sw_rv.rv.train = Train::getTrainNumber(trainIndex);
+            trackCommand.type = COMMANDS::TRAIN;
+            trackCommand.tr_sw_rv.tr.train = Train::getTrainNumber(trainIndex);
+            trackCommand.tr_sw_rv.tr.speed = 0;
             queueCommand(trackCommand);
         }
-    }
-    if (distanceLeft < Train::stoppingDistances[trainIndex][trainSpeed[trainIndex]] / 1000 && !stopCommandSent[trainIndex]) { // && reverseList[trainIndex].empty()) {
-        stopCommandSent[trainIndex] = true;
-        bwprintf(COM2, "Stop sent\n\r");
-        // TODO: fix this....
-        // STOP TRAIN
-        TrackCommand trackCommand;
-        trackCommand.type = COMMANDS::TRAIN;
-        trackCommand.tr_sw_rv.tr.train = Train::getTrainNumber(trainIndex);
-        trackCommand.tr_sw_rv.tr.speed = 0;
-        queueCommand(trackCommand);
     }
 
     while (!tempPath.empty()) {
@@ -633,6 +633,8 @@ void NavigationServer::navigate() {
         //first update the lastKnownLocation and then evaluate the train
         Location* newLocation = &(locmsg->locationInfo[locationInfoIndex].location);
         lastKnownLocations[trainIndex] = Location(newLocation->landmark, newLocation->offset / 1000);
+
+        // bwprintf(COM2, "Got L:%s %d, expect: %s", track.trackNodes[newLocation->landmark].name, newLocation->offset, track.trackNodes[paths[trainIndex].peek()].name);
 
         evaluate(trainIndex);
     }

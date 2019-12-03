@@ -30,12 +30,12 @@ void navCSCourier() {
         }
         if (mh->type == Constants::MSG::TR) {
             result = Send(CS, (char*)trmsg, trmsg->size(), (char *)&rdymsg, rdymsg.size());
-            // bwprintf(COM2, "<tr %d %d>\n\r", trmsg->train, trmsg->speed);
+            bwprintf(COM2, "<tr %d %d>\n\r", trmsg->train, trmsg->speed);
         } else if (mh->type == Constants::MSG::RV) {
             result = Send(CS, (char*)rvmsg, rvmsg->size(), (char *)&rdymsg, rdymsg.size());
-            // bwprintf(COM2, "<rv %d>\n\r", rvmsg->train);
+            bwprintf(COM2, "<rv %d>\n\r", rvmsg->train);
         } else if (mh->type == Constants::MSG::SW) {
-            // bwprintf(COM2, "<sw %d %c>\n\r", swmsg->sw, swmsg->state);
+            bwprintf(COM2, "<sw %d %c>\n\r", swmsg->sw, swmsg->state);
             result = Send(CS, (char*)swmsg, swmsg->size(), (char *)&rdymsg, rdymsg.size());
         } else {
             bwprintf(COM2, "NAV->CS Courier - Expected TR,RV,SW message but received unexpected message type %d\r\n", mh->type);

@@ -92,7 +92,7 @@ class NavigationServer {
         void predictSensors(); // only called when we get SENSOR_ATTRIBUTE msg, pops sensor List, sensorDistance List path and landmarkDistance List
         void initSensorPredictions(); // only called when findPath() was successful
         bool findPath(); // only called when we get RT msg
-        int journeyLeft(int trainIndex); // returns journey left for travel, assumes path is matched up to lastKnownLocation
+        int journeyLeft(int trainIndex, int offset); // returns journey left for travel, assumes path is matched up to lastKnownLocation
         void evaluate(int trainIndex); // evaluates next 300mm of path for train, calls queueCommand appropriately
         void navigate(); // only called when we get LOCATION msg
 

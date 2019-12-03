@@ -75,12 +75,13 @@ void TrainServer::attributeSensors() {
 
                 // Update train info
                 trains[j].trainInfo.prev = trains[j].nextSensor[0];
-                if (trains[j].aheadOfPrediction[0]) {
-                    trains[j].trainInfo.distanceDelta = trains[j].location.offset/1000; // TODO: fix this to use distance since we became "ahead of sensor"
-                    trains[j].aheadOfPrediction[0] = false;
-                } else {
-                    trains[j].trainInfo.distanceDelta = currnode->edges[getDirection(j)].dist - trains[j].location.offset/1000; // TODO: fix this too
-                }
+                trains[j].trainInfo.distanceDelta = trains[j].location.offset/1000;
+                // if (trains[j].aheadOfPrediction[0]) {
+                //      // TODO: fix this to use distance since we became "ahead of sensor"
+                //     trains[j].aheadOfPrediction[0] = false;
+                // } else {
+                //     trains[j].trainInfo.distanceDelta = currnode->edges[getDirection(j)].dist - trains[j].location.offset/1000; // TODO: fix this too
+                // }
                 trains[j].trainInfo.timeDelta = attributionTime - trains[j].lastAttributionTime - trains[j].trainInfo.predictedTime;
                 trains[j].lastAttributionTime = attributionTime;
 
@@ -216,7 +217,7 @@ void TrainServer::updateLocation() {
             // acceleration
             if (trainVelocity[i] < Train::velocities[i][(int)trains[i].speed]) {
                 // TODO: fix this
-                trainVelocity[i] = trainVelocity[i] + Train::accelerations[i][(int)trains[i].speed] * 2 * delta / 100;
+                trainVelocity[i] = trainVelocity[i] + Train::accelerations[i][(int)trains[i].speed] * delta / 200;
                 if (trainVelocity[i] > Train::velocities[i][(int)trains[i].speed]) {
                     trainVelocity[i] = Train::velocities[i][(int)trains[i].speed];
                 }
@@ -237,23 +238,23 @@ void TrainServer::updateLocation() {
             int dist = trainVelocity[i] * delta / 100;
             // bwprintf(COM2, "Dist: %d\n\r", dist);
             // Update train location
-            TrackNode *currnode = &track.trackNodes[(int)trains[i].location.landmark];
+            // TrackNode *currnode = &track.trackNodes[(int)trains[i].location.landmark];
             trains[i].location.offset += dist;
-            int direction = DIR_AHEAD;
-            direction = getDirection(i);
-            dist = trains[i].location.offset - currnode->edges[direction].dist * 1000;
-            while (dist >= 0) {
-                int index = (currnode->edges[direction].destNode - track.trackNodes);
-                trains[i].location.landmark = (char)index;
-                trains[i].location.offset = dist;
-                direction = getDirection(i);
-                dist = trains[i].location.offset - currnode->edges[direction].dist * 1000;
-            }
+            // int direction = DIR_AHEAD;
+            // direction = getDirection(i);
+            // dist = trains[i].location.offset - currnode->edges[direction].dist * 1000;
+            // while (dist >= 0) {
+            //     int index = (currnode->edges[direction].destNode - track.trackNodes);
+            //     trains[i].location.landmark = (char)index;
+            //     trains[i].location.offset = dist;
+            //     direction = getDirection(i);
+            //     dist = trains[i].location.offset - currnode->edges[direction].dist * 1000;
+            // }
 
             // Check to see if we're ahead of our next predicted sensor
-            if (!trains[i].aheadOfPrediction[0] && trains[i].location.landmark == Track::getIndex(trains[i].nextSensor[0])) {
-                trains[i].aheadOfPrediction[0] = true;
-            }
+            // if (!trains[i].aheadOfPrediction[0] && trains[i].location.landmark == Track::getIndex(trains[i].nextSensor[0])) {
+            //     trains[i].aheadOfPrediction[0] = true;
+            // }
 
             // Add train to location message
             locmsg.locationInfo[locmsg.count].train = trains[i].number;
@@ -279,9 +280,9 @@ void TrainServer::sendMarklin() {
     if (trmsg->speed == 15) {
         // TODO: use to delay if needed
         TrackNode *currnode = &track.trackNodes[(int)trains[index].location.landmark];
-        int direction = getDirection(index);
-        train->location.offset = currnode->edges[direction].dist * 1000 + 20000 - train->location.offset;
-        train->location.landmark = currnode->edges[direction].destNode->reverseNode - track.trackNodes;
+        // int direction = getDirection(index);
+        // train->location.offset = currnode->edges[direction].dist * 1000 + 20000 - train->location.offset;
+        // train->location.landmark = currnode->edges[direction].destNode->reverseNode - track.trackNodes;
         train->reverse = !train->reverse;
     }
     setTrainSpeed(index, trmsg->speed);
