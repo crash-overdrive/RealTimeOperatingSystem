@@ -243,12 +243,16 @@ void TrainServer::updateLocation() {
             direction = getDirection(i);
             dist = trains[i].location.offset - currnode->edges[direction].dist * 1000;
             while (dist >= 0) {
-                int index = (currnode->edges[direction].destNode - track.trackNodes);
-                trains[i].location.landmark = (char)index;
-                currnode = &track.trackNodes[(int)trains[i].location.landmark];
-                trains[i].location.offset = dist;
-                direction = getDirection(i);
-                dist = trains[i].location.offset - currnode->edges[direction].dist * 1000;
+                if (currnode->edges[direction].destNode->type == NODE_TYPE::NODE_EXIT) {
+                    trains[i].location.offset = 0;
+                } else {
+                    int index = (currnode->edges[direction].destNode - track.trackNodes);
+                    trains[i].location.landmark = (char)index;
+                    currnode = &track.trackNodes[(int)trains[i].location.landmark];
+                    trains[i].location.offset = dist;
+                    direction = getDirection(i);
+                    dist = trains[i].location.offset - currnode->edges[direction].dist * 1000;
+                }
             }
 
             // Check to see if we're ahead of our next predicted sensor
